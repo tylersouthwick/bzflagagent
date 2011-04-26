@@ -10,7 +10,9 @@ repositories {
 dependencies {
 	scalaTools 'org.scala-lang:scala-compiler:2.8.1'
 	scalaTools 'org.scala-lang:scala-library:2.8.1'
-	compile'org.scala-lang:scala-library:2.8.1'
+	compile 'org.scala-lang:scala-library:2.8.1'
+	compile 'commons-cli:commons-cli:1.2'
+	compile 'log4j:log4j:1.2.16'
 }
 
 jar {
