@@ -9,12 +9,13 @@ class MyTank(line : String) {
 	val shotsAvailable = splitter.getInt
 	val timeToReload = splitter.getFloat
 	val flag = splitter.getString
-	val x = splitter.getInt
-	val y = splitter.getInt
+	val location = splitter.getPoint
 	val angle = splitter.getFloat
 	val vx = splitter.getFloat
 	val xy = splitter.getFloat
 	val angvel = splitter.getFloat
+
+	override def toString = callsign + "@" + location
 }
 
 class OtherTank(line : String) {
@@ -26,6 +27,8 @@ class OtherTank(line : String) {
     val flag = splitter.getString
     val location = new Point(splitter.getFloat, splitter.getFloat)
     val angle = splitter.getFloat
+
+	override def toString = callsign + "[" + color + "] @" + location
 }
 
 class Shot(line : String) {
