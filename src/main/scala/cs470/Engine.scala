@@ -5,7 +5,7 @@ object Engine {
 }
 
 class Engine(host : String, port : Int) {
-	val queue = new BzrcQueue(host, port)
+	private val queue = new BzrcQueue(host, port)
 
 	def start {
 		val agent = new Agent(1)

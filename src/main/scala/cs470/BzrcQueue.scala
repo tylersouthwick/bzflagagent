@@ -5,12 +5,12 @@ import Actor._
 
 class BzrcQueue(host: String, port: Int) {
 
-	val LOG = org.apache.log4j.Logger.getLogger(classOf[BzrcQueue])
+	private val LOG = org.apache.log4j.Logger.getLogger(classOf[BzrcQueue])
 
-	case class ItemAvailable()
+	private case class ItemAvailable()
 
-	val con = new BzFlagConnection(host, port)
-	val callbacks = new java.util.concurrent.ConcurrentLinkedQueue[BzFlagConnection => Unit]
+	private val con = new BzFlagConnection(host, port)
+	private val callbacks = new java.util.concurrent.ConcurrentLinkedQueue[BzFlagConnection => Unit]
 
 
 	def invoke(callback: BzFlagConnection => Unit) {
@@ -33,7 +33,7 @@ class BzrcQueue(host: String, port: Int) {
 		}
 	}
 
-	val queue = actor {
+	private val queue = actor {
 		loop {
 			react {
 				case ItemAvailable => {
