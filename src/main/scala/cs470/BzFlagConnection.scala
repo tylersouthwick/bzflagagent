@@ -140,6 +140,12 @@ class BzFlagConnection(host : String, port : Int) {
 		}
 	}
 
+	def occgrid(agent : Int) {
+		send("occgrid " + agent)
+		receive { line =>
+			LOG.debug("occgrid :: " + line)
+		}
+	}
 }
 
 class Splitter(line : String) {
