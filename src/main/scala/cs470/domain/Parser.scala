@@ -24,12 +24,12 @@ class Parser(prefix : String, line : String) {
     def getPoint = new Point(getFloat, getFloat)
     def getVector = getPoint
 
-    def points : Seq[Point] = {
+    def points = {
         val list = new java.util.LinkedList[Point]
         while (hasMore) {
             list.add(new Point(getFloat, getFloat))
         }
-        list
+        new Polygon(list)
     }
 
     def hasMore = i < tokens.length

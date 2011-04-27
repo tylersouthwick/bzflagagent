@@ -18,6 +18,4 @@ class Obstacle(line : String) {
     val points = splitter.points
 }
 
-class Point(x : Float, y : Float)
-
 // vim: set ts=4 sw=4 et:
