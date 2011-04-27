@@ -1,7 +1,7 @@
 package cs470.domain
 
 class Team(line : String) {
-    val splitter = new Parser("team", line)
+    private val splitter = new Parser("team", line)
     val color = splitter.getString
     val playerCount = splitter.getInt
 }

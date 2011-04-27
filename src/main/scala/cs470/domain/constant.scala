@@ -1,7 +1,7 @@
 package cs470.domain
 
 class Constant(line : String) {
-    val splitter = new Parser("constant", line)
+    private val splitter = new Parser("constant", line)
     val name = splitter.getString
     val value = splitter.getString
 }

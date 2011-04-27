@@ -1,7 +1,7 @@
 package cs470.domain
 
 class MyTank(line : String) {
-	val splitter = new Parser("mytank", line)
+	private val splitter = new Parser("mytank", line)
 
 	val id = splitter.getInt
 	val callsign = splitter.getString
@@ -18,7 +18,7 @@ class MyTank(line : String) {
 }
 
 class OtherTank(line : String) {
-    val splitter = new Parser("othertank", line)
+    private val splitter = new Parser("othertank", line)
 
     val callsign = splitter.getString
     val color = splitter.getString
@@ -29,7 +29,7 @@ class OtherTank(line : String) {
 }
 
 class Shot(line : String) {
-    val splitter = new Parser("shot", line)
+    private val splitter = new Parser("shot", line)
     val location = splitter.getPoint
     val speed = splitter.getVector
 }
