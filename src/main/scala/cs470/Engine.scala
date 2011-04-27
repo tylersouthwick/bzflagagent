@@ -5,30 +5,33 @@ object Engine {
 }
 
 class Engine(host : String, port : Int) {
-	val con = new BzFlagConnection(host, port)
+	val queue = new BzrcQueue(host, port)
 
 	def start {
-		val tanks = con.mytanks
+		val agent = new Agent(1)
 
-/*
-		tanks.foreach{tank =>
-			con.speed(tank.id, 1)
-		}
-		con.constants
-		con.othertanks
-		con.mytanks
-		con.teams
-		con.obstacles
-		con.shots
-		con.flags
-		con.bases
-		*/
-
-        con.obstacles
-        con.bases
-        con.flags
-        con.occgrid(0)
+		agent.speed(1)
+		while(true) {}
 	}
+
+	/*
+	def obstacles = con.obstacles
+	def tanks = con.othertanks.filter(_.color == "red")
+	val flag = con.flags.filter(_.color == "red").apply(0)
+	*/
+
+	class Agent(id : Int) {
+		def speed(s : Float) = queue.invoke(_.speed(id, s))
+
+		/*
+		def potentialField = {
+			obstacles.foreach { obstacle =>
+
+			}
+		}
+		*/
+	}
+
 }
 
 // vim: set ts=4 sw=4 et:
