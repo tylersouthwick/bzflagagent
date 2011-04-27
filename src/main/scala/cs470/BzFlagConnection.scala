@@ -13,12 +13,12 @@ object BZRC {
 }
 
 class BzFlagConnection(host : String, port : Int) {
-	val socket = new Socket(host, port)
+	private val socket = new Socket(host, port)
 
 	if (!socket.isConnected) throw new UnableToConnectException
 
-	val in = new BufferedReader(new InputStreamReader(socket.getInputStream))
-	val out = new PrintWriter(socket.getOutputStream, true)
+	private val in = new BufferedReader(new InputStreamReader(socket.getInputStream))
+	private val out = new PrintWriter(socket.getOutputStream, true)
 
 	import BZRC._
 
