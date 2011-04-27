@@ -10,10 +10,10 @@ class Engine(host : String, port : Int) {
 	def start {
 		val tanks = con.mytanks
 
+/*
 		tanks.foreach{tank =>
 			con.speed(tank.id, 1)
 		}
-		/*
 		con.constants
 		con.othertanks
 		con.mytanks
@@ -23,6 +23,11 @@ class Engine(host : String, port : Int) {
 		con.flags
 		con.bases
 		*/
+
+        con.obstacles
+        con.bases
+        con.flags
+        con.occgrid(0)
 	}
 }
 

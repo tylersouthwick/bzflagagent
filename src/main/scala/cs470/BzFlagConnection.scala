@@ -5,6 +5,7 @@ import java.net._
 import java.util._
 import java.lang.{Integer => JInteger}
 import scala.collection.JavaConversions._
+import domain._
 
 object BZRC {
 	val VERSION = 1
@@ -51,7 +52,8 @@ class BzFlagConnection(host : String, port : Int) {
 		}
 	}
 
-	private def receiveItems[T](callback : (String) => T) : Seq[T] = {
+	private def receiveItems[T](command : String, callback : (String) => T) : Seq[T] = {
+        send(command)
 		val begin = readLine
 		if (!"begin".equals(begin)) throw new InvalidBlockException(begin)
 
@@ -79,66 +81,15 @@ class BzFlagConnection(host : String, port : Int) {
 	def accelx(agent : Int, speed : Float) = movement("accelx", agent, speed)
 	def accely(agent : Int, speed : Float) = movement("accely", agent, speed)
 
-	def teams {
-		send("teams")
-		receive { line =>
-			LOG.debug("teams :: " + line)
-		}
-	}
+	def teams = receiveItems("teams", new Team(_))
+	def obstacles = receiveItems("obstacles", new Obstacle(_))
+	def bases = receiveItems("bases", new Base(_))
+	def flags = receiveItems("flags", new Flag(_))
+	def shots = receiveItems("shots", new Shot(_))
+	def mytanks = receiveItems("mytanks", new MyTank(_))
+	def othertanks = receiveItems("othertanks", new OtherTank(_))
 
-	def obstacles {
-		send("obstacles")
-		receive { line =>
-			LOG.debug("obstacles :: " + line)
-		}
-	}
-
-	def bases {
-		send("bases")
-		receive { line =>
-			LOG.debug("bases :: " + line)
-		}
-	}
-
-	def flags {
-		send("flags")
-		receive { line =>
-			LOG.debug("flags :: " + line)
-		}
-	}
-
-	def shots {
-		send("shots")
-		receive { line =>
-			LOG.debug("shots :: " + line)
-		}
-	}
-
-	def mytanks = {
-		send("mytanks")
-		receiveItems { line =>
-			LOG.debug("mytanks :: " + line)
-			new MyTank(line)
-		}
-	}
-
-	def othertanks {
-		send("othertanks")
-		receive { line =>
-			LOG.debug("othertanks :: " + line)
-		}
-	}
-
-	def constants = {
-		send("constants")
-		receiveItems { line =>
-			LOG.debug("Received Line: " + line)
-			val tokens = line.split("\\s")
-			val name = tokens.apply(1)
-			val value = tokens.apply(2)
-			new Constant(name, value)
-		}
-	}
+    def constants = receiveItems("constants", new Constant(_))
 
 	def occgrid(agent : Int) {
 		send("occgrid " + agent)
@@ -148,39 +99,6 @@ class BzFlagConnection(host : String, port : Int) {
 	}
 }
 
-class Splitter(line : String) {
-	private val tokens = line.split("\\s")
-	private var i = 0
-	private def index = {
-		val old = i
-		i = i + 1
-		old
-	}
-	def get = tokens.apply(index)
-	def getInt = Integer.parseInt(get)
-	def getFloat = java.lang.Float.parseFloat(get)
-}
-class Constant(key : String, value : String)
-class MyTank(line : String) {
-	val splitter = new Splitter(line)
-	def get = splitter.get
-	def getInt = splitter.getInt
-	def getFloat = splitter.getFloat
-
-	get
-	val id = getInt
-	val callsign = get
-	val status = get
-	val shotsAvailable = getInt
-	val timeToReload = getFloat
-	val flag = get
-	val x = getInt
-	val y = getInt
-	val angle = getFloat
-	val vx = getFloat
-	val xy = getFloat
-	val angvel = getFloat
-}
 class BZRCException(msg : String) extends Exception(msg)
 class UnableToConnectException extends BZRCException("Unable to connect")
 class InvalidHandshakeException extends BZRCException("Invalid Handshake")
