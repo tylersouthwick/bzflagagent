@@ -4,11 +4,12 @@ import scala.collection.JavaConversions._
 
 object Parser {
     val LOG = org.apache.log4j.Logger.getLogger(classOf[Parser])
+    val debug = LOG.isDebugEnabled
 }
 
 class Parser(prefix : String, line : String) {
-    import Parser.LOG
-    if (LOG.isDebugEnabled) LOG.debug(prefix + " :: " + line)
+    import Parser._
+    if (debug) LOG.debug(prefix + " :: " + line)
 
 	private val tokens = line.split("\\s")
 	private var i = 0
