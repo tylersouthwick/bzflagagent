@@ -5,6 +5,8 @@ import org.apache.log4j.Logger
 
 object Main {
 	val LOG = Logger.getLogger("cs470.Main")
+  val PORT = 7387
+  val HOST = "localhost"
 
 	def main(args : Array[String]) {
 		setupLog4j
@@ -15,24 +17,27 @@ object Main {
 		val port = {
 			if (!cmd.hasOption("p")) {
 				LOG.error("Must specify a port")
-				System.exit(-1)
-			}
-			try {
-				Integer.parseInt(cmd.getOptionValue("p"))
-			} catch {
-				case _ : Throwable => {
-					LOG.error("Invalid port")
-					System.exit(-1)
-					0
-				}
-			}
+        LOG.info("Using default port: " + PORT)
+        PORT
+			} else {
+			  try {
+				  Integer.parseInt(cmd.getOptionValue("p"))
+			  } catch {
+				  case _ : Throwable => {
+					  LOG.error("Invalid port")
+            0
+				  }
+			  }
+      }
 		}
 		val host = {
 			if (!cmd.hasOption("h")) {
 				LOG.error("Must specify a host")
-				System.exit(-1)
-			}
-			cmd.getOptionValue("h")
+        LOG.info("Using default host: " + HOST)
+        HOST
+			} else {
+			  cmd.getOptionValue("h")
+      }
 		}
 
 		Engine.start(host, port)
