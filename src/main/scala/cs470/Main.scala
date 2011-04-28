@@ -27,10 +27,10 @@ object Main {
     }
 
 	def main(args : Array[String]) {
-		setupLog4j
-
 		val parser = new PosixParser
 		val cmd = parser.parse(options, args)
+
+		setupLog4j
 
 		val port = Integer.parseInt(cmd.findAttribute("p", "Must specify port", DEFAULT_PORT))
 		val host = cmd.findAttribute("h", "Must specify host", DEFAULT_HOST)
@@ -44,8 +44,8 @@ object Main {
 	options.addOption("h", true, "host")
 	options.addOption("a", true, "Which Agent " + Agents.all)
 
-	def setupLog4j {
-		org.apache.log4j.BasicConfigurator.configure
+	def setupLog4j() {
+        org.apache.log4j.PropertyConfigurator.configure(classOf[Options].getResource("/logging/log4j.properties"))
 	}
 
 }
