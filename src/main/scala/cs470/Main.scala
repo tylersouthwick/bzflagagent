@@ -7,7 +7,7 @@ import agents.Agents
 object Main {
 	val LOG = Logger.getLogger("cs470.Main")
     val DEFAULT_HOST = "localhost"
-    val DEFAULT_PORT = "5555";
+    val DEFAULT_PORT = "48998";
     val DEFAULT_AGENT = "dummy"
 
     implicit def findAttribute(cmd : CommandLine) = new {
