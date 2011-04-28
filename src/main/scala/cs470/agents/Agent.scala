@@ -9,6 +9,9 @@ import java.lang.Math._
 abstract class Agent(host: String, port: Int) {
   val queue = new BzrcQueue(host, port)
 
+	val constants = queue.invokeAndWait(_.constants)
+	val flags = queue.invokeAndWait(_.flags)
+
   def run
 
   def rad2deg(rad: Float) = {
@@ -34,7 +37,9 @@ abstract class Agent(host: String, port: Int) {
         angle
     }
 
-    def shoot = queue.invoke(_.shoot((tank.id)))
+    def shoot {
+		queue.invoke(_.shoot((tank.id)))
+	}
 
     def moveAngle(theta: Float) = {
       if (tank.status == "dead") {
@@ -53,7 +58,7 @@ abstract class Agent(host: String, port: Int) {
       val Ki = 0.0f
       val tol = 5e-3f
       val tolv = 1e-1f
-      //val dt = 100;
+      val dt = 100;
 
       def getTime = java.util.Calendar.getInstance().getTimeInMillis()
       def timeDifference(start: Long, end: Long) = (end - start).asInstanceOf[Int]
@@ -64,7 +69,7 @@ abstract class Agent(host: String, port: Int) {
       def pdController(error0: Float, ierror: Float, time: Long) {
         val angle = getAngle
         val error = targetAngle - angle
-        val dt = (getTime - time).asInstanceOf[Float]
+        //val dt = (getTime - time).asInstanceOf[Float]
 
         val v = Kp * error + Ki * ierror * dt + Kd * (error - error0) / dt
 
@@ -73,7 +78,7 @@ abstract class Agent(host: String, port: Int) {
           setAngularVelocity(0f)
         } else {
           setAngularVelocity(v.asInstanceOf[Float])
-        // timeout(100) {}
+          sleep(dt)
           pdController(error.asInstanceOf[Float], (ierror + error).asInstanceOf[Float], getTime)
         }
       }
@@ -94,6 +99,8 @@ abstract class Agent(host: String, port: Int) {
       case TIMEOUT => callback
     }
   }
+
+	def sleep(milliseconds : Long) = timeout(milliseconds) {}
 }
 
 trait AgentCreator {
