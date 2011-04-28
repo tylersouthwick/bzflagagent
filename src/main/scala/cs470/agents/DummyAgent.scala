@@ -24,16 +24,16 @@ class DummyAgent(host: String, port: Int) extends Agent(host, port) {
       loop {
         LOG.debug("Tank #" + tank.id + " is moving")
         tank.speed(1.0f)
-		  LOG.debug("set speed")
 
-        timeout(7000) {
-          LOG.debug("Tank #" + tank.id + " is stopping")
-          tank.speed(0.0f)
-          LOG.debug("Tank #" + tank.id + " is rotating")
+        sleep(7000)
 
-          val (angle, time) = tank.moveAngle(60.0f * PI.asInstanceOf[Float] / 180.0f)
-          LOG.debug("Tank #%d rotated %.1f deg (in %d ms)".format(tank.id.asInstanceOf[Int], rad2deg(angle), time))
-        }
+        LOG.debug("Tank #" + tank.id + " is stopping")
+        tank.speed(0.0f)
+
+        LOG.debug("Tank #" + tank.id + " is rotating")
+        val (angle, time) = tank.moveAngle(60.0f * PI.asInstanceOf[Float] / 180.0f)
+        LOG.debug("Tank #%d rotated %.1f deg (in %d ms)".format(tank.id.asInstanceOf[Int], rad2deg(angle), time))
+
       }
     }
 

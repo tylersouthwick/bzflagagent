@@ -58,9 +58,9 @@ abstract class Agent(host: String, port: Int) {
       val Kp = 1f
       val Kd = 4.5f
       val Ki = 0.0f
-      val tol = 5e-3f
-      val tolv = 1e-1f
-      val dt = 100;
+      val tol = 58e-3f
+      val tolv = 1f
+      val dt = 10;
 
       def getTime = java.util.Calendar.getInstance().getTimeInMillis
       def timeDifference(start: Long, end: Long) = (end - start).asInstanceOf[Int]
