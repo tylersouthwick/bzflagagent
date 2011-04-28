@@ -9,8 +9,8 @@ import java.lang.Math._
 abstract class Agent(host: String, port: Int) {
   val queue = new BzrcQueue(host, port)
 
-	val constants = queue.invokeAndWait(_.constants)
-	val flags = queue.invokeAndWait(_.flags)
+  val constants = queue.invokeAndWait(_.constants)
+  val flags = queue.invokeAndWait(_.flags)
 
   def run
 
@@ -27,24 +27,26 @@ abstract class Agent(host: String, port: Int) {
 
     def setAngularVelocity(v: Float) = queue.invoke(_.angvel(tank.id, v))
 
+    def getAngularVelocity = updateTank.angvel
+
     def updateTank = queue.invokeAndWait(_.mytanks.filter(_.id == tank.id).apply(0))
 
     def getAngle = {
       val angle = updateTank.angle
       if (angle < 0)
-        2 * PI + angle
+        (2 * PI + angle).asInstanceOf[Float]
       else
-        angle
+        angle.asInstanceOf[Float]
     }
 
     def shoot {
-		queue.invoke(_.shoot((tank.id)))
-	}
+      queue.invoke(_.shoot((tank.id)))
+    }
 
     def moveAngle(theta: Float) = {
       if (tank.status == "dead") {
         Agents.LOG.debug("Tried to rotate Tank #" + tank.id + " but it is dead")
-        (0f,0)
+        (0f, 0)
       } else {
         computeAngle(theta)
       }
@@ -56,25 +58,21 @@ abstract class Agent(host: String, port: Int) {
       val Kp = 1f
       val Kd = 4.5f
       val Ki = 0.0f
-      val tol = 58e-3f
-      val tolv = 1f
+      val tol = deg2rad(1)
+      val tolv = .1f
       val dt = 10;
+      val maxVel = .7854f //constants("tankangvel")
 
       def getTime = java.util.Calendar.getInstance().getTimeInMillis
       def timeDifference(start: Long, end: Long) = (end - start).asInstanceOf[Int]
 
-      //Agents.LOG.debug("Constants: " + queue.invokeAndWait(_.constants))
-
-      //Agents.LOG.debug("Tank #" + tank.id + " rotating from " + angle + " to " + finalAngle)
       def pdController(error0: Float, ierror: Float, time: Long) {
         val angle = getAngle
         val error = targetAngle - angle
-        //val dt = (getTime - time).asInstanceOf[Float]
 
-        val v = Kp * error + Ki * ierror * dt + Kd * (error - error0) / dt
+        val v = (Kp * error + Ki * ierror * dt + Kd * (error - error0) / dt) / maxVel
 
-        //Agents.LOG.debug("Tank #%d error=%.3f".format(tank.id, abs(error)))
-        if (abs(error) < tol && v < tolv) {
+        if (abs(error) < tol && abs(v) < tolv) {
           setAngularVelocity(0f)
         } else {
           setAngularVelocity(v.asInstanceOf[Float])
@@ -85,30 +83,26 @@ abstract class Agent(host: String, port: Int) {
 
       val startTime = getTime
       pdController(0.0f, 0.0f, startTime)
-
-      val i1 = (getAngle - startingAngle).asInstanceOf[Float]
-      val i2 = timeDifference(startTime, getTime)
-
-      (i1,i2)
+      ((getAngle - startingAngle).asInstanceOf[Float], timeDifference(startTime, getTime))
     }
 
   }
 
-	def timeout(milliseconds : Long) (callback : => Unit) = receiveTimeout(milliseconds)(callback)
+  def timeout(milliseconds: Long)(callback: => Unit) = receiveTimeout(milliseconds)(callback)
 
-	def reactTimeout(milliseconds : Long)(callback: => Unit) {
-		reactWithin(milliseconds) {
-			case TIMEOUT => callback
-		}
-	}
+  def reactTimeout(milliseconds: Long)(callback: => Unit) {
+    reactWithin(milliseconds) {
+      case TIMEOUT => callback
+    }
+  }
 
-	def receiveTimeout(milliseconds : Long)(callback: => Unit) {
-		receiveWithin(milliseconds) {
-			case TIMEOUT => callback
-		}
-	}
+  def receiveTimeout(milliseconds: Long)(callback: => Unit) {
+    receiveWithin(milliseconds) {
+      case TIMEOUT => callback
+    }
+  }
 
-	def sleep(milliseconds : Long) = receiveTimeout(milliseconds) {}
+  def sleep(milliseconds: Long) = receiveTimeout(milliseconds) {}
 }
 
 trait AgentCreator {
