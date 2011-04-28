@@ -19,7 +19,7 @@ class DummyAgent(host: String, port: Int) extends Agent(host, port) {
     LOG.info("Starting tank #" + tank.id + " on dummy path")
 
     //Go forward a bit, then rotate 60 degrees
-    timeout(3000) {
+    timeout(7000) {
         LOG.debug("Tank #" + tank.id + " is stopping")
         tank.speed(0.0f)
         LOG.debug("Tank #" + tank.id + " is rotating")
