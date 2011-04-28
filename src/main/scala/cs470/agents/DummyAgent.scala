@@ -24,7 +24,6 @@ class DummyAgent(host: String, port: Int) extends Agent(host, port) {
       loop {
         LOG.debug("Tank #" + tank.id + " is moving")
         tank.speed(1.0f)
-		  LOG.debug("set speed")
 
         sleep(7000)
 
