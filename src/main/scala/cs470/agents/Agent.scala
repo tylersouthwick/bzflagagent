@@ -12,3 +12,16 @@ abstract class Agent(host : String, port : Int) {
     def speed(s : Float) = queue.invoke(_.speed(tank.id,s))
   }
 }
+
+trait AgentCreator {
+	def name : String
+	def create(host : String, port : Int) : Agent
+}
+
+object Agents {
+	val all = Seq(DummyAgent)
+
+	def start(agent : String, host : String, port : Int) {
+		all.filter(_.name == agent).foreach(_.create(host, port))
+	}
+}

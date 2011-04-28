@@ -2,6 +2,7 @@ package cs470
 
 import org.apache.commons.cli._
 import org.apache.log4j.Logger
+import agents.Agents
 
 object Main {
 	val LOG = Logger.getLogger("cs470.Main")
@@ -41,12 +42,23 @@ object Main {
 			}
 		}
 
-		Engine.start(host, port)
+        val agent = {
+            if (!cmd.hasOption("a")) {
+                LOG.error("Must specify an agent: " + Agents.all)
+                System.exit(-1)
+                ""
+            } else {
+                cmd.getOptionValue("a")
+            }
+        }
+
+		Agents.start(agent, host, port)
 	}
 
 	val options = new Options
 	options.addOption("p", true, "port")
 	options.addOption("h", true, "host")
+	options.addOption("a", true, "Which Agent " + Agents.all)
 
 	def setupLog4j {
 		org.apache.log4j.BasicConfigurator.configure
