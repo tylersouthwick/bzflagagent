@@ -60,7 +60,7 @@ abstract class Agent(host: String, port: Int) {
       val tolv = 1e-1f
       val dt = 100;
 
-      def getTime = java.util.Calendar.getInstance().getTimeInMillis()
+      def getTime = java.util.Calendar.getInstance().getTimeInMillis
       def timeDifference(start: Long, end: Long) = (end - start).asInstanceOf[Int]
 
       //Agents.LOG.debug("Constants: " + queue.invokeAndWait(_.constants))
@@ -94,13 +94,21 @@ abstract class Agent(host: String, port: Int) {
 
   }
 
-  def timeout(milliseconds : Long)(callback: => Unit) {
-  	reactWithin(milliseconds) {
-  		case TIMEOUT => callback
-  	}
-  }
+	def timeout(milliseconds : Long) (callback : => Unit) = receiveTimeout(milliseconds)(callback)
 
-	def sleep(milliseconds : Long) = timeout(milliseconds) {}
+	def reactTimeout(milliseconds : Long)(callback: => Unit) {
+		reactWithin(milliseconds) {
+			case TIMEOUT => callback
+		}
+	}
+
+	def receiveTimeout(milliseconds : Long)(callback: => Unit) {
+		receiveWithin(milliseconds) {
+			case TIMEOUT => callback
+		}
+	}
+
+	def sleep(milliseconds : Long) = receiveTimeout(milliseconds) {}
 }
 
 trait AgentCreator {
