@@ -87,7 +87,7 @@ abstract class Agent(host: String, port: Int) {
 
   }
 
-  def timeout(milliseconds: => Long)(callback: => Unit) {
+  def timeout(milliseconds : Long)(callback: => Unit) {
   	receiveWithin(milliseconds) {
   		case TIMEOUT => callback
   	}
