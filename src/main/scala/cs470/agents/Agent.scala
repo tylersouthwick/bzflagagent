@@ -1,7 +1,7 @@
 package cs470.agents
 
 import cs470.BzrcQueue
-import cs470.domain.MyTank
+import cs470.domain._
 import actors._
 import Actor._
 import java.lang.Math._
@@ -46,31 +46,38 @@ abstract class Agent(host: String, port: Int) {
     }
 
     def computeAngle(theta: Float) = {
-      val angle = getAngle
-      val finalAngle = angle + theta
+      val startingAngle = getAngle
+      val targetAngle = startingAngle + theta
       val Kp = 2f
-      val Kd = 45f
-      val tol = 1e-2f
+      val Kd = 415f
+      val Ki = .0f
+      val tol = 5e-3f
       val tolv = 1e-2f
 
+      def getTime = java.util.Calendar.getInstance().getTimeInMillis()
+
+      //Agents.LOG.debug("Constants: " + queue.invokeAndWait(_.constants))
+
       //Agents.LOG.debug("Tank #" + tank.id + " rotating from " + angle + " to " + finalAngle)
-      def pdController(diff2: Float) {
+      def pdController(error0: Float,ierror:Float,time: Long) {
         val angle = getAngle
-        val diff = finalAngle - angle
-        val v = Kp * diff + Kd * (diff - diff2)
+        val error = targetAngle - angle
+        val dt = (getTime - time).asInstanceOf[Float]
+
+        val v = Kp * error + Ki*ierror + Kd * (error - error0) / dt
 
         //Agents.LOG.debug("Tank #" + tank.id + " diff=" + diff + " v=" + v)
-        if (abs(diff) < tol) {
+        if (abs(error) < tol && v < tolv) {
           setAngularVelocity(0f)
         } else {
           setAngularVelocity(v.asInstanceOf[Float])
-          pdController(diff.asInstanceOf[Float])
+          pdController(error.asInstanceOf[Float],(ierror+error).asInstanceOf[Float],getTime)
         }
       }
 
-      pdController(0.0f)
+      pdController(0.0f,0.0f,getTime)
 
-      (getAngle - angle).asInstanceOf[Float]
+      (getAngle - startingAngle).asInstanceOf[Float]
     }
 
   }
