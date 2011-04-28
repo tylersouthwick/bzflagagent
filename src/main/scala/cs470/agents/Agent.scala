@@ -92,6 +92,8 @@ abstract class Agent(host: String, port: Int) {
   		case TIMEOUT => callback
   	}
   }
+
+	def sleep(milliseconds : Long) = timeout(milliseconds) {}
 }
 
 trait AgentCreator {
