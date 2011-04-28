@@ -9,6 +9,9 @@ import java.lang.Math._
 abstract class Agent(host: String, port: Int) {
   val queue = new BzrcQueue(host, port)
 
+	val constants = queue.invokeAndWait(_.constants)
+	val flags = queue.invokeAndWait(_.flags)
+
   def run
 
   def rad2deg(rad: Float) = {
@@ -34,7 +37,9 @@ abstract class Agent(host: String, port: Int) {
         angle
     }
 
-    def shoot = queue.invoke(_.shoot((tank.id)))
+    def shoot {
+		queue.invoke(_.shoot((tank.id)))
+	}
 
     def moveAngle(theta: Float) = {
       if (tank.status == "dead") {
