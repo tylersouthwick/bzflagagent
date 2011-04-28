@@ -16,6 +16,8 @@ abstract class Agent(host : String, port : Int) {
 trait AgentCreator {
 	def name : String
 	def create(host : String, port : Int) : Agent
+
+	override def toString = name
 }
 
 object Agents {
