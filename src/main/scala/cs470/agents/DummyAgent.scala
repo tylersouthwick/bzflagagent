@@ -12,7 +12,7 @@ class DummyAgent(host: String, port: Int) extends Agent(host, port) {
     LOG.info("Running dummy agent")
     val tanks = queue.invokeAndWait(_.mytanks)
     tanks.foreach(moveDummyTank(_))
-    //moveDummyTank(tanks.apply(0))
+    //moveDummyTank(tanks.apply(2))
   }
 
   def moveDummyTank(tank: MyTank) = {
@@ -23,7 +23,8 @@ class DummyAgent(host: String, port: Int) extends Agent(host, port) {
         LOG.debug("Tank #" + tank.id + " is stopping")
         tank.speed(0.0f)
         LOG.debug("Tank #" + tank.id + " is rotating")
-        tank.moveAngle(60.0f*PI.asInstanceOf[Float]/180.0f)
+        val angle = tank.moveAngle(60.0f*PI.asInstanceOf[Float]/180.0f)
+        LOG.debug("Tank #" + tank.id + " rotated " + rad2deg(angle) + " deg")
         LOG.debug("Tank #" + tank.id + " is moving")
         tank.speed(1.0f)
     }

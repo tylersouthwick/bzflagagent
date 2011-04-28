@@ -11,6 +11,14 @@ abstract class Agent(host: String, port: Int) {
 
   def run
 
+  def rad2deg(rad: Float) = {
+    (rad * 180 / PI).asInstanceOf[Float]
+  }
+
+  def deg2rad(deg: Float) = {
+    (deg * PI / 180).asInstanceOf[Float]
+  }
+
   implicit def tankSpeed(tank: MyTank) = new {
     def speed(s: Float) = queue.invoke(_.speed(tank.id, s))
 
@@ -31,31 +39,28 @@ abstract class Agent(host: String, port: Int) {
     def moveAngle(theta: Float) = {
       if (tank.status == "dead") {
         Agents.LOG.debug("Tried to rotate Tank #" + tank.id + " but it is dead")
+        0f
       } else {
         computeAngle(theta)
       }
     }
 
-    def computeAngle(theta: Float) {
+    def computeAngle(theta: Float) = {
       val angle = getAngle
-      val finalAngle = {
-        val tmp = angle + theta
-        if (tmp > 2 * PI)
-          (tmp - 2 * PI).asInstanceOf[Float]
-        else
-          tmp.asInstanceOf[Float]
-      }
+      val finalAngle = angle + theta
       val Kp = 2f
       val Kd = 45f
-      val tol = 1e-3f
+      val tol = 1e-2f
+      val tolv = 1e-2f
 
-      Agents.LOG.debug("Tank #1 rotating from " + angle + " to " + finalAngle)
+      //Agents.LOG.debug("Tank #" + tank.id + " rotating from " + angle + " to " + finalAngle)
       def pdController(diff2: Float) {
         val angle = getAngle
         val diff = finalAngle - angle
         val v = Kp * diff + Kd * (diff - diff2)
 
-        if (v < tol) {
+        //Agents.LOG.debug("Tank #" + tank.id + " diff=" + diff + " v=" + v)
+        if (abs(diff) < tol) {
           setAngularVelocity(0f)
         } else {
           setAngularVelocity(v.asInstanceOf[Float])
@@ -65,16 +70,7 @@ abstract class Agent(host: String, port: Int) {
 
       pdController(0.0f)
 
-      def rad2deg(rad: Float) = {
-        (rad * 180 / PI).asInstanceOf[Float]
-      }
-
-      def deg2rad(deg: Float) = {
-        (deg * PI / 180).asInstanceOf[Float]
-      }
-
-      val finalDiff = getAngle - angle
-      Agents.LOG.debug("Achieved an angle difference of: " + finalDiff.asInstanceOf[Float] + " rad (" + rad2deg(finalDiff.asInstanceOf[Float]) + " deg)")
+      (getAngle - angle).asInstanceOf[Float]
     }
 
   }
