@@ -36,8 +36,12 @@ trait AgentCreator {
 
 object Agents {
 	val all = Seq(DummyAgent)
+  val LOG = org.apache.log4j.Logger.getLogger("cs470.agents.Agents")
 
 	def start(agent : String, host : String, port : Int) {
-		all.filter(_.name == agent).foreach(_.create(host, port))
+    LOG.info("Creating agent: " + agent)
+		val agents = all.filter(_.name == agent).map(_.create(host, port))
+    LOG.info("Created agents " + agents)
+    agents.foreach(_.run)
 	}
 }
