@@ -3,6 +3,7 @@ package cs470.agents
 import cs470.domain.MyTank
 import scala.actors._
 import Actor._
+import java.lang.Math.PI
 
 class DummyAgent(host: String, port: Int) extends Agent(host, port) {
   import DummyAgent._
@@ -11,6 +12,7 @@ class DummyAgent(host: String, port: Int) extends Agent(host, port) {
     LOG.info("Running dummy agent")
     val tanks = queue.invokeAndWait(_.mytanks)
     tanks.foreach(moveDummyTanks(_))
+    //moveDummyTanks(tanks.apply(0))
   }
 
   def moveDummyTanks(tank: MyTank) = {
@@ -18,11 +20,12 @@ class DummyAgent(host: String, port: Int) extends Agent(host, port) {
 
     //Go forward a bit, then rotate 60 degrees
     timeout(3000) {
-        LOG.debug("Tank #" + tank.id + " is moving")
+        LOG.debug("Tank #" + tank.id + " is stopping")
         tank.speed(0.0f)
+        LOG.debug("Tank #" + tank.id + " is rotating")
+        tank.moveAngle(60.0f*PI.asInstanceOf[Float]/180.0f)
+        LOG.debug("Tank #" + tank.id + " is moving")
         tank.speed(1.0f)
-        //wait 3-8 seconds
-        //rotate ~60 degrees
     }
 
     //Shoot every 1.5-2.5 seconds
