@@ -18,40 +18,65 @@ abstract class Agent(host: String, port: Int) {
 
     def updateTank = queue.invokeAndWait(_.mytanks.filter(_.id == tank.id).apply(0))
 
-    def getAngle = updateTank.angle
+    def getAngle = {
+      val angle = updateTank.angle
+      if (angle < 0)
+        2 * PI + angle
+      else
+        angle
+    }
 
     def shoot = queue.invoke(_.shoot((tank.id)))
 
     def moveAngle(theta: Float) = {
-      if(tank.status == "dead"){
-          Agents.LOG.debug("Tried to move Tank #" + tank.id + " but it is dead")
+      if (tank.status == "dead") {
+        Agents.LOG.debug("Tried to rotate Tank #" + tank.id + " but it is dead")
       } else {
-          computeAngle(theta)
+        computeAngle(theta)
       }
     }
 
     def computeAngle(theta: Float) {
-      val finalAngle = getAngle + theta;
-      val Kp = .1f
-      val Kd = 4.5f
-      val tol = 1e-2
+      val angle = getAngle
+      val finalAngle = {
+        val tmp = angle + theta
+        if (tmp > 2 * PI)
+          (2 * PI - tmp).asInstanceOf[Float]
+        else
+          tmp.asInstanceOf[Float]
+      }
+      val Kp = 2f
+      val Kd = 45f
+      val tol = 1e-3f
 
-      def pdController(diff2 : Float) {
+      Agents.LOG.debug("Tank #1 rotating from " + angle + " to " + finalAngle)
+      def pdController(diff2: Float) {
         val angle = getAngle
         val diff = finalAngle - angle
         val v = Kp * diff + Kd * (diff - diff2)
 
-        setAngularVelocity(v)
-
-        if (abs(angle-finalAngle) < tol) {
-
+        if (v < tol) {
+          setAngularVelocity(0f)
         } else {
-          pdController(diff)
+          setAngularVelocity(v.asInstanceOf[Float])
+          pdController(diff.asInstanceOf[Float])
         }
       }
 
       pdController(0.0f)
+
+      def rad2deg(rad: Float) = {
+        (rad * 180 / PI).asInstanceOf[Float]
+      }
+
+      def deg2rad(deg: Float) = {
+        (deg * PI / 180).asInstanceOf[Float]
+      }
+
+      val finalDiff = getAngle - angle
+      Agents.LOG.debug("Achieved an angle difference of: " + finalDiff.asInstanceOf[Float] + " rad (" + rad2deg(finalDiff.asInstanceOf[Float]) + " deg)")
     }
+
   }
 
   def timeout(milliseconds: => Long)(callback: => Unit) {
