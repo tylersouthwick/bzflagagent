@@ -5,12 +5,14 @@ import cs470.domain._
 import actors._
 import Actor._
 import java.lang.Math._
+import cs470.bzrc.RefreshableTanks
 
 abstract class Agent(host: String, port: Int) {
   val queue = new BzrcQueue(host, port)
 
   val constants = queue.invokeAndWait(_.constants)
   val flags = queue.invokeAndWait(_.flags)
+  val myTanks = new RefreshableTanks(queue)
 
   def run
 

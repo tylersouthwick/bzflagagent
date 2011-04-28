@@ -86,7 +86,7 @@ class BzFlagConnection(host : String, port : Int) {
 	def bases = receiveItems("bases", new Base(_))
 	def flags = receiveItems("flags", new Flag(_))
 	def shots = receiveItems("shots", new Shot(_))
-	def mytanks = receiveItems("mytanks", new MyTank(_))
+	def mytanks = receiveItems("mytanks", new MyTankImpl(_).asInstanceOf[MyTank])
 	def othertanks = receiveItems("othertanks", new OtherTank(_))
 
     def constants = new Constants(receiveItems("constants", new Constant(_)))
