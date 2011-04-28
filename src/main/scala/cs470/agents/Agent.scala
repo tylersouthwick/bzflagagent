@@ -39,7 +39,7 @@ abstract class Agent(host: String, port: Int) {
     def moveAngle(theta: Float) = {
       if (tank.status == "dead") {
         Agents.LOG.debug("Tried to rotate Tank #" + tank.id + " but it is dead")
-        0f
+        (0f,0)
       } else {
         computeAngle(theta)
       }
@@ -48,44 +48,51 @@ abstract class Agent(host: String, port: Int) {
     def computeAngle(theta: Float) = {
       val startingAngle = getAngle
       val targetAngle = startingAngle + theta
-      val Kp = 2f
-      val Kd = 415f
-      val Ki = .0f
+      val Kp = 1f
+      val Kd = 4.5f
+      val Ki = 0.0f
       val tol = 5e-3f
-      val tolv = 1e-2f
+      val tolv = 1e-1f
+      //val dt = 100;
 
       def getTime = java.util.Calendar.getInstance().getTimeInMillis()
+      def timeDifference(start: Long, end: Long) = (end - start).asInstanceOf[Int]
 
       //Agents.LOG.debug("Constants: " + queue.invokeAndWait(_.constants))
 
       //Agents.LOG.debug("Tank #" + tank.id + " rotating from " + angle + " to " + finalAngle)
-      def pdController(error0: Float,ierror:Float,time: Long) {
+      def pdController(error0: Float, ierror: Float, time: Long) {
         val angle = getAngle
         val error = targetAngle - angle
         val dt = (getTime - time).asInstanceOf[Float]
 
-        val v = Kp * error + Ki*ierror + Kd * (error - error0) / dt
+        val v = Kp * error + Ki * ierror * dt + Kd * (error - error0) / dt
 
-        //Agents.LOG.debug("Tank #" + tank.id + " diff=" + diff + " v=" + v)
+        //Agents.LOG.debug("Tank #%d error=%.3f".format(tank.id, abs(error)))
         if (abs(error) < tol && v < tolv) {
           setAngularVelocity(0f)
         } else {
           setAngularVelocity(v.asInstanceOf[Float])
-          pdController(error.asInstanceOf[Float],(ierror+error).asInstanceOf[Float],getTime)
+        // timeout(100) {}
+          pdController(error.asInstanceOf[Float], (ierror + error).asInstanceOf[Float], getTime)
         }
       }
 
-      pdController(0.0f,0.0f,getTime)
+      val startTime = getTime
+      pdController(0.0f, 0.0f, startTime)
 
-      (getAngle - startingAngle).asInstanceOf[Float]
+      val i1 = (getAngle - startingAngle).asInstanceOf[Float]
+      val i2 = timeDifference(startTime, getTime)
+
+      (i1,i2)
     }
 
   }
 
   def timeout(milliseconds: => Long)(callback: => Unit) {
-  	reactWithin(milliseconds) {
-  		case TIMEOUT => callback
-  	}
+    reactWithin(milliseconds) {
+      case TIMEOUT => callback
+    }
   }
 }
 
