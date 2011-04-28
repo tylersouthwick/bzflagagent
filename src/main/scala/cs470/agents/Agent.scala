@@ -94,10 +94,10 @@ abstract class Agent(host: String, port: Int) {
 
   }
 
-  def timeout(milliseconds: => Long)(callback: => Unit) {
-    reactWithin(milliseconds) {
-      case TIMEOUT => callback
-    }
+  def timeout(milliseconds : Long)(callback: => Unit) {
+  	reactWithin(milliseconds) {
+  		case TIMEOUT => callback
+  	}
   }
 
 	def sleep(milliseconds : Long) = timeout(milliseconds) {}
