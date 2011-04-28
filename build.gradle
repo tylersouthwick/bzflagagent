@@ -1,7 +1,10 @@
 apply plugin: 'scala'
 apply plugin: 'idea'
+apply plugin: 'application'
 
 version = '1.0-SNAPSHOT'
+
+mainClassName = 'cs470.Main'
 
 repositories {
 	mavenLocal()
@@ -20,6 +23,6 @@ dependencies {
 jar {
 	from configurations.compile.collect {it.isDirectory() ? it : zipTree(it) }
 	manifest {
-		attributes 'Main-Class': 'cs470.Main'
+		attributes 'Main-Class': mainClassName
 	}
 }

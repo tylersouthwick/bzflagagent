@@ -6,7 +6,25 @@ import agents.Agents
 
 object Main {
 	val LOG = Logger.getLogger("cs470.Main")
-  val HOST = "localhost"
+    val DEFAULT_HOST = "localhost"
+    val DEFAULT_PORT = "5555";
+    val DEFAULT_AGENT = "dummy"
+
+    implicit def findAttribute(cmd : CommandLine) = new {
+        def findAttribute (name : String, error : => String, default : String) = {
+            if (cmd.hasOption(name)) {
+                cmd.getOptionValue(name)
+            } else {
+                val property = "ai." + name
+                LOG.debug("reading system property: " + property)
+                val v = System.getProperty(property)
+                if (v == null) {
+                    LOG.warn("using default " + name + ": " + default)
+                    default
+                } else v
+            }
+        }
+    }
 
 	def main(args : Array[String]) {
 		setupLog4j
@@ -14,43 +32,9 @@ object Main {
 		val parser = new PosixParser
 		val cmd = parser.parse(options, args)
 
-		val port = {
-			if (!cmd.hasOption("p")) {
-				LOG.error("Must specify a port")
-				System.exit(-1)
-				0
-			} else {
-				try {
-					Integer.parseInt(cmd.getOptionValue("p"))
-				} catch {
-					case _ : Throwable => {
-						LOG.error("Invalid port")
-						System.exit(-1)
-						0
-					}
-				}
-			}
-		}
-
-		val host = {
-			if (!cmd.hasOption("h")) {
-				LOG.error("Must specify a host")
-				LOG.info("Using default host: " + HOST)
-				HOST
-			} else {
-			  cmd.getOptionValue("h")
-			}
-		}
-
-        val agent = {
-            if (!cmd.hasOption("a")) {
-                LOG.error("Must specify an agent: " + Agents.all)
-                System.exit(-1)
-                ""
-            } else {
-                cmd.getOptionValue("a")
-            }
-        }
+		val port = Integer.parseInt(cmd.findAttribute("p", "Must specify port", DEFAULT_PORT))
+		val host = cmd.findAttribute("h", "Must specify host", DEFAULT_HOST)
+        val agent = cmd.findAttribute("a", "Must specify an agent", DEFAULT_AGENT)
 
 		Agents.start(agent, host, port)
 	}
@@ -63,6 +47,7 @@ object Main {
 	def setupLog4j {
 		org.apache.log4j.BasicConfigurator.configure
 	}
+
 }
 
 // vim: set ts=4 sw=4 et:
