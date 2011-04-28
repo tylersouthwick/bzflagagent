@@ -52,7 +52,7 @@ abstract class Agent(host: String, port: Int) {
       Agents.LOG.debug("Tank #1 rotating from " + angle + " to " + finalAngle)
       def pdController(diff2: Float) {
         val angle = getAngle
-        val diff = abs(finalAngle - angle)
+        val diff = finalAngle - angle
         val v = Kp * diff + Kd * (diff - diff2)
 
         if (v < tol) {
