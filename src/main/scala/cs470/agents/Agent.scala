@@ -41,7 +41,7 @@ abstract class Agent(host: String, port: Int) {
       val finalAngle = {
         val tmp = angle + theta
         if (tmp > 2 * PI)
-          (2 * PI - tmp).asInstanceOf[Float]
+          (tmp - 2 * PI).asInstanceOf[Float]
         else
           tmp.asInstanceOf[Float]
       }
@@ -52,7 +52,7 @@ abstract class Agent(host: String, port: Int) {
       Agents.LOG.debug("Tank #1 rotating from " + angle + " to " + finalAngle)
       def pdController(diff2: Float) {
         val angle = getAngle
-        val diff = finalAngle - angle
+        val diff = abs(finalAngle - angle)
         val v = Kp * diff + Kd * (diff - diff2)
 
         if (v < tol) {
