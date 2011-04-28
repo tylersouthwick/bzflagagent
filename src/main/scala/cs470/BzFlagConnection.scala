@@ -89,7 +89,7 @@ class BzFlagConnection(host : String, port : Int) {
 	def mytanks = receiveItems("mytanks", new MyTank(_))
 	def othertanks = receiveItems("othertanks", new OtherTank(_))
 
-    def constants = receiveItems("constants", new Constant(_))
+    def constants = new Constants(receiveItems("constants", new Constant(_)))
 
 	def occgrid(agent : Int) {
 		send("occgrid " + agent)
