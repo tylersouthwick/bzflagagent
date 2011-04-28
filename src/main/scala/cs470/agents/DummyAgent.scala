@@ -1,9 +1,8 @@
 package cs470.agents
 
-import cs470.BzrcQueue
-
-object DummyAgent extends Agent {
-  def run(queue: BzrcQueue) = {
-
+class DummyAgent(host : String,port : Int) extends Agent(host,port) {
+  def run {
+      val tanks = queue.invokeAndWait(_.mytanks)
+      tanks.foreach(tank => tank.speed(1))
   }
 }

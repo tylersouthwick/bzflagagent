@@ -1,11 +1,14 @@
 package cs470.agents
 
 import cs470.BzrcQueue
+import cs470.domain.MyTank
 
-trait Agent {
-  final def start(host : String, port : Int) {
-	  run(new BzrcQueue(host, port))
+abstract class Agent(host : String, port : Int) {
+  val queue = new BzrcQueue(host, port)
+
+  def run
+
+  implicit def tankSpeed(tank : MyTank) = new {
+    def speed(s : Float) = queue.invoke(_.speed(tank.id,s))
   }
-
-  def run(queue : BzrcQueue)
 }
