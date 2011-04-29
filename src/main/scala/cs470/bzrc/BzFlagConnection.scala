@@ -1,11 +1,11 @@
-package cs470
+package cs470.bzrc
 
 import java.io._
 import java.net._
 import java.util._
 import java.lang.{Integer => JInteger}
 import scala.collection.JavaConversions._
-import domain._
+import cs470.domain._
 
 object BZRC {
 	val VERSION = 1
@@ -33,7 +33,9 @@ class BzFlagConnection(host : String, port : Int) {
 	}
 
 	private def send(s : String) {
+		LOG.debug("sending " + s)
 		out.println(s)
+		LOG.debug("sent")
 		ack
 	}
 	private def readLine = in.readLine
@@ -86,7 +88,7 @@ class BzFlagConnection(host : String, port : Int) {
 	def bases = receiveItems("bases", new Base(_))
 	def flags = receiveItems("flags", new Flag(_))
 	def shots = receiveItems("shots", new Shot(_))
-	def mytanks = receiveItems("mytanks", new MyTankImpl(_).asInstanceOf[MyTank])
+	def mytanks = receiveItems("mytanks", new MyTank(_))
 	def othertanks = receiveItems("othertanks", new OtherTank(_))
 
     def constants = new Constants(receiveItems("constants", new Constant(_)))

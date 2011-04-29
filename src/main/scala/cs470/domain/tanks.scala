@@ -1,23 +1,6 @@
 package cs470.domain
 
-trait MyTank {
-
-	def id : Int
-	def callsign : String
-	def status : String
-	def shotsAvailable : Int
-	def timeToReload : Float
-	def flag : String
-	def location : Point
-	def angle : Float
-	def vx : Float
-	def xy : Float
-	def angvel : Float
-
-	override def toString = callsign + "@" + location
-}
-
-class MyTankImpl(line : String) extends MyTank {
+class MyTank(line : String) {
 	private val splitter = new Parser("mytank", line)
 
 	val id = splitter.getInt

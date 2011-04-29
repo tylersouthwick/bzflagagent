@@ -4,19 +4,19 @@ import cs470.domain.MyTank
 import scala.actors._
 import Actor._
 import java.lang.Math.PI
+import cs470.bzrc.Tank
+import cs470.utils.{Units, Threading}
 
-class DummyAgent(host: String, port: Int) extends Agent(host, port) {
+class DummyAgent(host: String, port: Int) extends Agent(host, port) with Threading with Units {
 
   import DummyAgent._
 
-  def run {
-    LOG.info("Running dummy agent")
-    val tanks = queue.invokeAndWait(_.mytanks)
-    tanks.foreach(moveDummyTank(_))
-    //moveDummyTank(tanks.apply(2))
-  }
+	def run() {
+		LOG.info("Running dummy agent")
+		myTanks.foreach{moveDummyTank(_)}
+	}
 
-  def moveDummyTank(tank: MyTank) = {
+  def moveDummyTank(tank: Tank) = {
     LOG.info("Starting tank #" + tank.id + " on dummy path")
 
     //Go forward a bit, then rotate 60 degrees
@@ -42,7 +42,7 @@ class DummyAgent(host: String, port: Int) extends Agent(host, port) {
       loop {
         timeout(2000) {
           //LOG.debug("Tank #" + tank.id + " is shooting")
-          tank.shoot
+          tank.shoot()
         }
       }
     }

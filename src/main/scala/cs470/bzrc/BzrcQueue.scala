@@ -1,6 +1,5 @@
-package cs470
+package cs470.bzrc
 
-import scala.actors._
 import java.util.concurrent.{Callable, Executors}
 
 class BzrcQueue(host: String, port: Int) {
@@ -20,7 +19,9 @@ class BzrcQueue(host: String, port: Int) {
 
 	def invokeAndWait[T](callback: BzFlagConnection => T): T = {
 		queue.submit(new Callable[T] {
-			def call() = callback(con)
+			def call() = {
+				callback(con)
+			}
 		}).get
 	}
 

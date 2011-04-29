@@ -1,5 +1,7 @@
 package cs470
 
+import bzrc.BzrcQueue
+
 object Engine {
 	def start(host : String, port : Int) = new Engine(host, port).start
 }
