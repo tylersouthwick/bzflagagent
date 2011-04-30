@@ -2,6 +2,10 @@ package cs470.domain
 
 import java.lang.Math._
 
+object Point {
+	implicit def convertTupleToPoint(t : Tuple2[Double, Double]) = new Point(t._1, t._2)
+}
+
 class Point(val x: Double, val y: Double) {
 
   override def toString = "(" + x + ", " + y + ")"
