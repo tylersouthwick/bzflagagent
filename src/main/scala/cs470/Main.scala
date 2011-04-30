@@ -27,6 +27,15 @@ object Main {
     }
 
 	def main(args : Array[String]) {
+		if (args.length == 0) {
+			val formatter = new HelpFormatter
+			formatter.printHelp("agents", options)
+		} else {
+			doMain(args)
+		}
+	}
+
+	def doMain(args : Array[String]) {
 		val parser = new PosixParser
 		val cmd = parser.parse(options, args)
 
