@@ -14,7 +14,7 @@ class PotentialFieldGenerator(q: BzrcQueue) {
   import PotentialFieldGenerator._
 
   def getPFVector(point :Point) = {
-    new Vector((.5,.2))
+    new Vector((.5,.7))
   }
 
   def AttractivePF(current: Point, goal: Point, r1: Double, r2: Double, alpha: Double) = {

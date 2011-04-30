@@ -8,6 +8,11 @@ class Constant(line : String) {
     val value = splitter.getString
 }
 
+object Constants {
+  implicit def convertDouble(s : String) = java.lang.Double.parseDouble(s)
+  implicit def convertInt(s : String) = Integer.parseInt(s)
+}
+
 class Constants(constants : Seq[Constant]) extends ListMap[String, String] {
 
 	constants.foreach {constant =>

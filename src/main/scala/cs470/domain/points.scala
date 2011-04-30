@@ -34,8 +34,11 @@ class Point(val x: Double, val y: Double) {
 
 }
 
-class Vector(val vector: Point) {
-  override def toString = "(" + vector.x + ", " + vector.y + ")"
+class Vector(vector: Point) {
+  val x = vector.x
+  val y = vector.y
+
+  override def toString = "(" + x + ", " + y + ")"
 
   def magnitude = {
     vector.distance(new Point(0, 0))

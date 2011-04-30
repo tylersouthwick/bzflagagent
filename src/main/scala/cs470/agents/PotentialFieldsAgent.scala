@@ -1,8 +1,10 @@
 package cs470.agents
 
-import scala.actors._
 import cs470.bzrc.Tank
 import cs470.utils.Threading
+import cs470.visualization.PFVisualizer
+import cs470.movement.PotentialFieldGenerator
+import cs470.domain.Constants._
 
 class PotentialFieldAgent(host: String, port: Int) extends Agent(host, port) with Threading {
 
@@ -12,6 +14,10 @@ class PotentialFieldAgent(host: String, port: Int) extends Agent(host, port) wit
 		LOG.info("Running potential field agent")
 		val tanks = myTanks
     moveAlongPotentialField(tanks.apply(1))
+
+    val pfgen = new PotentialFieldGenerator(queue)
+    val vis = new PFVisualizer(pfgen,"pf.gpi",convertInt(constants("worldsize")),25)
+
 	}
 
   def moveAlongPotentialField(tank : Tank) {
