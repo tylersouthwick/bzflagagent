@@ -12,9 +12,10 @@ class DummyAgent(host: String, port: Int) extends Agent(host, port) {
   def run {
     LOG.info("Running dummy agent")
     val tanks = queue.invokeAndWait(_.mytanks)
-    tanks.foreach(moveDummyTank(_))
-    //moveDummyTank(tanks.apply(2))
-  }
+    //tanks.foreach(moveDummyTank(_))
+    moveDummyTank(tanks.apply(1))
+    moveDummyTank(tanks.apply(2))
+      }
 
   def moveDummyTank(tank: MyTank) = {
     LOG.info("Starting tank #" + tank.id + " on dummy path")

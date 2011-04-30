@@ -62,7 +62,7 @@ abstract class Agent(host: String, port: Int) {
       val Ki = 0.0f
       val tol = deg2rad(1)
       val tolv = .1f
-      val dt = 10;
+      val dt = 300;
       val maxVel = .7854f //constants("tankangvel")
 
       def getTime = java.util.Calendar.getInstance().getTimeInMillis
@@ -72,11 +72,14 @@ abstract class Agent(host: String, port: Int) {
         val angle = getAngle
         val error = targetAngle - angle
 
-        val v = (Kp * error + Ki * ierror * dt + Kd * (error - error0) / dt) / maxVel
+        val rv = (Kp * error + Ki * ierror * dt + Kd * (error - error0) / 200);
+        val v = if(rv > maxVel) 1 else rv/maxVel
 
         if (abs(error) < tol && abs(v) < tolv) {
+        //Agents.LOG.debug("Setting velocity to 0")
           setAngularVelocity(0f)
         } else {
+        //Agents.LOG.debug("Setting velocity to " + v)
           setAngularVelocity(v.asInstanceOf[Float])
           sleep(dt)
           pdController(error.asInstanceOf[Float], (ierror + error).asInstanceOf[Float], getTime)
