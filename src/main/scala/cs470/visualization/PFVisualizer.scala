@@ -24,12 +24,13 @@ class PFVisualizer(pfgenerator: PotentialFieldGenerator, filename: String, world
     write("plot '-' with vectors head")
 
     val diff: Int = worldsize / samples
-    val samples2: Int = samples / 2
+    val samples2: Int = samples / 2 + 1
+    val offset = new Point(worldsize / 2, worldsize / 2)
 
-    val grid: Seq[Point] = (-samples2 to samples2).foldLeft(Seq[Point]()) {
+    val grid: Seq[Point] = (0 to samples).foldLeft(Seq[Point]()) {
       (points, x) =>
-        points ++ (-samples2 to samples2).map(
-          y => new Point(x * diff, y * diff)
+        points ++ (0 to samples).map(
+          y => (new Point(x * diff, y * diff)) - offset
         )
     }
 
