@@ -2,7 +2,7 @@ package cs470.bzrc
 
 import cs470.domain.{Point, MyTank}
 import java.util.Date
-import cs470.utils.{Angle, Threading}
+import cs470.utils.{Radian, Angle, Threading}
 
 class RefreshableTanks(queue: BzrcQueue) extends RefreshableData[Tank] {
 	private var tanks: Seq[MyTank] = Seq[MyTank]()
@@ -98,22 +98,22 @@ abstract class Tank(queue : BzrcQueue, tanks : RefreshableTanks) extends Threadi
 
 	def getTime = (new Date).getTime
 
-	def computeAngle(theta: Angle) = {
+	def computeAngle(theta: Radian) = {
 		val startingAngle = angle
 		val targetAngle = startingAngle + theta
 
 		val startTime = getTime
-		pdController(degree(0), targetAngle)
+		pdController(radian(0), targetAngle)
 		((angle - startingAngle), (getTime - startTime))
 	}
 
 	val Kp = 1
 	val Kd = 4.5
-	val tol = degree(5)
+	val tol = degree(5).radian
 	val tolv = .1
 	val maxVel = .7854 //constants("tankangvel")
 
-	def pdController(error0: Angle, targetAngle : Angle) {
+	def pdController(error0: Radian, targetAngle : Radian) {
 		val error = targetAngle - angle
 
 		val rv = (Kp * error + Kd * (error - error0) / 200);

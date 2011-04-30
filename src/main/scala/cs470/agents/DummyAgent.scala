@@ -34,7 +34,7 @@ class DummyAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 
         LOG.debug("Tank #" + tank.id + " is rotating")
         val (angle, time) = tank.moveAngle(degree(60))
-        LOG.debug("Tank #%d rotated %.1f deg (in %d ms)".format(tank.id, angle.degree, time))
+        LOG.debug("Tank #%d rotated %s (in %d ms)".format(tank.id, angle.degree, time))
 
       }
     }
