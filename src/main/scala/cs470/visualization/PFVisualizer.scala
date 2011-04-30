@@ -2,39 +2,40 @@ package cs470.visualization
 
 import cs470.movement.PotentialFieldGenerator
 import cs470.domain.Point
-import cs470.domain.Vector
-import java.lang.StringBuilder
+import java.io.{FileOutputStream, PrintWriter}
 
 class PFVisualizer(pfgenerator: PotentialFieldGenerator, filename: String, worldsize: Int, samples: Int) {
+	import PFVisualizer._
   private val vec_len = 0.75 * worldsize / samples
 
-  import PFVisualizer._
+	LOG.info("Opening file: " + filename)
+	private val file = new PrintWriter(new FileOutputStream(filename))
 
-  def visualize {
-    s = new StringBuilder
+	def visualize() {
+		LOG.info("Saving file: " + filename)
+		file.close()
+		LOG.info("File Saved: " + filename)
+	}
 
-    setGnuPlotHeader(s,)
-  }
-
-  private def plotField(s:StringBuilder) = {
-    s.append("plot '-' with vectors head\n")
+  private def plotField() {
+    write("plot '-' with vectors head")
 
     val diff: Int = worldsize / samples
     val samples2: Int = samples / 2
 
     val grid: Seq[Point] = (-samples2 to samples2).foldLeft(Seq[Point]()) {
       (points, x) =>
-        points :: (-samples2 to samples2).map(new Point(x * diff, _ * diff))
+        points ++ (-samples2 to samples2).map(y => new Point(x * diff, y * diff))
     }
 
     grid.foreach {
       point =>
         val vector = pfgenerator.getPFVector(point)
         val endpoint = vector.getArrowHeadPoint(point)
-        s.append(" " + point.x + " " + point.y + " " + endpoint.x + " " + endpoint.y + "\n")
+        write(" " + point.x + " " + point.y + " " + endpoint.x + " " + endpoint.y)
     }
 
-    s.append("e\n")
+    write("e")
 
 //    gpi_point(x, y, vec_x, vec_y):
 //    ' ' 'Create the centered gpi data point (4 - tuple) for a position and
@@ -54,17 +55,19 @@ class PFVisualizer(pfgenerator: PotentialFieldGenerator, filename: String, world
     //      x1, y1, x2, y2 = plotvalues
     //    s += '% s % s % s % s \ n ' %(x1, y1, x2, y2)
     //    s += 'e\ n '
-
-    s
   }
 
-  private def setGnuPlotHeader(s: StringBuilder, minimum: Int, maximum: Int) {
-    s.append("set xrange [%d,%d]\n".format(minimum, maximum))
-    s.append("set yrange [%d,%d]\n".format(minimum, maximum))
-    s.append("unset key\n")
-    s.append("set size square\n")
-    s.append("set title 'Potential Fields'\n")
+  private def setGnuPlotHeader(minimum: Int, maximum: Int) {
+    write("set xrange [%d,%d]".format(minimum, maximum))
+    write("set yrange [%d,%d]".format(minimum, maximum))
+    write("unset key")
+    write("set size square")
+    write("set title 'Potential Fields'")
   }
+
+	def write(s : String) {
+		file.println(s)
+	}
 }
 
 object PFVisualizer {

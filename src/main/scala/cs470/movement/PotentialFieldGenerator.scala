@@ -3,6 +3,7 @@ package cs470.movement
 import java.lang.Math._
 import cs470.bzrc.BzrcQueue
 import cs470.domain._
+import Point._
 
 class PotentialFieldGenerator(q: BzrcQueue) {
 
@@ -13,7 +14,7 @@ class PotentialFieldGenerator(q: BzrcQueue) {
   import PotentialFieldGenerator._
 
   def getPFVector(point :Point) = {
-    new Vector(.5,.2)
+    new Vector((.5,.2))
   }
 
   def AttractivePF(current: Point, goal: Point, r1: Double, r2: Double, alpha: Double) = {
