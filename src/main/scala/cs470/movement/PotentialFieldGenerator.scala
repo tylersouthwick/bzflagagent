@@ -12,7 +12,7 @@ class PotentialField(q: BzrcQueue) {
 
   import PotentialField._
 
-  getPFVector(point :Point) = {
+  def getPFVector(point :Point) = {
     0.0
   }
 
