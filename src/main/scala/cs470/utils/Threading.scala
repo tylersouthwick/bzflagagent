@@ -1,12 +1,19 @@
 package cs470.utils
 
-import actors._
-import Actor._
+import java.util.concurrent.Executors
+
+object Threading {
+	val pool = Executors.newCachedThreadPool
+}
 
 trait Threading {
 
-  def timeout(milliseconds: Long)(callback: => Unit) = receiveTimeout(milliseconds)(callback)
+	def timeout(milliseconds: Long)(callback: => Unit) {
+		sleep(milliseconds)
+		callback
+	}
 
+	/*
   def reactTimeout(milliseconds: Long)(callback: => Unit) {
     reactWithin(milliseconds) {
       case TIMEOUT => callback
@@ -18,10 +25,24 @@ trait Threading {
       case TIMEOUT => callback
     }
   }
+  */
 
   def sleep(milliseconds: Long) {
-	  receiveTimeout(milliseconds) {}
+	  Thread.sleep(milliseconds)
+	  //receiveTimeout(milliseconds) {}
   }
+
+	def actor(callback : => Unit) {
+		Threading.pool.submit(new Runnable {
+			def run() {
+				callback
+			}
+		})
+	}
+
+	def loop(callback : => Unit) {
+		while (true) callback
+	}
 }
 
 

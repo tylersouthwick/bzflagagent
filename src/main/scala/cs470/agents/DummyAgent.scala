@@ -1,10 +1,9 @@
 package cs470.agents
 
-import scala.actors._
-import Actor._
 import java.lang.Math.PI
 import cs470.bzrc.Tank
 import cs470.utils.{Units, Threading}
+import cs470.domain.Point
 
 class DummyAgent(host: String, port: Int) extends Agent(host, port) with Threading with Units {
 
@@ -13,8 +12,11 @@ class DummyAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 	def run() {
 		LOG.info("Running dummy agent")
 		val tanks = myTanks
+		myTanks.foreach(moveDummyTank(_))
+		/*
 		moveDummyTank(tanks.apply(1))
 		moveDummyTank(tanks.apply(2))
+		*/
 	}
 
   def moveDummyTank(tank: Tank) = {
