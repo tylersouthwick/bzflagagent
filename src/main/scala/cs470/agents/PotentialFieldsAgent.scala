@@ -1,11 +1,10 @@
 package cs470.agents
 
 import scala.actors._
-import Actor._
 import cs470.bzrc.Tank
-import cs470.utils.{Threading, Units}
+import cs470.utils.Threading
 
-class PotentialFieldAgent(host: String, port: Int) extends Agent(host, port) with Threading with Units {
+class PotentialFieldAgent(host: String, port: Int) extends Agent(host, port) with Threading {
 
   import PotentialFieldAgent._
 

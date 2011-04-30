@@ -12,6 +12,7 @@ object RefreshableData {
 trait RefreshableData[T] extends Traversable[T] {
 	private val locker = new ReentrantLock
 	import RefreshableData.LOG
+	private val waitingObject = new Object
 
 	protected def availableData : Seq[T]
 
@@ -45,8 +46,17 @@ trait RefreshableData[T] extends Traversable[T] {
 				callback
 				val end = time
 				LOG.debug("Scheduled task took " + (end - start) + "ms")
+				waitingObject.synchronized{
+					try {
+						waitingObject.notifyAll()
+					} catch {
+						case t : Throwable => {
+							println("error notifyAll: " + t)
+						}
+					}
+				}
 			}
-		}, 0, 100, TimeUnit.MILLISECONDS)
+		}, 0, 50, TimeUnit.MILLISECONDS)
 	}
 
 	final def foreach[U](f: (T) => U) {
@@ -54,4 +64,14 @@ trait RefreshableData[T] extends Traversable[T] {
 	}
 
 	final def apply(index : Int) = availableData.apply(index)
+
+	final def waitForNewData() {
+		waitingObject.synchronized{
+			try {
+				waitingObject.wait()
+			} catch {
+				case t : Throwable => println("error WAIT: " + t)
+			}
+		}
+	}
 }

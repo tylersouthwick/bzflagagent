@@ -27,7 +27,7 @@ object Main {
     }
 
 	def main(args : Array[String]) {
-		if (args.length == 0) {
+		if (args.length == 1 && args.apply(0) == "help") {
 			val formatter = new HelpFormatter
 			formatter.printHelp("agents", options)
 		} else {

@@ -1,5 +1,7 @@
 package cs470.domain
 
+import cs470.utils.Radian
+
 class MyTank(line : String) {
 	private val splitter = new Parser("mytank", line)
 
@@ -10,7 +12,7 @@ class MyTank(line : String) {
 	val timeToReload = splitter.getDouble
 	val flag = splitter.getString
 	val location = splitter.getPoint
-	val angle = splitter.getDouble
+	val angle = new Radian(splitter.getDouble)
 	val vx = splitter.getDouble
 	val xy = splitter.getDouble
 	val angvel = splitter.getDouble
@@ -26,7 +28,7 @@ class OtherTank(line : String) {
     val status = splitter.getString
     val flag = splitter.getString
     val location = new Point(splitter.getDouble, splitter.getDouble)
-    val angle = splitter.getDouble
+    val angle = new Radian(splitter.getDouble)
 
 	override def toString = callsign + "[" + color + "] @" + location
 }

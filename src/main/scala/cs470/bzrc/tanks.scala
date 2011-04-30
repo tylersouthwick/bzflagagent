@@ -1,7 +1,8 @@
 package cs470.bzrc
 
 import cs470.domain.{Point, MyTank}
-import cs470.utils.{Units, Threading}
+import java.util.Date
+import cs470.utils.{Angle, Threading}
 
 class RefreshableTanks(queue: BzrcQueue) extends RefreshableData[Tank] {
 	private var tanks: Seq[MyTank] = Seq[MyTank]()
@@ -21,7 +22,7 @@ class RefreshableTanks(queue: BzrcQueue) extends RefreshableData[Tank] {
 		}
 	}
 
-	private def buildTank(buildTankId: Int) = new Tank(queue) {
+	private def buildTank(buildTankId: Int) = new Tank(queue, this) {
 		private def tank: MyTank = lock {
 			tanks.filter(_.id == tankId).apply(0)
 		}
@@ -46,8 +47,9 @@ object Tank {
 }
 
 import java.lang.Math._
+import cs470.utils.Angle._
 
-abstract class Tank(queue : BzrcQueue) extends Threading with Units {
+abstract class Tank(queue : BzrcQueue, tanks : RefreshableTanks) extends Threading {
 
 	val tankId: Int
 
@@ -56,7 +58,7 @@ abstract class Tank(queue : BzrcQueue) extends Threading with Units {
 	def angvel: Double
 	def xy: Double
 	def vx: Double
-	def angle: Double
+	def angle: Angle
 	def location: Point
 	def flag: String
 	def timeToReload: Double
@@ -77,17 +79,6 @@ abstract class Tank(queue : BzrcQueue) extends Threading with Units {
 		}
 	}
 
-	def getAngle = {
-		this.angle
-		/*
-		val angle = this.angle
-		if (angle < 0)
-			(2 * PI + angle).asInstanceOf[Double]
-		else
-			angle.asInstanceOf[Double]
-		*/
-	}
-
 	def shoot() {
 		queue.invoke{
 			_.shoot(tankId)
@@ -96,49 +87,45 @@ abstract class Tank(queue : BzrcQueue) extends Threading with Units {
 
 	import Tank.LOG
 
-	def moveAngle(theta: Double) = {
+	def moveAngle(theta: Angle) = {
 		if (dead) {
 			LOG.debug("Tried to rotate Tank #" + tankId + " but it is dead")
-			(0.0, 0)
+			(degree(0), 0)
 		} else {
 			computeAngle(theta)
 		}
 	}
 
-	def computeAngle(theta: Double) = {
-		val startingAngle = getAngle
+	def getTime = (new Date).getTime
+
+	def computeAngle(theta: Angle) = {
+		val startingAngle = angle
 		val targetAngle = startingAngle + theta
-		val Kp = 1
-		val Kd = 4.5
-		val Ki = 0.0
-		val tol = deg2rad(1)
-		val tolv = .1
-		val dt = 300;
-		val maxVel = .7854 //constants("tankangvel")
-
-		def getTime = java.util.Calendar.getInstance().getTimeInMillis
-		def timeDifference(start: Long, end: Long) = (end - start).asInstanceOf[Int]
-
-		def pdController(error0: Double, ierror: Double, time: Long) {
-			val angle = getAngle
-			val error = targetAngle - angle
-
-			val rv = (Kp * error + Ki * ierror * dt + Kd * (error - error0) / 200);
-			val v = if(rv > maxVel) 1 else rv/maxVel
-
-			if (abs(error) < tol && abs(v) < tolv) {
-				//Agents.LOG.debug("Setting velocity to 0")
-				setAngularVelocity(0f)
-			} else {
-				//Agents.LOG.debug("Setting velocity to " + v)
-				setAngularVelocity(v)
-				sleep(dt)
-				pdController(error, (ierror + error), getTime)
-			}
-		}
 
 		val startTime = getTime
-		pdController(0.0f, 0.0f, startTime)
-		((getAngle - startingAngle), timeDifference(startTime, getTime))
+		pdController(degree(0), targetAngle)
+		((angle - startingAngle), (getTime - startTime))
+	}
+
+	val Kp = 1
+	val Kd = 4.5
+	val tol = degree(5)
+	val tolv = .1
+	val maxVel = .7854 //constants("tankangvel")
+
+	def pdController(error0: Angle, targetAngle : Angle) {
+		val error = targetAngle - angle
+
+		val rv = (Kp * error + Kd * (error - error0) / 200);
+		val v = if(rv > maxVel) 1 else rv/maxVel
+
+		if (abs(error) < tol && abs(v) < tolv) {
+			setAngularVelocity(0f)
+		} else {
+			//Agents.LOG.debug("Setting velocity to " + v)
+			setAngularVelocity(v)
+			tanks.waitForNewData()
+			pdController(error, targetAngle)
+		}
 	}
 }

@@ -1,20 +1,21 @@
 package cs470.agents
 
-import scala.actors._
-import Actor._
-import java.lang.Math.PI
 import cs470.bzrc.Tank
-import cs470.utils.{Units, Threading}
+import cs470.utils._
+import Angle._
 
-class DummyAgent(host: String, port: Int) extends Agent(host, port) with Threading with Units {
+class DummyAgent(host: String, port: Int) extends Agent(host, port) with Threading {
 
   import DummyAgent._
 
 	def run() {
 		LOG.info("Running dummy agent")
 		val tanks = myTanks
+		myTanks.foreach(moveDummyTank(_))
+		/*
 		moveDummyTank(tanks.apply(1))
 		moveDummyTank(tanks.apply(2))
+		*/
 	}
 
   def moveDummyTank(tank: Tank) = {
@@ -32,8 +33,8 @@ class DummyAgent(host: String, port: Int) extends Agent(host, port) with Threadi
         tank.speed(0.0)
 
         LOG.debug("Tank #" + tank.id + " is rotating")
-        val (angle, time) = tank.moveAngle(60.0 * PI / 180.0)
-        LOG.debug("Tank #%d rotated %.1f deg (in %d ms)".format(tank.id, rad2deg(angle), time))
+        val (angle, time) = tank.moveAngle(degree(60))
+        LOG.debug("Tank #%d rotated %.1f deg (in %d ms)".format(tank.id, angle.degree, time))
 
       }
     }
