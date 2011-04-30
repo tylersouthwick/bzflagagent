@@ -23,7 +23,7 @@ class Engine(host : String, port : Int) {
 	*/
 
 	class Agent(id : Int) {
-		def speed(s : Float) = queue.invoke(_.speed(id, s))
+		def speed(s : Double) = queue.invoke(_.speed(id, s))
 
 		/*
 		def potentialField = {

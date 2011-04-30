@@ -73,15 +73,15 @@ class BzFlagConnection(host : String, port : Int) {
 		status
 	}
 
-	private def movement(action : String, agent : Int, speed : Float) {
+	private def movement(action : String, agent : Int, speed : Double) {
 		send(action + " " + agent + " " + speed)
 		status
 	}
 
-	def speed(agent : Int, speed : Float) = movement("speed", agent, speed)
-	def angvel(agent : Int, speed : Float) = movement("angvel", agent, speed)
-	def accelx(agent : Int, speed : Float) = movement("accelx", agent, speed)
-	def accely(agent : Int, speed : Float) = movement("accely", agent, speed)
+	def speed(agent : Int, speed : Double) = movement("speed", agent, speed)
+	def angvel(agent : Int, speed : Double) = movement("angvel", agent, speed)
+	def accelx(agent : Int, speed : Double) = movement("accelx", agent, speed)
+	def accely(agent : Int, speed : Double) = movement("accely", agent, speed)
 
 	def teams = receiveItems("teams", new Team(_))
 	def obstacles = receiveItems("obstacles", new Obstacle(_))

@@ -7,13 +7,13 @@ class MyTank(line : String) {
 	val callsign = splitter.getString
 	val status = splitter.getString
 	val shotsAvailable = splitter.getInt
-	val timeToReload = splitter.getFloat
+	val timeToReload = splitter.getDouble
 	val flag = splitter.getString
 	val location = splitter.getPoint
-	val angle = splitter.getFloat
-	val vx = splitter.getFloat
-	val xy = splitter.getFloat
-	val angvel = splitter.getFloat
+	val angle = splitter.getDouble
+	val vx = splitter.getDouble
+	val xy = splitter.getDouble
+	val angvel = splitter.getDouble
 
 	override def toString = callsign + "@" + location
 }
@@ -25,8 +25,8 @@ class OtherTank(line : String) {
     val color = splitter.getString
     val status = splitter.getString
     val flag = splitter.getString
-    val location = new Point(splitter.getFloat, splitter.getFloat)
-    val angle = splitter.getFloat
+    val location = new Point(splitter.getDouble, splitter.getDouble)
+    val angle = splitter.getDouble
 
 	override def toString = callsign + "[" + color + "] @" + location
 }

@@ -16,7 +16,7 @@ class Constants(constants : Seq[Constant]) extends ListMap[String, String] {
 
 	def getAsInt(name : String) = Integer.parseInt(this(name))
 
-	def getAsFloat(name : String) = java.lang.Float.parseFloat(this(name))
+	def getAsDouble(name : String) = java.lang.Double.parseDouble(this(name))
 }
 
 // vim: set ts=4 sw=4 et:

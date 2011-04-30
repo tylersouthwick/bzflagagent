@@ -20,14 +20,14 @@ class Parser(prefix : String, line : String) {
 	}
 	def getString = tokens.apply(index)
 	def getInt = Integer.parseInt(getString)
-	def getFloat = java.lang.Float.parseFloat(getString)
-    def getPoint = new Point(getFloat, getFloat)
+	def getDouble = java.lang.Double.parseDouble(getString)
+    def getPoint = new Point(getDouble, getDouble)
     def getVector = getPoint
 
     def points = {
         val list = new java.util.LinkedList[Point]
         while (hasMore) {
-            list.add(new Point(getFloat, getFloat))
+            list.add(new Point(getDouble, getDouble))
         }
         new Polygon(list)
     }

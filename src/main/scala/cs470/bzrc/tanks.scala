@@ -53,25 +53,25 @@ abstract class Tank(queue : BzrcQueue) extends Threading with Units {
 
 	def id = tankId
 
-	def angvel: Float
-	def xy: Float
-	def vx: Float
-	def angle: Float
+	def angvel: Double
+	def xy: Double
+	def vx: Double
+	def angle: Double
 	def location: Point
 	def flag: String
-	def timeToReload: Float
+	def timeToReload: Double
 	def shotsAvailable: Int
 	def status: String
 	def callsign: String
 	def dead = "dead" == status
 
-	def speed(s: Float) {
+	def speed(s: Double) {
 		queue.invoke {
 			_.speed(tankId, s)
 		}
 	}
 
-	def setAngularVelocity(v: Float) {
+	def setAngularVelocity(v: Double) {
 		queue.invoke{
 			_.angvel(tankId, v)
 		}
@@ -82,9 +82,9 @@ abstract class Tank(queue : BzrcQueue) extends Threading with Units {
 		/*
 		val angle = this.angle
 		if (angle < 0)
-			(2 * PI + angle).asInstanceOf[Float]
+			(2 * PI + angle).asInstanceOf[Double]
 		else
-			angle.asInstanceOf[Float]
+			angle.asInstanceOf[Double]
 		*/
 	}
 
@@ -96,30 +96,30 @@ abstract class Tank(queue : BzrcQueue) extends Threading with Units {
 
 	import Tank.LOG
 
-	def moveAngle(theta: Float) = {
+	def moveAngle(theta: Double) = {
 		if (dead) {
 			LOG.debug("Tried to rotate Tank #" + tankId + " but it is dead")
-			(0f, 0)
+			(0.0, 0)
 		} else {
 			computeAngle(theta)
 		}
 	}
 
-	def computeAngle(theta: Float) = {
+	def computeAngle(theta: Double) = {
 		val startingAngle = getAngle
 		val targetAngle = startingAngle + theta
-		val Kp = 1f
-		val Kd = 4.5f
-		val Ki = 0.0f
+		val Kp = 1
+		val Kd = 4.5
+		val Ki = 0.0
 		val tol = deg2rad(1)
-		val tolv = .1f
+		val tolv = .1
 		val dt = 300;
-		val maxVel = .7854f //constants("tankangvel")
+		val maxVel = .7854 //constants("tankangvel")
 
 		def getTime = java.util.Calendar.getInstance().getTimeInMillis
 		def timeDifference(start: Long, end: Long) = (end - start).asInstanceOf[Int]
 
-		def pdController(error0: Float, ierror: Float, time: Long) {
+		def pdController(error0: Double, ierror: Double, time: Long) {
 			val angle = getAngle
 			val error = targetAngle - angle
 
@@ -131,14 +131,14 @@ abstract class Tank(queue : BzrcQueue) extends Threading with Units {
 				setAngularVelocity(0f)
 			} else {
 				//Agents.LOG.debug("Setting velocity to " + v)
-				setAngularVelocity(v.asInstanceOf[Float])
+				setAngularVelocity(v)
 				sleep(dt)
-				pdController(error.asInstanceOf[Float], (ierror + error).asInstanceOf[Float], getTime)
+				pdController(error, (ierror + error), getTime)
 			}
 		}
 
 		val startTime = getTime
 		pdController(0.0f, 0.0f, startTime)
-		((getAngle - startingAngle).asInstanceOf[Float], timeDifference(startTime, getTime))
+		((getAngle - startingAngle), timeDifference(startTime, getTime))
 	}
 }
