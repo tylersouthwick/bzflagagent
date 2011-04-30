@@ -42,6 +42,8 @@ class RefreshableTanks(queue: BzrcQueue) extends RefreshableData with Traversabl
 	def foreach[U](f: (Tank) => U) {
 		availableTanks.foreach(tank => f(tank))
 	}
+
+	def apply(index : Int) = availableTanks.apply(index)
 }
 
 object Tank {
@@ -122,19 +124,18 @@ abstract class Tank(queue : BzrcQueue) extends Threading with Units {
 		def getTime = java.util.Calendar.getInstance().getTimeInMillis
 		def timeDifference(start: Long, end: Long) = (end - start).asInstanceOf[Int]
 
-		LOG.debug("Starting angle: " + rad2deg(startingAngle) + "; need "+rad2deg(targetAngle))
-
 		def pdController(error0: Float, ierror: Float, time: Long) {
 			val angle = getAngle
 			val error = targetAngle - angle
 
-			val v = (Kp * error + Ki * ierror * dt + Kd * (error - error0) / dt) / maxVel
+			val rv = (Kp * error + Ki * ierror * dt + Kd * (error - error0) / 200);
+			val v = if(rv > maxVel) 1 else rv/maxVel
 
 			if (abs(error) < tol && abs(v) < tolv) {
-				LOG.debug("setting tank#" + tankId + " angular velocity: " + 0)
+				//Agents.LOG.debug("Setting velocity to 0")
 				setAngularVelocity(0f)
 			} else {
-				LOG.debug("setting tank#" + tankId + " angular velocity: " + v)
+				//Agents.LOG.debug("Setting velocity to " + v)
 				setAngularVelocity(v.asInstanceOf[Float])
 				sleep(dt)
 				pdController(error.asInstanceOf[Float], (ierror + error).asInstanceOf[Float], getTime)

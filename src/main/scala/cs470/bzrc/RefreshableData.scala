@@ -2,6 +2,7 @@ package cs470.bzrc
 
 import java.util.concurrent.{TimeUnit, Executors}
 import java.util.concurrent.locks.ReentrantLock
+import java.util.Date
 
 object RefreshableData {
 	private val LOG = org.apache.log4j.Logger.getLogger(classOf[RefreshableData])
@@ -10,6 +11,7 @@ object RefreshableData {
 
 trait RefreshableData {
 	private val locker = new ReentrantLock
+	import RefreshableData.LOG
 
 	protected def doLock(callback : => Unit) {
 		locker.lock()
@@ -29,6 +31,7 @@ trait RefreshableData {
 		}
 	}
 
+	def time = (new Date).getTime
 	/**
 	 * Schedules the task for every 100 Milliseconds
 	 */
@@ -36,8 +39,11 @@ trait RefreshableData {
 		callback
 		RefreshableData.executor.scheduleWithFixedDelay(new Runnable {
 			def run() {
+				val start = time
 				callback
+				val end = time
+				LOG.debug("Scheduled task took " + (end - start) + "ms")
 			}
-		}, 0, 500, TimeUnit.MILLISECONDS)
+		}, 0, 100, TimeUnit.MILLISECONDS)
 	}
 }
