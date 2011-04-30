@@ -3,9 +3,9 @@ package cs470.bzrc
 import cs470.domain.{Point, MyTank}
 import cs470.utils.{Units, Threading}
 
-class RefreshableTanks(queue: BzrcQueue) extends RefreshableData with Traversable[Tank] {
+class RefreshableTanks(queue: BzrcQueue) extends RefreshableData[Tank] {
 	private var tanks: Seq[MyTank] = Seq[MyTank]()
-	private lazy val availableTanks = lock {
+	override lazy val availableData = lock {
 		tanks.map(tank =>
 				buildTank(tank.id)
 		)
@@ -39,11 +39,6 @@ class RefreshableTanks(queue: BzrcQueue) extends RefreshableData with Traversabl
 		def callsign = tank.callsign
 	}
 
-	def foreach[U](f: (Tank) => U) {
-		availableTanks.foreach(tank => f(tank))
-	}
-
-	def apply(index : Int) = availableTanks.apply(index)
 }
 
 object Tank {

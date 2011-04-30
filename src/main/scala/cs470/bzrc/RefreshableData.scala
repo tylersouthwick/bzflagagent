@@ -5,13 +5,15 @@ import java.util.concurrent.locks.ReentrantLock
 import java.util.Date
 
 object RefreshableData {
-	private val LOG = org.apache.log4j.Logger.getLogger(classOf[RefreshableData])
+	private val LOG = org.apache.log4j.Logger.getLogger("cs470.bzrc.RefreshableData")
 	protected[RefreshableData] val executor = Executors.newScheduledThreadPool(5)
 }
 
-trait RefreshableData {
+trait RefreshableData[T] extends Traversable[T] {
 	private val locker = new ReentrantLock
 	import RefreshableData.LOG
+
+	protected def availableData : Seq[T]
 
 	protected def doLock(callback : => Unit) {
 		locker.lock()
@@ -46,4 +48,10 @@ trait RefreshableData {
 			}
 		}, 0, 100, TimeUnit.MILLISECONDS)
 	}
+
+	final def foreach[U](f: (T) => U) {
+		availableData.foreach(t => f(t))
+	}
+
+	final def apply(index : Int) = availableData.apply(index)
 }
