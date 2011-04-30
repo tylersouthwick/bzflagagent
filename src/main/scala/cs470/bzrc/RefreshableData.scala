@@ -9,12 +9,29 @@ object RefreshableData {
 	protected[RefreshableData] val executor = Executors.newScheduledThreadPool(5)
 }
 
-trait RefreshableData[T] extends Traversable[T] {
-	private val locker = new ReentrantLock
+abstract class RefreshableData[F, T](queue : BzrcQueue) extends Traversable[T] {
 	import RefreshableData.LOG
+	private val locker = new ReentrantLock
 	private val waitingObject = new Object
+	private var buffer : Seq[F] = null
 
-	protected def availableData : Seq[T]
+	schedule {
+		LOG.debug("reloading buffer")
+		val myBuffer = queue.invokeAndWait(loadData)
+		LOG.debug("reload buffer")
+		doLock {
+			buffer = myBuffer
+		}
+	}
+
+	val availableData = lock { buffer.map(convert(_)) }
+
+	protected def loadData(con : BzFlagConnection) : Seq[F]
+	protected def convert(f : F) : T
+
+	protected def findItem(callback : F => Boolean) = lock {
+		buffer.filter(callback).apply(0)
+	}
 
 	protected def doLock(callback : => Unit) {
 		locker.lock()
