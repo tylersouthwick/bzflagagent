@@ -11,10 +11,20 @@ class DummyAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 
   import DummyAgent._
 
+<<<<<<< HEAD
 	def run() {
 		LOG.info("Running dummy agent")
 		myTanks.foreach{moveDummyTank(_)}
 	}
+=======
+  def run {
+    LOG.info("Running dummy agent")
+    val tanks = queue.invokeAndWait(_.mytanks)
+    //tanks.foreach(moveDummyTank(_))
+    moveDummyTank(tanks.apply(1))
+    moveDummyTank(tanks.apply(2))
+      }
+>>>>>>> 6ad9b3121ec6a547480c8a10a3b28b8be809ce2b
 
   def moveDummyTank(tank: Tank) = {
     LOG.info("Starting tank #" + tank.id + " on dummy path")
