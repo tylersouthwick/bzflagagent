@@ -2,18 +2,18 @@ package cs470.movement
 
 import java.lang.Math._
 import cs470.bzrc.BzrcQueue
-import cs470.domain.Point
+import cs470.domain._
 
-class PotentialField(q: BzrcQueue) {
+class PotentialFieldGenerator(q: BzrcQueue) {
 
   val enemies = q.invokeAndWait(_.othertanks)
   val obstacles = q.invokeAndWait(_.obstacles)
   val flags = q.invokeAndWait(_.flags)
 
-  import PotentialField._
+  import PotentialFieldGenerator._
 
-  getPFVector(point :Point) = {
-    0.0
+  def getPFVector(point :Point) = {
+    new Vector(.5,.2)
   }
 
   def AttractivePF(current: Point, goal: Point, r1: Double, r2: Double, alpha: Double) = {
@@ -44,6 +44,6 @@ class PotentialField(q: BzrcQueue) {
   }
 }
 
-object PotentialField {
+object PotentialFieldGenerator {
   val LOG = org.apache.log4j.Logger.getLogger("cs470.movement.pf")
 }
