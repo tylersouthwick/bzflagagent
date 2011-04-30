@@ -103,7 +103,7 @@ abstract class Tank(queue : BzrcQueue, tanks : RefreshableTanks) extends Threadi
 		val targetAngle = startingAngle + theta
 
 		val startTime = getTime
-		pdController(0, targetAngle)
+		pdController(degree(0), targetAngle)
 		((angle - startingAngle), (getTime - startTime))
 	}
 
@@ -113,7 +113,7 @@ abstract class Tank(queue : BzrcQueue, tanks : RefreshableTanks) extends Threadi
 	val tolv = .1
 	val maxVel = .7854 //constants("tankangvel")
 
-	def pdController(error0: Double, targetAngle : Angle) {
+	def pdController(error0: Angle, targetAngle : Angle) {
 		val error = targetAngle - angle
 
 		val rv = (Kp * error + Kd * (error - error0) / 200);
