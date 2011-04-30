@@ -1,8 +1,8 @@
 package cs470.bzrc
 
 import cs470.domain.{Point, MyTank}
-import cs470.utils.{Units, Threading}
 import java.util.Date
+import cs470.utils.{Angle, Threading}
 
 class RefreshableTanks(queue: BzrcQueue) extends RefreshableData[Tank] {
 	private var tanks: Seq[MyTank] = Seq[MyTank]()
@@ -47,8 +47,9 @@ object Tank {
 }
 
 import java.lang.Math._
+import cs470.utils.Angle._
 
-abstract class Tank(queue : BzrcQueue, tanks : RefreshableTanks) extends Threading with Units {
+abstract class Tank(queue : BzrcQueue, tanks : RefreshableTanks) extends Threading {
 
 	val tankId: Int
 
@@ -57,7 +58,7 @@ abstract class Tank(queue : BzrcQueue, tanks : RefreshableTanks) extends Threadi
 	def angvel: Double
 	def xy: Double
 	def vx: Double
-	def angle: Double
+	def angle: Angle
 	def location: Point
 	def flag: String
 	def timeToReload: Double
@@ -86,10 +87,10 @@ abstract class Tank(queue : BzrcQueue, tanks : RefreshableTanks) extends Threadi
 
 	import Tank.LOG
 
-	def moveAngle(theta: Double) = {
+	def moveAngle(theta: Angle) = {
 		if (dead) {
 			LOG.debug("Tried to rotate Tank #" + tankId + " but it is dead")
-			(0.0, 0)
+			(degree(0), 0)
 		} else {
 			computeAngle(theta)
 		}
@@ -97,7 +98,7 @@ abstract class Tank(queue : BzrcQueue, tanks : RefreshableTanks) extends Threadi
 
 	def getTime = (new Date).getTime
 
-	def computeAngle(theta: Double) = {
+	def computeAngle(theta: Angle) = {
 		val startingAngle = angle
 		val targetAngle = startingAngle + theta
 
@@ -108,11 +109,11 @@ abstract class Tank(queue : BzrcQueue, tanks : RefreshableTanks) extends Threadi
 
 	val Kp = 1
 	val Kd = 4.5
-	val tol = deg2rad(5)
+	val tol = degree(5)
 	val tolv = .1
 	val maxVel = .7854 //constants("tankangvel")
 
-	def pdController(error0: Double, targetAngle : Double) {
+	def pdController(error0: Double, targetAngle : Angle) {
 		val error = targetAngle - angle
 
 		val rv = (Kp * error + Kd * (error - error0) / 200);
