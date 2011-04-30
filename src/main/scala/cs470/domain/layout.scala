@@ -10,7 +10,7 @@ class Flag(line : String) {
     private val splitter = new Parser("flag", line)
     val color = splitter.getString
     val possessingTeamColor = splitter.getString
-    val location = new Point(splitter.getFloat, splitter.getFloat)
+    val location = new Point(splitter.getDouble, splitter.getDouble)
 }
 
 class Obstacle(line : String) {

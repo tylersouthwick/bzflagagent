@@ -24,16 +24,16 @@ class DummyAgent(host: String, port: Int) extends Agent(host, port) with Threadi
     actor {
       loop {
         LOG.debug("Tank #" + tank.id + " is moving")
-        tank.speed(1.0f)
+        tank.speed(1.0)
 
         sleep(7000)
 
         LOG.debug("Tank #" + tank.id + " is stopping")
-        tank.speed(0.0f)
+        tank.speed(0.0)
 
         LOG.debug("Tank #" + tank.id + " is rotating")
-        val (angle, time) = tank.moveAngle(60.0f * PI.asInstanceOf[Float] / 180.0f)
-        LOG.debug("Tank #%d rotated %.1f deg (in %d ms)".format(tank.id.asInstanceOf[Int], rad2deg(angle), time))
+        val (angle, time) = tank.moveAngle(60.0 * PI / 180.0)
+        LOG.debug("Tank #%d rotated %.1f deg (in %d ms)".format(tank.id, rad2deg(angle), time))
 
       }
     }

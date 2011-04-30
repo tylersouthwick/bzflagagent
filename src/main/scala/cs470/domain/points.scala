@@ -1,6 +1,6 @@
 package cs470.domain
 
-class Point(x : Float, y : Float) {
+class Point(x : Double, y : Double) {
 	override def toString = "(" + x + ", " + y + ")"
 }
 
