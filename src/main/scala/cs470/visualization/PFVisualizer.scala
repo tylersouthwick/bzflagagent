@@ -26,8 +26,7 @@ class PFVisualizer(pfgenerator: PotentialFieldGenerator, filename: String, obsta
     obstacles.foreach {
       obstacle =>
         obstacle.edges.foreach {
-          tmp =>
-            val (p1, p2) = tmp
+          case (p1, p2) =>
             write("set arrow from " + p1.x + ", " + p1.y + " to " + p2.x + ", " + p2.y + " nohead lt 3")
         }
     }
@@ -50,8 +49,11 @@ class PFVisualizer(pfgenerator: PotentialFieldGenerator, filename: String, obsta
     grid.foreach {
       point =>
         val vector = pfgenerator.getPFVector(point)
-        val endpoint = vector
-        write(" " + point.x + " " + point.y + " " + endpoint.x + " " + endpoint.y)
+        val mag = vector.magnitude
+        if (mag != 0) {
+          val endpoint = (if (mag > 1) vector / mag else vector) * vec_len
+          write(" " + point.x + " " + point.y + " " + endpoint.x + " " + endpoint.y)
+        }
     }
 
     write("e")

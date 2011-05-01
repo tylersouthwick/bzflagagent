@@ -18,6 +18,10 @@ class Point(val x: Double, val y: Double) {
     new Point(x + other.x, y + other.y)
   }
 
+  def /(div: Double) = {
+    new Point(x / div, y / div)
+  }
+
   def distance(goal: Point) = {
     val dx = goal.x - x
     val dy = goal.y - y
@@ -32,6 +36,9 @@ class Point(val x: Double, val y: Double) {
     atan2(dy, dx)
   }
 
+  def magnitude = {
+    distance(new Point(0, 0))
+  }
 }
 
 class Vector(vector: Point) {
@@ -39,6 +46,14 @@ class Vector(vector: Point) {
   val y = vector.y
 
   override def toString = "(" + x + ", " + y + ")"
+
+  def /(div: Double) = {
+    new Vector(x / div, y / div)
+  }
+
+  def *(mult: Double) = {
+    new Vector(x * mult, y * mult)
+  }
 
   def magnitude = {
     vector.distance(new Point(0, 0))
@@ -61,6 +76,14 @@ class Polygon(points: Seq[Point]) {
         (point, points.apply(idx + 1))
       else
         (point, points.apply(0))
+  }
+
+  val center = {
+    (points.foldLeft(new Point(0, 0))((a, b) => a + b)) / points.size
+  }
+
+  val maxDistance = {
+    points.apply(0).distance(center)
   }
 }
 

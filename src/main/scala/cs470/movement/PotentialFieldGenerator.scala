@@ -13,8 +13,15 @@ class PotentialFieldGenerator(q: BzrcQueue) {
 
   import PotentialFieldGenerator._
 
-  def getPFVector(point :Point) = {
-    new Vector((.5,.7))
+  def getPFVector(point: Point) = {
+
+    val fromObstacles = obstacles.foldLeft(new Point(0, 0))((total, obstacle) =>
+      total + RegectivePF(point, obstacle.center, obstacle.maxDistance, 20, 4)
+    )
+
+    //val from Flags = flags.foldLeft(new Point())
+
+    new Vector(fromObstacles)
   }
 
   def AttractivePF(current: Point, goal: Point, r1: Double, r2: Double, alpha: Double) = {
@@ -25,13 +32,13 @@ class PotentialFieldGenerator(q: BzrcQueue) {
     if (d < r1)
       new Point(0, 0)
     else if (d > r2)
-      new Point (as * cos(theta), as * sin(theta))
+      new Point(as * cos(theta), as * sin(theta))
     else
       new Point(alpha * (d - r1) * cos(theta), alpha * (d - r1) * sin(theta))
   }
 
-  def RegectivePF(current: Point, goal: Point, r1: Double, r2: Double, beta: Double) = {
-    val s = (r2 - r1)
+  def RegectivePF(goal: Point, current: Point, r1: Double, s: Double, beta: Double) = {
+    val r2 = r1 + s
     val d = current.distance(goal)
     val theta = current.getAngle(goal)
     val i = 30
