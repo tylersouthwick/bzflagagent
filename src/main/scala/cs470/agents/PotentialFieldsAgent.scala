@@ -16,8 +16,7 @@ class PotentialFieldAgent(host: String, port: Int) extends Agent(host, port) wit
     moveAlongPotentialField(tanks.apply(1))
 
     val pfgen = new PotentialFieldGenerator(queue)
-    val vis = new PFVisualizer(pfgen,"pf.gpi",convertInt(constants("worldsize")),25)
-
+    val vis = new PFVisualizer(pfgen,"pf.gpi",obstacles, convertInt(constants("worldsize")),25)
 	}
 
   def moveAlongPotentialField(tank : Tank) {

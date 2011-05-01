@@ -8,6 +8,7 @@ abstract class Agent(host: String, port: Int) {
   val constants = queue.invokeAndWait(_.constants)
   val flags = queue.invokeAndWait(_.flags)
   val myTanks = new RefreshableTanks(queue)
+  val obstacles = queue.invokeAndWait(_.obstacles)
 
   def run()
 

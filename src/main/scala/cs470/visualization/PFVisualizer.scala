@@ -1,10 +1,10 @@
 package cs470.visualization
 
 import cs470.movement.PotentialFieldGenerator
-import cs470.domain.Point
 import java.io.{FileOutputStream, PrintWriter}
+import cs470.domain.{Polygon, Point}
 
-class PFVisualizer(pfgenerator: PotentialFieldGenerator, filename: String, worldsize: Int, samples: Int) {
+class PFVisualizer(pfgenerator: PotentialFieldGenerator, filename: String, obstacles: Seq[Polygon], worldsize: Int, samples: Int) {
 
   import PFVisualizer._
 
@@ -14,11 +14,24 @@ class PFVisualizer(pfgenerator: PotentialFieldGenerator, filename: String, world
   private val file = new PrintWriter(new FileOutputStream(filename))
 
   setGnuPlotHeader()
+  drawObjects()
   plotField()
 
   LOG.debug("Saving PF visualization to file: " + filename)
   file.close()
   LOG.info("Visualization for potential fields saved to: " + filename)
+
+  private def drawObjects() {
+    write("unset arrow")
+    obstacles.foreach {
+      obstacle =>
+        obstacle.edges.foreach {
+          tmp =>
+            val (p1, p2) = tmp
+            write("set arrow from " + p1.x + ", " + p1.y + " to " + p2.x + ", " + p2.y + " nohead lt 3")
+        }
+    }
+  }
 
   private def plotField() {
     write("plot '-' with vectors head")
@@ -27,13 +40,12 @@ class PFVisualizer(pfgenerator: PotentialFieldGenerator, filename: String, world
     val samples2: Int = samples / 2 + 1
     val offset = new Point(worldsize / 2, worldsize / 2)
 
-    val grid: Seq[Point] = (0 to samples).foldLeft(Seq[Point]()) {
+    val grid: Seq[Point] = (1 to samples).foldLeft(Seq[Point]()) {
       (points, x) =>
-        points ++ (0 to samples).map(
+        points ++ (1 to samples).map(
           y => (new Point(x * diff, y * diff)) - offset
         )
     }
-
 
     grid.foreach {
       point =>

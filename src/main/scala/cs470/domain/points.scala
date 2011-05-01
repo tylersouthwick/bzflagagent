@@ -3,7 +3,7 @@ package cs470.domain
 import java.lang.Math._
 
 object Point {
-	implicit def convertTupleToPoint(t : Tuple2[Double, Double]) = new Point(t._1, t._2)
+  implicit def convertTupleToPoint(t: Tuple2[Double, Double]) = new Point(t._1, t._2)
 }
 
 class Point(val x: Double, val y: Double) {
@@ -54,6 +54,14 @@ class Polygon(points: Seq[Point]) {
   def convexHull = this
 
   def inConvexInterior(point: Point) = false
+
+  val edges = points.zipWithIndex.map {
+    case (point, idx) =>
+      if (idx + 1 < points.size)
+        (point, points.apply(idx + 1))
+      else
+        (point, points.apply(0))
+  }
 }
 
 // vim: set ts=4 sw=4 et:
