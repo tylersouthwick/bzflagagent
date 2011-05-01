@@ -6,7 +6,10 @@ object Angle {
 	def radian(rad : Double) = new Radian(rad)
 	def degree(deg : Double) = new Degree(deg)
 
-	implicit def angleAsDouble(angle : Angle) = angle.value
+	implicit def radianAsDouble(angle : Radian) = angle.value
+	implicit def angleAsRadian(angle : Angle) = angle.radian
+	implicit def degreeAsDouble(angle : Degree) = angle.value
+	implicit def angleAsDegree(angle : Angle) = angle.degree
 }
 
 trait Angle {
@@ -25,10 +28,10 @@ class Degree(private val deg : Double) extends Angle {
 	def radian = new Radian(deg * PI / 180)
 	def degree = this
 
-	def +(angle : Angle) = new Degree(angle.degree.deg + deg)
-	def -(angle : Angle) = new Degree(angle.degree.deg - deg)
+	def +(angle : Angle) = new Degree(deg + angle.degree.deg)
+	def -(angle : Angle) = new Degree(deg - angle.degree.deg)
 
-	override def toString = deg + " degrees"
+	override def toString = deg % 360 + " deg"
 }
 
 class Radian(private val rad : Double) extends Angle {
@@ -37,8 +40,8 @@ class Radian(private val rad : Double) extends Angle {
 	def degree = new Degree(rad * 180 / PI)
 	def radian = this
 
-	def +(angle: Angle) = new Radian(angle.radian.rad + rad)
-	def -(angle: Angle) = new Radian(angle.radian.rad - rad)
+	def +(angle: Angle) = new Radian(rad + angle.radian.rad)
+	def -(angle: Angle) = new Radian(rad - angle.radian.rad)
 
-	override def toString = rad + " radians"
+	override def toString = rad + " rad"
 }
