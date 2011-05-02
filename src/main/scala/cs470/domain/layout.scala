@@ -3,7 +3,7 @@ package cs470.domain
 class Base(line: String) {
   private val splitter = new Parser("base", line)
   val color = splitter.getString
-  val points = splitter.points
+  val points = new Polygon(splitter.points)
 }
 
 class Flag(line: String) {

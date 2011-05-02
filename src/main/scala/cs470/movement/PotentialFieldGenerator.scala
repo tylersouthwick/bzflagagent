@@ -5,31 +5,38 @@ import cs470.bzrc.BzrcQueue
 import cs470.domain._
 import Point._
 
-class PotentialFieldGenerator(q: BzrcQueue) {
+class pfReturnToGoal(q: BzrcQueue, baseGoalColor: String) extends PotentialFieldGenerator(q) {
 
-  val enemies = q.invokeAndWait(_.othertanks)
-  val obstacles = q.invokeAndWait(_.obstacles)
-  val flags = q.invokeAndWait(_.flags)
-  val ourColor = "blue"
+  def getPathVector(point: Point) = {
+    val fromObstacles = obstacles.foldLeft(new Point(0, 0))((total, obstacle) =>
+      total + RegectivePF(point, obstacle.center, obstacle.maxDistance + 5, 50, 1.2)
+    )
 
-  import PotentialFieldGenerator._
+    val base = bases.filter(_.color == baseGoalColor)
+    val fromBase =  AttractivePF(point, base(0).points.center, 5, 70, .5)
 
-  def getPFVector(point: Point) = {
-    val goalColor = "green"
+    new Vector(fromObstacles + fromBase)
+  }
+}
+
+class pfFindFlag(q: BzrcQueue, flagColor: String) extends PotentialFieldGenerator(q) {
+
+  def getPathVector(point: Point) = {
 
     val fromObstacles = obstacles.foldLeft(new Point(0, 0))((total, obstacle) =>
-      total + RegectivePF(point, obstacle.center, obstacle.maxDistance, 50, .9)
+      total + RegectivePF(point, obstacle.center, obstacle.maxDistance + 5, 50, 1.2)
     )
 
-    val fromFlags = flags.filter(_.color == goalColor).foldLeft(new Point(0,0))((total,flag) =>
-      total + AttractivePF(point,flag.location, 5,70,.5)
-    )
+    val fromFlags =  AttractivePF(point, flags.filter(_.color == flagColor).apply(0).location, 5, 70, .5)
 
-    fromObstacles + fromFlags
+    new Vector(fromObstacles + fromFlags)
   }
 
+}
+
+abstract class PotentialFieldGenerator(q: BzrcQueue) extends FindAgentPath(q) {
   def AttractivePF(current: Point, goal: Point, r1: Double, s: Double, alpha: Double) = {
-    val r2 = r1+s
+    val r2 = r1 + s
     val as = alpha * s
     val d = current.distance(goal)
     val theta = current.getAngle(goal)
