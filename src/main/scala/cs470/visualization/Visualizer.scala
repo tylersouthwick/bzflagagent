@@ -1,10 +1,10 @@
 package cs470.visualization
 
-import cs470.movement.PotentialFieldGenerator
 import java.io.{FileOutputStream, PrintWriter}
 import cs470.domain.{Polygon, Point}
+import cs470.movement.{FindAgentPath}
 
-class PFVisualizer(pfgenerator: PotentialFieldGenerator, filename: String, obstacles: Seq[Polygon], worldsize: Int, samples: Int) {
+class Visualizer(pfgenerator: FindAgentPath, filename: String, obstacles: Seq[Polygon], worldsize: Int, samples: Int) {
 
   import PFVisualizer._
 
