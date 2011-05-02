@@ -4,7 +4,7 @@ import java.io.{FileOutputStream, PrintWriter}
 import cs470.domain.{Polygon, Point}
 import cs470.movement.{FindAgentPath}
 
-class Visualizer(pfgenerator: FindAgentPath, filename: String, obstacles: Seq[Polygon], worldsize: Int, samples: Int) {
+class Visualizer(pathFinder: FindAgentPath, filename: String, obstacles: Seq[Polygon], worldsize: Int, samples: Int) {
 
   import PFVisualizer._
 
@@ -48,7 +48,7 @@ class Visualizer(pfgenerator: FindAgentPath, filename: String, obstacles: Seq[Po
 
     grid.foreach {
       point =>
-        val vector = pfgenerator.getPFVector(point)
+        val vector = pathFinder.getPathVector(point)
         val mag = vector.magnitude
         if (mag != 0) {
           val endpoint = (if (mag > 1) vector / mag else vector) * vec_len
