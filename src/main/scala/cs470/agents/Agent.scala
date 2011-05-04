@@ -1,14 +1,16 @@
 package cs470.agents
 
-import cs470.bzrc.{BzrcQueue, RefreshableTanks}
+import cs470.bzrc.{DataStore, RefreshableEnemies, BzrcQueue, RefreshableTanks}
 
 abstract class Agent(host: String, port: Int) {
   val queue = new BzrcQueue(host, port)
+	val store = new DataStore(queue)
 
-  val constants = queue.invokeAndWait(_.constants)
-  val flags = queue.invokeAndWait(_.flags)
-  val myTanks = new RefreshableTanks(queue)
-  val obstacles = queue.invokeAndWait(_.obstacles)
+  val constants = store.constants
+  val flags = store.flags
+  val myTanks = store.tanks
+  val obstacles = store.obstacles
+	val enemies = store.enemies
 
   def run()
 

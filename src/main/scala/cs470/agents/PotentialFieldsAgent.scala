@@ -13,15 +13,17 @@ class PotentialFieldAgent(host: String, port: Int) extends Agent(host, port) wit
 	def run() {
 		LOG.info("Running potential field agent")
 		val tanks = myTanks
-    moveAlongPotentialField(tanks.apply(1))
+		//pick a tank
+		val tank = tanks(1)
+		moveAlongPotentialField(tank)
 
-    val pfgen = new pfReturnToGoal(queue,"blue")
-    val vis = new Visualizer(pfgen,"pf.gpi",obstacles, convertInt(constants("worldsize")),25)
+		val pfgen = new pfReturnToGoal(queue,"blue")
+		val vis = new Visualizer(pfgen,"pf.gpi",obstacles, convertInt(constants("worldsize")),25)
 	}
 
-  def moveAlongPotentialField(tank : Tank) {
-    tank.speed(1)
-  }
+	def moveAlongPotentialField(tank : Tank) {
+		tank.speed(1)
+	}
 
 }
 
