@@ -38,7 +38,7 @@ class pfFindFlag(store : DataStore, flagColor: String) extends PotentialFieldGen
 
     val fromFlags =  AttractivePF(point, flags.filter(_.color == flagColor).apply(0).location, 5, 70, .5)
 
-    new Vector(fromObstacles + fromTanks + fromFlags + fromEnemies)
+    new Vector(fromObstacles + fromTanks + fromFlags + fromEnemies + randomVector)
   }
 
 }

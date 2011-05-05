@@ -30,7 +30,7 @@ class PotentialFieldAgent(host: String, port: Int) extends Agent(host, port) wit
 
 	val Kp = 1
 	val Kd = 4.5
-	val tol = degree(5).radian
+	val tol = degree(2).radian
 	val tolv = .1
 	val maxVel: Double = constants("tankangvel")
 	val worldsize: Int = constants("worldsize")
