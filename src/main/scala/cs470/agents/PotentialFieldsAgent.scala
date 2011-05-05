@@ -39,10 +39,16 @@ class PotentialFieldAgent(host: String, port: Int) extends Agent(host, port) wit
 	val maxVelocity = 1.0
 	val team = constants("team")
 
+	trait TankPathFinder {
+		def path : Vector
+		val color : String
+	}
+
 	def moveAlongPotentialField(tank: Tank) {
-		val flagFinders = flags map {
+		val flagFinders = flags filter (_.color != team.toUpperCase) map {
 			flag =>
-				new {
+					LOG.debug("flag: " + flag.color)
+				new TankPathFinder {
 					private val findFlag = new pfFindFlag(store, flag.color)
 
 					def path = {
@@ -59,7 +65,6 @@ class PotentialFieldAgent(host: String, port: Int) extends Agent(host, port) wit
 			def path = finder.getPathVector(tank.location)
 		}
 
-		val finder = flagFinders(1)
 		actor {
 			loop {
 				def waitForNewData() {
@@ -68,7 +73,7 @@ class PotentialFieldAgent(host: String, port: Int) extends Agent(host, port) wit
 				}
 				tank.shoot();
 
-				def move(pdVector : Vector) {
+				def move(pdVector : => Vector) {
 					//	tank.speed(vector.magnitude / maxMagnitude)
 					//val (angle, time) = tank.moveAngle(vector.angle)
 
@@ -113,7 +118,17 @@ class PotentialFieldAgent(host: String, port: Int) extends Agent(host, port) wit
 					pdController(radian(0), pdVector)
 				}
 				def findFlag() {
-					LOG.debug("going to flag")
+					/*
+					val finder = flagFinders.foldLeft((Double.MaxValue, null : TankPathFinder)) { (closest, finder ) =>
+						val magnitude = finder.path.magnitude
+						if (magnitude < closest._1)
+							(magnitude, finder)
+						else
+							closest
+					}._2
+					*/
+					val finder = flagFinders(0)
+					LOG.debug("Going to " + finder.color)
 					move(finder.path)
 				}
 				def returnHome() {
@@ -124,7 +139,7 @@ class PotentialFieldAgent(host: String, port: Int) extends Agent(host, port) wit
 				LOG.debug("flag: " + tank.flag)
 				tank.flag match {
 					case None => findFlag()
-					case flag : Some[String] => returnHome()
+					case Some(flag) => returnHome()
 				}
 			}
 		}
