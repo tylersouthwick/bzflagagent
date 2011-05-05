@@ -73,7 +73,7 @@ class PotentialFieldAgent(host: String, port: Int) extends Agent(host, port) wit
 				}
 				tank.shoot();
 
-				def move(pdVector : Vector) {
+				def move(pdVector : => Vector) {
 					//	tank.speed(vector.magnitude / maxMagnitude)
 					//val (angle, time) = tank.moveAngle(vector.angle)
 
