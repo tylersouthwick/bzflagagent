@@ -71,6 +71,7 @@ class PotentialFieldAgent(host: String, port: Int) extends Agent(host, port) wit
 						LOG.debug("Done Turning");
 						tank.setAngularVelocity(0f)
 						tank.speed(vector.magnitude / maxMagnitude)
+						waitForNewData()
 					} else {
 						//Agents.LOG.debug("Setting velocity to " + v)
 						tank.setAngularVelocity(v)
