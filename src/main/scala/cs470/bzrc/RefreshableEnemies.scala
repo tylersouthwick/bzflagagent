@@ -13,14 +13,14 @@ class RefreshableEnemies(queue : BzrcQueue) extends RefreshableData[OtherTank, E
 		def status = tank.status
 		def color = tank.color
 
-		def callsign = f.callsign
+		val callsign = f.callsign
 	}
 
 	protected def loadData(con: BzFlagConnection) = con.othertanks
 }
 
 trait Enemy {
-	def callsign : String
+	val callsign : String
 	def color : String
 	def status : String
 	def flag : String
