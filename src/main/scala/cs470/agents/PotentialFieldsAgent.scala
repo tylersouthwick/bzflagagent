@@ -30,7 +30,7 @@ class PotentialFieldAgent(host: String, port: Int) extends Agent(host, port) wit
 
 	val Kp = 1
 	val Kd = 4.5
-	val tol = degree(2).radian
+	val tol = degree(5).radian
 	val tolv = .1
 	val maxVel: Double = constants("tankangvel")
 	val worldsize: Int = constants("worldsize")
@@ -69,11 +69,11 @@ class PotentialFieldAgent(host: String, port: Int) extends Agent(host, port) wit
 			loop {
 				def waitForNewData() {
 					RefreshableData.waitForNewData()
-					tank.shoot()
+					//tank.shoot()
 				}
-				tank.shoot();
+				//tank.shoot();
 
-				def move(pdVector : => Vector) {
+				def move(pdVector : Vector) {
 					//	tank.speed(vector.magnitude / maxMagnitude)
 					//val (angle, time) = tank.moveAngle(vector.angle)
 
@@ -84,7 +84,7 @@ class PotentialFieldAgent(host: String, port: Int) extends Agent(host, port) wit
 						LOG.debug("angle: " + angle.degree)
 						val error = targetAngle - angle
 
-						LOG.debug("error: " + error)
+						LOG.debug("error: " + error.degree)
 						val rv = (Kp * error + Kd * (error - error0) / 200);
 						LOG.debug("rv: " + rv)
 						val v = if (rv > maxVel) 1 else rv / maxVel
