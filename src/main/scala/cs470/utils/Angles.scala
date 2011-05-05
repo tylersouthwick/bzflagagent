@@ -20,6 +20,8 @@ trait Angle {
 
 	def +(angle : Angle) : Angle
 	def -(angle : Angle) : Angle
+
+	def abs : Angle
 }
 
 object Degree extends Function1[Double, Radian] {
@@ -34,6 +36,8 @@ class Degree(private val deg : Double) extends Angle {
 
 	def +(angle : Angle) = new Degree(deg + angle.degree.deg)
 	def -(angle : Angle) = new Degree(deg - angle.degree.deg)
+
+	def abs = new Degree(value.abs)
 
 	override def toString = value + " deg"
 }
@@ -50,6 +54,8 @@ class Radian(private val rad : Double) extends Angle {
 
 	def +(angle: Angle) = new Radian(rad + angle.radian.rad)
 	def -(angle: Angle) = new Radian(rad - angle.radian.rad)
+
+	def abs = new Radian(value.abs)
 
 	override def toString = value + " rad"
 }
