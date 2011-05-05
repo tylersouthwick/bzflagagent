@@ -56,6 +56,7 @@ class PotentialFieldAgent(host: String, port: Int) extends Agent(host, port) wit
 
 					val color = flag.color
 					def possessingTeamColor = flag.possessingTeamColor
+					def location = flag.location
 				}
 		}
 		val homeFinder = new {
@@ -118,16 +119,15 @@ class PotentialFieldAgent(host: String, port: Int) extends Agent(host, port) wit
 					pdController(radian(0), pdVector)
 				}
 				def findFlag() {
+					val location = tank.location
+					val finder = flagFinders.foldLeft((Double.MaxValue, null : TankPathFinder)) { (closest, finder ) =>
+						val magnitude = finder.location.distance(location)
+						if (magnitude < closest._1)
+							(magnitude, finder)
+						else
+							closest
+					}._2
 
-//					val finder = flagFinders.foldLeft((Double.MaxValue, null : TankPathFinder)) { (closest, finder ) =>
-//						val magnitude = finder.path.magnitude
-//						if (magnitude < closest._1)
-//							(magnitude, finder)
-//						else
-//							closest
-//					}._2
-//
-					val finder = flagFinders(0)
 					LOG.info("Going to " + finder.color)
 					move(finder.path)
 				}
