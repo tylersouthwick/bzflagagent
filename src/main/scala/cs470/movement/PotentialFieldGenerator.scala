@@ -27,7 +27,7 @@ class pfFindFlag(store : DataStore, flagColor: String) extends PotentialFieldGen
   def getPathVector(point: Point) = {
 
     val fromObstacles = obstacles.foldLeft(new Point(0, 0))((total, obstacle) =>
-      total + RegectivePF(point, obstacle.center, obstacle.maxDistance + 5, 100, 1.2)
+      total + RegectivePF(point, obstacle.center, obstacle.maxDistance + 5, 50, 1.2)
     )
 
 	  val fromEnemies =   getFieldForEnemies(point)
