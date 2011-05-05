@@ -69,9 +69,9 @@ class PotentialFieldAgent(host: String, port: Int) extends Agent(host, port) wit
 			loop {
 				def waitForNewData() {
 					RefreshableData.waitForNewData()
-					//tank.shoot()
+					tank.shoot()
 				}
-				//tank.shoot();
+				tank.shoot();
 
 				def move(pdVector : Vector) {
 					//	tank.speed(vector.magnitude / maxMagnitude)
