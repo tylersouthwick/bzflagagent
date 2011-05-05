@@ -6,6 +6,7 @@ import Point._
 import cs470.bzrc.{DataStore, BzrcQueue}
 import java.util.Random
 import java.security.SecureRandom
+import cs470.utils.Degree
 
 class pfReturnToGoal(store: DataStore, baseGoalColor: String) extends PotentialFieldGenerator(store) {
 
@@ -26,7 +27,7 @@ class pfFindFlag(store : DataStore, flagColor: String) extends PotentialFieldGen
   def getPathVector(point: Point) = {
 
     val fromObstacles = obstacles.foldLeft(new Point(0, 0))((total, obstacle) =>
-      total + RegectivePF(point, obstacle.center, obstacle.maxDistance + 5, 50, 1.2)
+      total + RegectivePF(point, obstacle.center, obstacle.maxDistance + 5, 100, 1.2)
     )
 
 	  /*
@@ -77,6 +78,26 @@ abstract class PotentialFieldGenerator(store: DataStore) extends FindAgentPath(s
     else
       new Point(-beta * (r2 - d) * cos(theta), -beta * (r2 - d) * sin(theta))
   }
+
+	val positive90 = Degree(90)
+	val negative90 = Degree(-90)
+
+	def TangentialPF(current: Point, goal: Point, r1: Double, s: Double, beta: Double, clockwise : Boolean) = {
+		val r2 = r1 + s
+		val d = current.distance(goal)
+		val theta1 = current.getAngle(goal)
+		val i = 30
+
+		val theta = theta1 + {
+			if (clockwise) positive90 else negative90
+		}
+		if (d < r1)
+			new Point(-signum(cos(theta)) * i, -signum(sin(theta)) * i)
+		else if (d > r2)
+			new Point(0, 0)
+		else
+			new Point(-beta * (r2 - d) * cos(theta), -beta * (r2 - d) * sin(theta))
+	}
 }
 
 object PotentialFieldGenerator {
