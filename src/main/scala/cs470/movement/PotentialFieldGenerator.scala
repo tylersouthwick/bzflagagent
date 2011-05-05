@@ -55,7 +55,7 @@ class pfFindFlag(store: DataStore, flagColor: String) extends PotentialFieldGene
 		val fromEnemies = getFieldForEnemies(point)
 
 		val fromTanks = store.tanks.filter(tank => tank.location != point).foldLeft(new Point(0, 0))((total, tank) =>
-			total + RegectivePF(point, tank.location, r.tanks, alpha.s, alpha.tanks)
+			total + RegectivePF(point, tank.location, r.tanks, s.tanks, alpha.tanks)
 		)
 
 		val flag = flags.filter(_.color == flagColor).apply(0)
