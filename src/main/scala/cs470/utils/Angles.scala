@@ -27,7 +27,7 @@ object Degree extends Function1[Double, Radian] {
 }
 
 class Degree(private val deg : Double) extends Angle {
-	val value = deg
+	val value = deg % 360
 
 	def radian = new Radian(deg * PI / 180)
 	def degree = this
@@ -35,7 +35,7 @@ class Degree(private val deg : Double) extends Angle {
 	def +(angle : Angle) = new Degree(deg + angle.degree.deg)
 	def -(angle : Angle) = new Degree(deg - angle.degree.deg)
 
-	override def toString = deg % 360 + " deg"
+	override def toString = deg + " deg"
 }
 
 object Radian extends Function1[Double, Radian] {
@@ -43,7 +43,7 @@ object Radian extends Function1[Double, Radian] {
 }
 
 class Radian(private val rad : Double) extends Angle {
-	val value = rad
+	val value = rad % (2 * PI)
 
 	def degree = new Degree(rad * 180 / PI)
 	def radian = this
