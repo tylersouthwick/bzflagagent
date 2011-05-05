@@ -70,11 +70,7 @@ class Vector(vector: Point) {
     vector + point
   }
 
-	def angle = {
-		println("point: " + vector)
-		val result = java.lang.Math.acos( x / y)
-		new Radian(result)
-	}
+	def angle = new Radian(java.lang.Math.atan2(x, y))
 }
 
 class Polygon(points: Seq[Point]) {
