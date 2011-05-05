@@ -35,6 +35,8 @@ class PotentialFieldAgent(host: String, port: Int) extends Agent(host, port) wit
 	val maxVel : Double = constants("tankangvel")
 	val worldsize : Int = constants("worldsize")
 	val offsetVector = new Vector(new Point(worldsize / 2, worldsize / 2))
+	val maxMagnitude = 100.0
+	val maxVelocity = 1.0
 
 	def moveAlongPotentialField(tank : Tank) {
 		val flagFinders = flags map { flag =>
@@ -49,7 +51,6 @@ class PotentialFieldAgent(host: String, port: Int) extends Agent(host, port) wit
 		}
 
 		val finder = flagFinders(1)
-		val maxMagnitude = 100.0
 		actor {
 			loop {
 		/*flags.foreach(flag =>
@@ -57,7 +58,7 @@ class PotentialFieldAgent(host: String, port: Int) extends Agent(host, port) wit
 		)
 			flagFinders.foreach(finder => println("vector: " + finder.path))
 			*/
-			def pdVector = finder.path// + offsetVector
+			val pdVector = finder.path// + offsetVector
 			//	tank.speed(vector.magnitude / maxMagnitude)
 			//val (angle, time) = tank.moveAngle(vector.angle)
 
@@ -71,7 +72,18 @@ class PotentialFieldAgent(host: String, port: Int) extends Agent(host, port) wit
 					val rv = (Kp * error + Kd * (error - error0) / 200);
 					val v = if(rv > maxVel) 1 else rv/maxVel
 
-					tank.speed(vector.magnitude / maxMagnitude)
+					val speed = {
+						val m = vector.magnitude
+						LOG.debug("magnitude: " + m)
+						val result = m / 30.0
+						if (result > maxVelocity) {
+							maxVelocity
+						} else {
+							result
+						}
+					}
+					LOG.debug("setting speed: " + speed)
+					tank.speed(speed)
 
 					if (abs(error) < tol && abs(v) < tolv) {
 						LOG.debug("Done Turning");
