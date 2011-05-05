@@ -8,6 +8,7 @@ import Angle._
 import java.lang.Math._
 import cs470.bzrc._
 import RefreshableData._
+import cs470.visualization.Visualizer
 
 class PotentialFieldAgent(host: String, port: Int) extends Agent(host, port) with Threading {
 
@@ -29,7 +30,7 @@ class PotentialFieldAgent(host: String, port: Int) extends Agent(host, port) wit
 
 	val Kp = 1
 	val Kd = 4.5
-	val tol = degree(5).radian
+	val tol = degree(2).radian
 	val tolv = .1
 	val maxVel : Double = constants("tankangvel")
 	val worldsize : Int = constants("worldsize")
@@ -39,7 +40,10 @@ class PotentialFieldAgent(host: String, port: Int) extends Agent(host, port) wit
 		val flagFinders = flags map { flag =>
 			new {
 				private val findFlag = new pfFindFlag(store, flag.color)
-				def path = findFlag.getPathVector(tank.location)
+				def path = {
+					val vis = new Visualizer(findFlag, "pf.gpi", obstacles, worldsize, 25)
+					findFlag.getPathVector(tank.location)
+				}
 				val color = flag.color
 			}
 		}
@@ -67,15 +71,15 @@ class PotentialFieldAgent(host: String, port: Int) extends Agent(host, port) wit
 					val rv = (Kp * error + Kd * (error - error0) / 200);
 					val v = if(rv > maxVel) 1 else rv/maxVel
 
+					tank.speed(vector.magnitude / maxMagnitude)
+
 					if (abs(error) < tol && abs(v) < tolv) {
 						LOG.debug("Done Turning");
 						tank.setAngularVelocity(0f)
-						tank.speed(vector.magnitude / maxMagnitude)
 						waitForNewData()
 					} else {
 						//Agents.LOG.debug("Setting velocity to " + v)
 						tank.setAngularVelocity(v)
-						tank.speed(vector.magnitude / maxMagnitude)
 						waitForNewData()
 						pdController(error, pdVector)
 					}
