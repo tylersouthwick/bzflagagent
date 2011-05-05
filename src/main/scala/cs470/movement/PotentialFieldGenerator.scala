@@ -4,6 +4,8 @@ import java.lang.Math._
 import cs470.domain._
 import Point._
 import cs470.bzrc.{DataStore, BzrcQueue}
+import java.util.Random
+import java.security.SecureRandom
 
 class pfReturnToGoal(store: DataStore, baseGoalColor: String) extends PotentialFieldGenerator(store) {
 
@@ -15,7 +17,7 @@ class pfReturnToGoal(store: DataStore, baseGoalColor: String) extends PotentialF
     val base = bases.filter(_.color == baseGoalColor)
     val fromBase =  AttractivePF(point, base(0).points.center, 5, 70, .5)
 
-    new Vector(fromObstacles + fromBase)
+    new Vector(fromObstacles + fromBase + randomVector)
   }
 }
 
@@ -31,20 +33,23 @@ class pfFindFlag(store : DataStore, flagColor: String) extends PotentialFieldGen
 	  val enemies = enemies.foldLeft(new Point(0, 0))((total, obstacle) =>
 		  total + RegectivePF(point, obstacle.center, obstacle.maxDistance + 5, 50, 1.2)
 	  )
-	  */
 
 	  val fromTanks = store.tanks.foldLeft(new Point(0, 0))((total, tank) =>
-		  total //+ RegectivePF(point, tank.location, 5, 5, .8)
+		  total + RegectivePF(point, tank.location, 5, 5, .8)
 	  )
+	  */
 
     val fromFlags =  AttractivePF(point, flags.filter(_.color == flagColor).apply(0).location, 5, 70, .5)
 
-    new Vector(fromObstacles + fromTanks + fromFlags)
+    new Vector(fromObstacles + fromFlags + randomVector)
   }
 
 }
 
 abstract class PotentialFieldGenerator(store: DataStore) extends FindAgentPath(store) {
+	val random = new Random(new java.util.Date().getTime)
+	val max = .02
+	def randomVector = new Point(random.nextDouble % max, random.nextDouble % max)
   def AttractivePF(current: Point, goal: Point, r1: Double, s: Double, alpha: Double) = {
     val r2 = r1 + s
     val as = alpha * s
