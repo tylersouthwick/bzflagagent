@@ -10,7 +10,10 @@ class MyTank(line : String) {
 	val status = splitter.getString
 	val shotsAvailable = splitter.getInt
 	val timeToReload = splitter.getDouble
-	val flag = splitter.getString
+	val flag = {
+		val tmp = splitter.getString
+		if (tmp == "-") None else Some(tmp)
+	}
 	val location = splitter.getPoint
 	val angle = new Radian(splitter.getDouble)
 	val vx = splitter.getDouble

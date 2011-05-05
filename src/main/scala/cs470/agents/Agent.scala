@@ -11,6 +11,7 @@ abstract class Agent(host: String, port: Int) {
   val myTanks = store.tanks
   val obstacles = store.obstacles
 	val enemies = store.enemies
+	val bases = store.bases
 
   def run()
 

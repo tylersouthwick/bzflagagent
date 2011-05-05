@@ -47,7 +47,7 @@ abstract class Tank(queue : BzrcQueue, tanks : RefreshableTanks) extends Threadi
 	def vx: Double
 	def angle: Angle
 	def location: Point
-	def flag: String
+	def flag: Option[String]
 	def timeToReload: Double
 	def shotsAvailable: Int
 	def status: String

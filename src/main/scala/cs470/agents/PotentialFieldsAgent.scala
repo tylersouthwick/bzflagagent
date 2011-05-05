@@ -7,18 +7,18 @@ import cs470.utils._
 import Angle._
 import java.lang.Math._
 import cs470.bzrc._
-import RefreshableData._
 import cs470.visualization.Visualizer
 
 class PotentialFieldAgent(host: String, port: Int) extends Agent(host, port) with Threading {
 
-  import PotentialFieldAgent._
+	import PotentialFieldAgent._
 
 	def run() {
 		LOG.info("Running potential field agent")
 		val tanks = myTanks
 		//pick a tank
-		tanks.filter(_.tankId == 1).foreach{tank =>
+		tanks.filter(_.tankId == 1).foreach {
+			tank =>
 				moveAlongPotentialField(tank)
 		}
 
@@ -32,72 +32,100 @@ class PotentialFieldAgent(host: String, port: Int) extends Agent(host, port) wit
 	val Kd = 4.5
 	val tol = degree(2).radian
 	val tolv = .1
-	val maxVel : Double = constants("tankangvel")
-	val worldsize : Int = constants("worldsize")
+	val maxVel: Double = constants("tankangvel")
+	val worldsize: Int = constants("worldsize")
 	val offsetVector = new Vector(new Point(worldsize / 2, worldsize / 2))
 	val maxMagnitude = 100.0
 	val maxVelocity = 1.0
+	val team = constants("team")
 
-	def moveAlongPotentialField(tank : Tank) {
-		val flagFinders = flags map { flag =>
-			new {
-				private val findFlag = new pfFindFlag(store, flag.color)
-				def path = {
-					val vis = new Visualizer(findFlag, "pf.gpi", obstacles, worldsize, 25)
-					findFlag.getPathVector(tank.location)
+	def moveAlongPotentialField(tank: Tank) {
+		val flagFinders = flags map {
+			flag =>
+				new {
+					private val findFlag = new pfFindFlag(store, flag.color)
+
+					def path = {
+						val vis = new Visualizer(findFlag, "pf.gpi", obstacles, worldsize, 25)
+						findFlag.getPathVector(tank.location)
+					}
+
+					val color = flag.color
+					def possessingTeamColor = flag.possessingTeamColor
 				}
-				val color = flag.color
-			}
+		}
+		val homeFinder = new {
+			val finder = new pfReturnToGoal(store, team)
+			def path = finder.getPathVector(tank.location)
 		}
 
 		val finder = flagFinders(1)
 		actor {
 			loop {
-		/*flags.foreach(flag =>
-				println("flag: " + flag)
-		)
-			flagFinders.foreach(finder => println("vector: " + finder.path))
-			*/
-			val pdVector = finder.path// + offsetVector
-			//	tank.speed(vector.magnitude / maxMagnitude)
-			//val (angle, time) = tank.moveAngle(vector.angle)
+				def waitForNewData() {
+					RefreshableData.waitForNewData()
+					tank.shoot()
+				}
+				tank.shoot();
 
-				def pdController(error0: Radian, vector : Vector) {
-					val targetAngle = vector.angle
-					val angle = tank.angle
-					LOG.debug("targetAngle: " + targetAngle.degree)
-					LOG.debug("angle: " + angle.degree)
-					val error = targetAngle - angle
+				def move(pdVector : Vector) {
+					//	tank.speed(vector.magnitude / maxMagnitude)
+					//val (angle, time) = tank.moveAngle(vector.angle)
 
-					val rv = (Kp * error + Kd * (error - error0) / 200);
-					val v = if(rv > maxVel) 1 else rv/maxVel
+					def pdController(error0: Radian, vector: Vector) {
+						val targetAngle = vector.angle
+						val angle = tank.angle
+						LOG.debug("targetAngle: " + targetAngle.degree)
+						LOG.debug("angle: " + angle.degree)
+						val error = targetAngle - angle
 
-					val speed = {
-						val m = vector.magnitude
-						LOG.debug("magnitude: " + m)
-						val result = m / 30.0
-						if (result > maxVelocity) {
-							maxVelocity
+						LOG.debug("error: " + error)
+						val rv = (Kp * error + Kd * (error - error0) / 200);
+						LOG.debug("rv: " + rv)
+						val v = if (rv > maxVel) 1 else rv / maxVel
+						LOG.debug("v: " + v)
+
+						val speed = {
+							val m = vector.magnitude
+							LOG.debug("magnitude: " + m)
+							val result = m / 30.0
+							if (result > maxVelocity) {
+								maxVelocity
+							} else {
+								result
+							}
+						}
+						LOG.debug("setting speed: " + speed)
+						tank.speed(speed)
+
+						if (abs(error) < tol && abs(v) < tolv) {
+							LOG.debug("Done Turning");
+							tank.setAngularVelocity(0f)
+							waitForNewData()
 						} else {
-							result
+							//Agents.LOG.debug("Setting velocity to " + v)
+							tank.setAngularVelocity(v)
+							waitForNewData()
+							pdController(error, pdVector)
 						}
 					}
-					LOG.debug("setting speed: " + speed)
-					tank.speed(speed)
 
-					if (abs(error) < tol && abs(v) < tolv) {
-						LOG.debug("Done Turning");
-						tank.setAngularVelocity(0f)
-						waitForNewData()
-					} else {
-						//Agents.LOG.debug("Setting velocity to " + v)
-						tank.setAngularVelocity(v)
-						waitForNewData()
-						pdController(error, pdVector)
-					}
+					pdController(radian(0), pdVector)
+				}
+				def findFlag() {
+					LOG.debug("going to flag")
+					move(finder.path)
+				}
+				def returnHome() {
+					LOG.debug("going home")
+					move(homeFinder.path)
 				}
 
-				pdController(radian(0), pdVector)
+				LOG.debug("flag: " + tank.flag)
+				tank.flag match {
+					case None => findFlag()
+					case flag : Some[String] => returnHome()
+				}
 			}
 		}
 	}
@@ -105,9 +133,9 @@ class PotentialFieldAgent(host: String, port: Int) extends Agent(host, port) wit
 }
 
 object PotentialFieldAgent extends AgentCreator {
-  val LOG = org.apache.log4j.Logger.getLogger("cs470.agents.PotentialFieldAgent")
+	val LOG = org.apache.log4j.Logger.getLogger("cs470.agents.PotentialFieldAgent")
 
-  def name = "pf"
+	def name = "pf"
 
-  def create(host: String, port: Int) = new PotentialFieldAgent(host, port)
+	def create(host: String, port: Int) = new PotentialFieldAgent(host, port)
 }
