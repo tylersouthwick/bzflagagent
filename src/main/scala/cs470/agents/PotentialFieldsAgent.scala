@@ -121,21 +121,21 @@ class PotentialFieldAgent(host: String, port: Int) extends Agent(host, port) wit
 					pdController(radian(0), pdVector)
 				}
 				def findFlag() {
-					/*
-					val finder = flagFinders.foldLeft((Double.MaxValue, null : TankPathFinder)) { (closest, finder ) =>
-						val magnitude = finder.path.magnitude
-						if (magnitude < closest._1)
-							(magnitude, finder)
-						else
-							closest
-					}._2
-					*/
+
+//					val finder = flagFinders.foldLeft((Double.MaxValue, null : TankPathFinder)) { (closest, finder ) =>
+//						val magnitude = finder.path.magnitude
+//						if (magnitude < closest._1)
+//							(magnitude, finder)
+//						else
+//							closest
+//					}._2
+//
 					val finder = flagFinders(0)
-					LOG.debug("Going to " + finder.color)
+					LOG.info("Going to " + finder.color)
 					move(finder.path)
 				}
 				def returnHome() {
-					LOG.debug("going home")
+					LOG.info("going home")
 					move(homeFinder.path)
 				}
 

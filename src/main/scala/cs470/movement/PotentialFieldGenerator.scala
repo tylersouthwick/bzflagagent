@@ -38,15 +38,15 @@ class pfFindFlag(store : DataStore, flagColor: String) extends PotentialFieldGen
 
     val fromFlags =  AttractivePF(point, flags.filter(_.color == flagColor).apply(0).location, 5, 70, .5)
 
-    new Vector(fromObstacles + fromTanks + fromFlags + fromEnemies)
+    new Vector(fromObstacles + fromTanks + fromFlags + fromEnemies + randomVector)
   }
 
 }
 
 abstract class PotentialFieldGenerator(store: DataStore) extends FindAgentPath(store) {
 	val random = new Random(new java.util.Date().getTime)
-	val max = .02
-	def randomVector = new Point(random.nextDouble % max, random.nextDouble % max)
+	val s2 = .1
+	def randomVector = new Point(s2 + scala.util.Random.nextGaussian, s2 + scala.util.Random.nextGaussian)
   def AttractivePF(current: Point, goal: Point, r1: Double, s: Double, alpha: Double) = {
     val r2 = r1 + s
     val as = alpha * s
