@@ -74,8 +74,12 @@ class BzFlagConnection(host : String, port : Int) {
 	}
 
 	private def movement(action : String, agent : Int, speed : Double) {
-		send(action + " " + agent + " " + speed)
-		status
+		if (speed == Double.NaN) {
+			LOG.warn("Trying to set " + action + " to NaN")
+		} else {
+			send(action + " " + agent + " " + speed)
+			status
+		}
 	}
 
 	def speed(agent : Int, speed : Double) = movement("speed", agent, speed)

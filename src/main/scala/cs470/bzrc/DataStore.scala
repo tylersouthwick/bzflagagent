@@ -7,4 +7,8 @@ class DataStore(queue : BzrcQueue) {
 	val flags = queue.invokeAndWait(_.flags)
 	val constants = queue.invokeAndWait(_.constants)
 	val bases = queue.invokeAndWait(_.bases)
+
+	flags.foreach {flag =>
+		println("flag: " + flag)
+	}
 }

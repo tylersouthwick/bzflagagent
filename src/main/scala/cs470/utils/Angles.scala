@@ -3,8 +3,8 @@ package cs470.utils
 import java.lang.Math._
 
 object Angle {
-	def radian(rad : Double) = new Radian(rad)
-	def degree(deg : Double) = new Degree(deg)
+	def radian(rad : Double) = Radian(rad)
+	def degree(deg : Double) = Degree(deg)
 
 	implicit def radianAsDouble(angle : Radian) = angle.value
 	implicit def angleAsRadian(angle : Angle) = angle.radian
@@ -22,6 +22,10 @@ trait Angle {
 	def -(angle : Angle) : Angle
 }
 
+object Degree extends Function1[Double, Radian] {
+	def apply(deg: Double) = new Degree(deg)
+}
+
 class Degree(private val deg : Double) extends Angle {
 	val value = deg
 
@@ -32,6 +36,10 @@ class Degree(private val deg : Double) extends Angle {
 	def -(angle : Angle) = new Degree(deg - angle.degree.deg)
 
 	override def toString = deg % 360 + " deg"
+}
+
+object Radian extends Function1[Double, Radian] {
+	def apply(rad: Double) = new Radian(rad)
 }
 
 class Radian(private val rad : Double) extends Angle {

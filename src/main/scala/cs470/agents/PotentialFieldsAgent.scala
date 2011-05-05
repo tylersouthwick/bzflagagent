@@ -1,10 +1,13 @@
 package cs470.agents
 
-import cs470.bzrc.Tank
-import cs470.utils.Threading
-import cs470.visualization.Visualizer
-import cs470.domain.Constants._
-import cs470.movement.{pfReturnToGoal, pfFindFlag}
+import cs470.domain._
+import Constants._
+import cs470.movement._
+import cs470.utils._
+import Angle._
+import java.lang.Math._
+import cs470.bzrc._
+import RefreshableData._
 
 class PotentialFieldAgent(host: String, port: Int) extends Agent(host, port) with Threading {
 
@@ -14,15 +17,72 @@ class PotentialFieldAgent(host: String, port: Int) extends Agent(host, port) wit
 		LOG.info("Running potential field agent")
 		val tanks = myTanks
 		//pick a tank
-		val tank = tanks(1)
-		moveAlongPotentialField(tank)
+		tanks.filter(_.tankId == 1).foreach{tank =>
+				moveAlongPotentialField(tank)
+		}
 
-		val pfgen = new pfReturnToGoal(queue,"blue")
+		/*
+		val pfgen = new pfReturnToGoal(store,"blue")
 		val vis = new Visualizer(pfgen,"pf.gpi",obstacles, convertInt(constants("worldsize")),25)
+		*/
 	}
 
+	val Kp = 1
+	val Kd = 4.5
+	val tol = degree(5).radian
+	val tolv = .1
+	val maxVel : Double = constants("tankangvel")
+	val worldsize : Int = constants("worldsize")
+	val offsetVector = new Vector(new Point(worldsize / 2, worldsize / 2))
+
 	def moveAlongPotentialField(tank : Tank) {
-		tank.speed(1)
+		val flagFinders = flags map { flag =>
+			new {
+				private val findFlag = new pfFindFlag(store, flag.color)
+				def path = findFlag.getPathVector(tank.location)
+				val color = flag.color
+			}
+		}
+
+		val finder = flagFinders(1)
+		val maxMagnitude = 100.0
+		actor {
+			loop {
+		/*flags.foreach(flag =>
+				println("flag: " + flag)
+		)
+			flagFinders.foreach(finder => println("vector: " + finder.path))
+			*/
+			def pdVector = finder.path// + offsetVector
+			//	tank.speed(vector.magnitude / maxMagnitude)
+			//val (angle, time) = tank.moveAngle(vector.angle)
+
+				def pdController(error0: Radian, vector : Vector) {
+					val targetAngle = vector.angle
+					val angle = tank.angle
+					LOG.debug("targetAngle: " + targetAngle.degree)
+					LOG.debug("angle: " + angle.degree)
+					val error = targetAngle - angle
+
+					val rv = (Kp * error + Kd * (error - error0) / 200);
+					val v = if(rv > maxVel) 1 else rv/maxVel
+
+					if (abs(error) < tol && abs(v) < tolv) {
+						LOG.debug("Done Turning");
+						tank.setAngularVelocity(0f)
+						tank.speed(vector.magnitude / maxMagnitude)
+					} else {
+						//Agents.LOG.debug("Setting velocity to " + v)
+						tank.setAngularVelocity(v)
+						tank.speed(vector.magnitude / maxMagnitude)
+						waitForNewData()
+						pdController(error, pdVector)
+					}
+				}
+
+				pdController(radian(0), pdVector)
+			}
+		}
 	}
 
 }

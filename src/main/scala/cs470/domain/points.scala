@@ -1,6 +1,7 @@
 package cs470.domain
 
 import java.lang.Math._
+import cs470.utils.Radian
 
 object Point {
   implicit def convertTupleToPoint(t: Tuple2[Double, Double]) = new Point(t._1, t._2)
@@ -59,6 +60,8 @@ class Vector(vector: Point) {
     new Vector(x * mult, y * mult)
   }
 
+	def +(v : Vector) = new Vector(x + v.x, y + v.y)
+
   def magnitude = {
     vector.distance(new Point(0, 0))
   }
@@ -66,6 +69,12 @@ class Vector(vector: Point) {
   def getArrowHeadPoint(point: Point) = {
     vector + point
   }
+
+	def angle = {
+		println("point: " + vector)
+		val result = java.lang.Math.acos( x / y)
+		new Radian(result)
+	}
 }
 
 class Polygon(points: Seq[Point]) {
@@ -77,9 +86,9 @@ class Polygon(points: Seq[Point]) {
   val edges = points.zipWithIndex.map {
     case (point, idx) =>
       if (idx + 1 < points.size)
-        (point, points.apply(idx + 1))
+        (point, points(idx + 1))
       else
-        (point, points.apply(0))
+        (point, points(0))
   }
 
   val center = {
@@ -87,7 +96,7 @@ class Polygon(points: Seq[Point]) {
   }
 
   val maxDistance = {
-    points.apply(0).distance(center)
+    points(0).distance(center)
   }
 }
 

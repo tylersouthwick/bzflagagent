@@ -1,13 +1,13 @@
 package cs470.movement
 
-import cs470.bzrc.BzrcQueue
 import cs470.domain.{Point,Vector}
+import cs470.bzrc.{DataStore, BzrcQueue}
 
-abstract class FindAgentPath(q: BzrcQueue) {
-  val enemies = q.invokeAndWait(_.othertanks)
-  val obstacles = q.invokeAndWait(_.obstacles)
-  val flags = q.invokeAndWait(_.flags)
-  val bases = q.invokeAndWait(_.bases)
+abstract class FindAgentPath(store : DataStore) {
+  val enemies = store.enemies
+  val obstacles = store.obstacles
+  val flags = store.flags
+  val bases = store.bases
 
   def getPathVector(point: Point) : Vector
 }

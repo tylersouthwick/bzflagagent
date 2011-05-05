@@ -91,7 +91,7 @@ abstract class Tank(queue : BzrcQueue, tanks : RefreshableTanks) extends Threadi
 
 		val startTime = getTime
 		pdController(radian(0), targetAngle)
-		((angle - startingAngle), (getTime - startTime))
+		((angle - startingAngle), (getTime - startTime).asInstanceOf[Int])
 	}
 
 	val Kp = 1
