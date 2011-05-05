@@ -27,19 +27,15 @@ class pfFindFlag(store : DataStore, flagColor: String) extends PotentialFieldGen
       total + RegectivePF(point, obstacle.center, obstacle.maxDistance + 5, 50, 1.2)
     )
 
-	  /*
-	  val enemies = enemies.foldLeft(new Point(0, 0))((total, obstacle) =>
-		  total + RegectivePF(point, obstacle.center, obstacle.maxDistance + 5, 50, 1.2)
-	  )
-	  */
+	  val fromEnemies =   getFieldForEnemies(point)
 
-	  val fromTanks = store.tanks.foldLeft(new Point(0, 0))((total, tank) =>
-		  total //+ RegectivePF(point, tank.location, 5, 5, .8)
+	  val fromTanks = store.tanks.filter(tank => tank.location != point).foldLeft(new Point(0, 0))((total, tank) =>
+		  total + RegectivePF(point, tank.location, 5, 5, .1)
 	  )
 
     val fromFlags =  AttractivePF(point, flags.filter(_.color == flagColor).apply(0).location, 5, 70, .5)
 
-    new Vector(fromObstacles + fromTanks + fromFlags)
+    new Vector(fromObstacles + fromTanks + fromFlags + fromEnemies)
   }
 
 }
@@ -57,6 +53,12 @@ abstract class PotentialFieldGenerator(store: DataStore) extends FindAgentPath(s
       new Point(as * cos(theta), as * sin(theta))
     else
       new Point(alpha * (d - r1) * cos(theta), alpha * (d - r1) * sin(theta))
+  }
+
+  def getFieldForEnemies(current:Point) = {
+     enemies.foldLeft(new Point(0,0))((total,enemy) =>
+        total + RegectivePF (current,enemy.location,3,5,.4)
+     )
   }
 
   def RegectivePF(current: Point, goal: Point, r1: Double, s: Double, beta: Double) = {
