@@ -12,6 +12,7 @@ object PotentialFieldConstants {
 		val base = 50
 		val tanks = 10
 		val flag = 70
+		val enemy = 5
 	}
 
 	val alpha = new {
@@ -19,13 +20,15 @@ object PotentialFieldConstants {
 		val base = 1
 		val tanks = .2
 		val flag = .5
+		val enemy = .4
 	}
 
 	val r = new {
 		val base = 5
-		val obstacle = 5
+		val obstacle = 0
 		val tanks = 5
 		val flag = 5
+		val enemy = 3
 	}
 }
 
@@ -87,7 +90,7 @@ abstract class PotentialFieldGenerator(store: DataStore) extends FindAgentPath(s
 
 	def getFieldForEnemies(current: Point) = {
 		enemies.foldLeft(new Point(0, 0))((total, enemy) =>
-			total + RegectivePF(current, enemy.location, 3, 5, .4)
+			total + RegectivePF(current, enemy.location, r.enemy, s.enemy, alpha.enemy)
 		)
 	}
 

@@ -17,10 +17,7 @@ class PotentialFieldAgent(host: String, port: Int) extends Agent(host, port) wit
 		LOG.info("Running potential field agent")
 		val tanks = myTanks
 		//pick a tank
-		tanks.filter(_.tankId == 1).foreach {
-			tank =>
-				moveAlongPotentialField(tank)
-		}
+		tanks.foreach(moveAlongPotentialField)
 
 		/*
 		val pfgen = new pfReturnToGoal(store,"blue")
@@ -36,8 +33,9 @@ class PotentialFieldAgent(host: String, port: Int) extends Agent(host, port) wit
 	val worldsize: Int = constants("worldsize")
 	val offsetVector = new Vector(new Point(worldsize / 2, worldsize / 2))
 	val maxMagnitude = 100.0
-	val maxVelocity = 0.75
+	val maxVelocity = 1
 	val team = constants("team")
+	val turningSpeed = 0.6
 
 	trait TankPathFinder {
 		def path : Vector
@@ -73,7 +71,7 @@ class PotentialFieldAgent(host: String, port: Int) extends Agent(host, port) wit
 				}
 				tank.shoot();
 
-				def move(pdVector : Vector) {
+				def move(pdVector : => Vector) {
 					//	tank.speed(vector.magnitude / maxMagnitude)
 					//val (angle, time) = tank.moveAngle(vector.angle)
 
@@ -110,9 +108,8 @@ class PotentialFieldAgent(host: String, port: Int) extends Agent(host, port) wit
 							//Agents.LOG.debug("Setting velocity to " + v)
 							tank.setAngularVelocity(v)
 							//slow it down to turn
-							val speed = 0.1
-							LOG.debug("setting speed: " + speed)
-							tank.speed(speed)
+							LOG.debug("setting speed: " + turningSpeed)
+							tank.speed(turningSpeed)
 							waitForNewData()
 							pdController(error, pdVector)
 						}
