@@ -70,7 +70,7 @@ class Vector(vector: Point) {
     vector + point
   }
 
-	def angle = new Radian(java.lang.Math.atan2(x, y))
+	def angle = new Radian(java.lang.Math.atan2(y, x))
 }
 
 class Polygon(points: Seq[Point]) {
