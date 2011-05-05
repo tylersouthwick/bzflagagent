@@ -12,11 +12,11 @@ class pfReturnToGoal(store: DataStore, baseGoalColor: String) extends PotentialF
 
   def getPathVector(point: Point) = {
     val fromObstacles = obstacles.foldLeft(new Point(0, 0))((total, obstacle) =>
-      total + RegectivePF(point, obstacle.center, obstacle.maxDistance + 5, 50, 1.2)
+      total + RegectivePF(point, obstacle.center, obstacle.maxDistance + 5, 50, 1)
     )
 
     val base = bases.filter(_.color == baseGoalColor)
-    val fromBase =  AttractivePF(point, base(0).points.center, 5, 70, .5)
+    val fromBase =  AttractivePF(point, base(0).points.center, 5, 50, 1)
 
     new Vector(fromObstacles + fromBase + randomVector)
   }
@@ -27,13 +27,13 @@ class pfFindFlag(store : DataStore, flagColor: String) extends PotentialFieldGen
   def getPathVector(point: Point) = {
 
     val fromObstacles = obstacles.foldLeft(new Point(0, 0))((total, obstacle) =>
-      total + RegectivePF(point, obstacle.center, obstacle.maxDistance + 5, 50, 1.2)
+      total + RegectivePF(point, obstacle.center, obstacle.maxDistance + 5, 50, 1)
     )
 
 	  val fromEnemies =   getFieldForEnemies(point)
 
 	  val fromTanks = store.tanks.filter(tank => tank.location != point).foldLeft(new Point(0, 0))((total, tank) =>
-		  total + RegectivePF(point, tank.location, 5, 5, .1)
+		  total + RegectivePF(point, tank.location, 5, 10, .2)
     )
 
     val fromFlags =  AttractivePF(point, flags.filter(_.color == flagColor).apply(0).location, 5, 70, .5)
