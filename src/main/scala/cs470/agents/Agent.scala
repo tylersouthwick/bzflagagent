@@ -1,38 +1,38 @@
 package cs470.agents
 
-import cs470.bzrc.{DataStore, RefreshableEnemies, BzrcQueue, RefreshableTanks}
+import cs470.bzrc.{DataStore, BzrcQueue}
 
 abstract class Agent(host: String, port: Int) {
-  val queue = new BzrcQueue(host, port)
+	val queue = new BzrcQueue(host, port)
 	val store = new DataStore(queue)
 
-  val constants = store.constants
-  val flags = store.flags
-  val myTanks = store.tanks
-  val obstacles = store.obstacles
+	val constants = store.constants
+	val flags = store.flags
+	val myTanks = store.tanks
+	val obstacles = store.obstacles
 	val enemies = store.enemies
 	val bases = store.bases
 
-  def run()
+	def run()
 
 }
 
 trait AgentCreator {
-  def name: String
+	def name: String
 
-  def create(host: String, port: Int): Agent
+	def create(host: String, port: Int): Agent
 
-  override def toString = name
+	override def toString = name
 }
 
 object Agents {
-  val all = Seq(DummyAgent,PotentialFieldAgent)
-  val LOG = org.apache.log4j.Logger.getLogger("cs470.agents.Agents")
+	val all = Seq(DummyAgent, PotentialFieldAgent, PotentialFieldsVisualizerAgent)
+	val LOG = org.apache.log4j.Logger.getLogger("cs470.agents.Agents")
 
-  def start(agent: String, host: String, port: Int) {
-    LOG.info("Creating agent: " + agent)
-    val agents = all.filter(_.name == agent).map(_.create(host, port))
-    LOG.info("Created agents " + agents)
-    agents.foreach(_.run)
-  }
+	def start(agent: String, host: String, port: Int) {
+		LOG.info("Creating agent: " + agent)
+		val agents = all.filter(_.name == agent).map(_.create(host, port))
+		LOG.info("Created agents " + agents)
+		agents.foreach(_.run())
+	}
 }
