@@ -35,36 +35,23 @@ object PotentialFieldConstants {
 import PotentialFieldConstants._
 class pfReturnToGoal(store: DataStore, baseGoalColor: String) extends PotentialFieldGenerator(store) {
 
+	val base = bases.find(_.color == baseGoalColor).get
+
 	def getPathVector(point: Point) = {
-		val fromObstacles = obstacles.foldLeft(new Point(0, 0))((total, obstacle) =>
-			total + RegectivePF(point, obstacle.center, obstacle.maxDistance + r.obstacle, s.obstacle, alpha.obstacle)
-		)
+		val toBase = AttractivePF(point, base.points.center, r.base, s.base, alpha.base)
 
-		val base = bases.find(_.color == baseGoalColor).get
-		val fromBase = AttractivePF(point, base.points.center, r.base, s.base, alpha.base)
-
-		new Vector(fromObstacles + fromBase + randomVector)
+		new Vector(toBase + buildRejectiveField(point) + randomVector)
 	}
 }
 
 class pfFindFlag(store: DataStore, flagColor: String) extends PotentialFieldGenerator(store) {
 
+	val flag = flags.find(_.color == flagColor).get
+
 	def getPathVector(point: Point) = {
+		val toFlag = AttractivePF(point, flag.location, r.flag, s.flag, alpha.flag)
 
-		val fromObstacles = obstacles.foldLeft(new Point(0, 0))((total, obstacle) =>
-			total + RegectivePF(point, obstacle.center, obstacle.maxDistance + r.obstacle , s.base, alpha.obstacle)
-		)
-
-		val fromEnemies = getFieldForEnemies(point)
-
-		val fromTanks = store.tanks.filter(tank => tank.location != point).foldLeft(new Point(0, 0))((total, tank) =>
-			total + RegectivePF(point, tank.location, r.tanks, s.tanks, alpha.tanks)
-		)
-
-		val flag = flags.find(_.color == flagColor).get
-		val fromFlags = AttractivePF(point, flag.location, r.flag, s.flag, alpha.flag)
-
-		new Vector(fromObstacles + fromTanks + fromFlags + fromEnemies + randomVector)
+		new Vector(toFlag + buildRejectiveField(point) + randomVector)
 	}
 
 }
@@ -88,9 +75,23 @@ abstract class PotentialFieldGenerator(store: DataStore) extends FindAgentPath(s
 			new Point(alpha * (d - r1) * cos(theta), alpha * (d - r1) * sin(theta))
 	}
 
+	def buildRejectiveField(current : Point) = getFieldForEnemies(current) + getFieldForTanks(current) + getFieldForObstacles(current)
+
 	def getFieldForEnemies(current: Point) = {
 		enemies.foldLeft(new Point(0, 0))((total, enemy) =>
 			total + RegectivePF(current, enemy.location, r.enemy, s.enemy, alpha.enemy)
+		)
+	}
+
+	def getFieldForObstacles(point : Point) = {
+		obstacles.foldLeft(new Point(0, 0))((total, obstacle) =>
+			total + RegectivePF(point, obstacle.center, obstacle.maxDistance + r.obstacle, s.obstacle, alpha.obstacle)
+		)
+	}
+
+	def getFieldForTanks(point : Point) = {
+		tanks.filter(tank => tank.location != point).foldLeft(new Point(0, 0))((total, tank) =>
+			total + RegectivePF(point, tank.location, r.tanks, s.tanks, alpha.tanks)
 		)
 	}
 
