@@ -22,7 +22,8 @@ realclean:
 
 %.d:	%.tex
 	echo "$(@:.d=.pdf) $@: $(@:.d=.tex) \\" > $@
-	grep includegraphics lab1.tex | cut -f 2 -d { | cut -f 1 -d } | sed 's/$$/\\/'  >> $@
+	grep includegraphics lab1.tex | grep -v subfigure | cut -f 2 -d { | cut -f 1 -d } | sed 's/$$/\\/'  >> $@
+	grep includegraphics lab1.tex | grep subfigure | cut -f 3 -d { | cut -f 1 -d } | sed 's/$$/\\/'  >> $@
 
 
 include	$(MAIN:.pdf=.d)
