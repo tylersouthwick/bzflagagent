@@ -15,7 +15,7 @@ all: $(MAIN)
 
 clean:
 	rm -f *.aux *.log *.dvi *.blg *.bbl *.d
-	find plots | grep png | xargs rm -f
+	#find plots | grep png | xargs rm -f
 
 realclean:
 	rm -f *.aux *.log *.dvi *.blg *.bbl *.d *.ps *.pdf
