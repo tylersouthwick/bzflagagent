@@ -2,7 +2,6 @@
 
 \usepackage[letterpaper,margin=0.75in]{geometry}
 \usepackage{graphicx}
-\usepackage{listings}
 \usepackage{subfigure}
 
 \begin{document}
@@ -26,39 +25,21 @@ By having the walls repulsive with $\beta = 1$ and $s$ equal to the maxDistance 
 \subsection{four\_ls}
 
 \begin{figure}[h]
-	\caption{Potential field towards flag or base}
-	\includegraphics[scale=.2]{plots/four_ls/pfFlag.png}
-\end{figure}
-\begin{figure}[h]
-	\caption{Potential fields away from obstacles}
-	\includegraphics[scale=.2]{plots/four_ls/pfObstacles.png}
-\end{figure}
-\begin{figure}[h]
-	\caption{Potential fields around obstacles (Tangential)}
-	\includegraphics[scale=.2]{plots/four_ls/pfObstaclesTangential.png}
-\end{figure}
-\begin{figure}[h]
-	\caption{Potential field towards flag or base and away from obstacles}
-	\includegraphics[scale=.2]{plots/four_ls/pfFlagsAndObstacles.png}
+	\subfigure[Toward flag or base]{\includegraphics[width=.24\textwidth]{plots/four_ls/pfFlag.png}}
+	\subfigure[Repulsive around obstacles]{\includegraphics[width=.24\textwidth]{plots/four_ls/pfObstacles.png}}
+	\subfigure[Tangential around obstacles]{\includegraphics[width=.24\textwidth]{plots/four_ls/pfObstaclesTangential.png}}
+	\subfigure[Attractive and repulsize]{\includegraphics[width=.24\textwidth]{plots/four_ls/pfFlagsAndObstacles.png}}
+	\caption{Potential fields in the FourLS World}
 \end{figure}
 
 \subsection{rotated squares}
 
 \begin{figure}[h]
-	\caption{Potential field towards flag or base}
-	\includegraphics[scale=.2]{plots/rotated_box_world/pfFlag.png}
-\end{figure}
-\begin{figure}[h]
-	\caption{Potential fields away from obstacles}
-	\includegraphics[scale=.2]{plots/rotated_box_world/pfObstacles.png}
-\end{figure}
-\begin{figure}[h]
-	\caption{Potential fields around obstacles (Tangential)}
-	\includegraphics[scale=.2]{plots/rotated_box_world/pfObstaclesTangential.png}
-\end{figure}
-\begin{figure}[h]
-	\caption{Potential field towards flag or base and away from obstacles}
-	\includegraphics[scale=.2]{plots/rotated_box_world/pfFlagsAndObstacles.png}
+	\subfigure[Attractive Fields]{\includegraphics[width=.24\textwidth]{plots/rotated_box_world/pfFlag.png}}
+	\subfigure[Repulsive Fields]{\includegraphics[width=.24\textwidth]{plots/rotated_box_world/pfObstacles.png}}
+	\subfigure[Tangential Fields]{\includegraphics[width=.24\textwidth]{plots/rotated_box_world/pfObstaclesTangential.png}}
+	\subfigure[Attractive and Tangential]{\includegraphics[width=.24\textwidth]{plots/rotated_box_world/pfFlagsAndObstacles.png}}
+	\caption{Potential fields in the rotated box world}
 \end{figure}
 
 \section{Tests}
