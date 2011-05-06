@@ -1,1 +1,6 @@
 *.png
+*.d
+*.iws
+build
+.gradle
+*.swp
