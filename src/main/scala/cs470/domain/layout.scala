@@ -8,7 +8,7 @@ class Base(line: String) {
 
 class Flag(line: String) {
   private val splitter = new Parser("flag", line)
-  val color = splitter.getString.toUpperCase
+  val color = splitter.getString
   val possessingTeamColor = splitter.getString
   val location = new Point(splitter.getDouble, splitter.getDouble)
 

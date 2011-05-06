@@ -43,7 +43,7 @@ class PotentialFieldAgent(host: String, port: Int) extends Agent(host, port) wit
 	}
 
 	def moveAlongPotentialField(tank: Tank) {
-		val flagFinders = flags filter (_.color != team.toUpperCase) map {
+		val flagFinders = flags filter (_.color != team) map {
 			flag =>
 					LOG.debug("flag: " + flag.color)
 				new TankPathFinder {
@@ -121,15 +121,24 @@ class PotentialFieldAgent(host: String, port: Int) extends Agent(host, port) wit
 				def findFlag() {
 					val location = tank.location
 					val finder = flagFinders.foldLeft((Double.MaxValue, null : TankPathFinder)) { (closest, finder ) =>
-						val magnitude = finder.location.distance(location)
-						if (magnitude < closest._1)
-							(magnitude, finder)
-						else
+						if (finder.possessingTeamColor == team)
 							closest
+						else {
+							val magnitude = finder.location.distance(location)
+							if (magnitude < closest._1)
+								(magnitude, finder)
+							else
+								closest
+						}
 					}._2
 
-					LOG.info("Going to " + finder.color)
-					move(finder.path)
+					if (finder == null) {
+						LOG.debug("my team has all the flags, so go home")
+						returnHome()
+					} else {
+						LOG.info("Going to " + finder.color)
+						move(finder.path)
+					}
 				}
 				def returnHome() {
 					LOG.info("going home")
