@@ -89,6 +89,12 @@ abstract class PotentialFieldGenerator(store: DataStore) extends FindAgentPath(s
 		)
 	}
 
+	def getFieldForObstaclesTangential(point : Point, clockwise : Boolean) = {
+		obstacles.foldLeft(new Point(0, 0))((total, obstacle) =>
+			total + TangentialPF(point, obstacle.center, obstacle.maxDistance + r.obstacle, s.obstacle, alpha.obstacle, clockwise)
+		)
+	}
+
 	def getFieldForTanks(point : Point) = {
 		tanks.filter(tank => tank.location != point).foldLeft(new Point(0, 0))((total, tank) =>
 			total + RegectivePF(point, tank.location, r.tanks, s.tanks, alpha.tanks)

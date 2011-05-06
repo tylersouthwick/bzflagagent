@@ -30,8 +30,12 @@ class PotentialFieldsVisualizerAgent(host : String, port : Int) extends Agent(ho
 		val obstaclesField = new PotentialFieldGenerator(store = store) {
 			def getPathVector(point: Point) = new Vector(getFieldForObstacles(point))
 		}
+		val obstaclesTangentialField = new PotentialFieldGenerator(store = store) {
+			def getPathVector(point: Point) = new Vector(getFieldForObstaclesTangential(point, true))
+		}
 
 		new Visualizer(obstaclesField, "pfObstacles.gpi", obstacles, worldsize, 25)
+		new Visualizer(obstaclesTangentialField, "pfObstaclesTangential.gpi", obstacles, worldsize, 25)
 		new Visualizer(flagField, "pfFlag.gpi", obstacles, worldsize, 25)
 		new Visualizer(flagAndObstaclesField, "pfFlagsAndObstacles.gpi", obstacles, worldsize, 25)
 	}
