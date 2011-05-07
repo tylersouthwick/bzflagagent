@@ -3,8 +3,12 @@
 \usepackage[letterpaper,margin=0.75in]{geometry}
 \usepackage{graphicx}
 \usepackage{subfigure}
+\usepackage{amsmath}
+\usepackage{float}
 
 \begin{document}
+
+\newcommand{\sgn}{\operatorname{sgn}}
 
 \title{Lab \#1 Report}
 
@@ -15,6 +19,40 @@
 \maketitle
 
 \section{Potential Fields}
+\subsection{Definition}
+The following are the definitions for the potential fields used, where $d$ is the distance from the object to the goal, $r$ is the main area, $s$ is a buffer zone, $\theta$ is the angle between the object and the goal, and $\alpha$ and $\beta$ are scaling parameters.
+
+The attractive potential fields are defined as:
+\begin{equation}
+a(d,\theta,r,s,\alpha) = \left\{
+     \begin{array}{ll}
+       (0,0) & : d < r\\
+			(\alpha s  \cos(\theta),\alpha s \cos(\theta)) & : d > r + s \\
+			(\alpha (d-r) \cos(\theta),\alpha (d-r) \sin(\theta)) & : otherwise
+     \end{array}
+   \right.
+\end{equation}
+The regective potential fields are defined as:
+\begin{equation}
+r(d,\theta,r,s,i,\beta) = \left\{
+	\begin{array}{ll}
+		(-\sgn(\cos(\theta)) i,-\sgn(\sin(\theta))i) & : d < r \\
+		(0,0) & : d > r + s\\
+		(-\beta (r + s - d) \cos(\theta),-\beta (r + s -d) \sin(\theta)) & : otherwise
+	\end{array}
+\right.
+\end{equation}
+The tangential field is defined as:
+\begin{equation}
+t(d,\theta,r,s,\beta,i) = \left\{
+	\begin{array}{ll}
+		(-\sgn(\cos(\theta)) i,-\sgn(\sin(\theta)) i) & : d < r \\
+		(0, 0) & : d > r + s \\
+		(-\beta (r + s -d) \cos(\theta), -\beta (r + s - d) \sin(\theta)) & : otherwise
+		
+	\end{array}
+\right.
+\end{equation}
 \subsection{Usage}
 
 We ended up using reflective fields around the obstacles as they seemed to work better than the tangential fields.
@@ -32,23 +70,25 @@ There is also an attractive field for the home base (where they need to go after
 
 \subsection{four\_ls}
 
-\begin{figure}[h]
-	\subfigure[Toward flag or base]{\includegraphics[width=.24\textwidth]{plots/four_ls/pfFlag.png}}
-	\subfigure[Repulsive around obstacles]{\includegraphics[width=.24\textwidth]{plots/four_ls/pfObstacles.png}}
-	\subfigure[Tangential around obstacles]{\includegraphics[width=.24\textwidth]{plots/four_ls/pfObstaclesTangential.png}}
+\begin{figure}[H]
+	\subfigure[Attractive]{\includegraphics[width=.24\textwidth]{plots/four_ls/pfFlag.png}}
+	\subfigure[Repulsive]{\includegraphics[width=.24\textwidth]{plots/four_ls/pfObstacles.png}}
+	\subfigure[Tangential]{\includegraphics[width=.24\textwidth]{plots/four_ls/pfObstaclesTangential.png}}
 	\subfigure[Attractive and repulsize]{\includegraphics[width=.24\textwidth]{plots/four_ls/pfFlagsAndObstacles.png}}
-	\caption{Potential fields in the FourLS World}
+	\caption{Potential fields in the Four-Ls World}
 \end{figure}
 
 \subsection{rotated squares}
 
-\begin{figure}[h]
-	\subfigure[Attractive Fields]{\includegraphics[width=.24\textwidth]{plots/rotated_box_world/pfFlag.png}}
-	\subfigure[Repulsive Fields]{\includegraphics[width=.24\textwidth]{plots/rotated_box_world/pfObstacles.png}}
-	\subfigure[Tangential Fields]{\includegraphics[width=.24\textwidth]{plots/rotated_box_world/pfObstaclesTangential.png}}
+\begin{figure}[H]
+	\subfigure[Attractive]{\includegraphics[width=.24\textwidth]{plots/rotated_box_world/pfFlag.png}}
+	\subfigure[Repulsive]{\includegraphics[width=.24\textwidth]{plots/rotated_box_world/pfObstacles.png}}
+	\subfigure[Tangential]{\includegraphics[width=.24\textwidth]{plots/rotated_box_world/pfObstaclesTangential.png}}
 	\subfigure[Attractive and Tangential]{\includegraphics[width=.24\textwidth]{plots/rotated_box_world/pfFlagsAndObstacles.png}}
 	\caption{Potential fields in the rotated box world}
 \end{figure}
+
+
 
 \section{Tests}
 We tested our agent against Daniel Brown and Ryan Hintze's agent.
