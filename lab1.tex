@@ -56,6 +56,11 @@ Our PF agent lost against theirs.
 We had our PF agent going really slow to guarantee that he followed the field path.
 After we ran the tests, we tweaked the values of the different fields as well as our controller and were significantly able to increase speed.
 
+\section{Controller}
+For turning we used a PD controller that slows the tank down to $.6$ while turning and then resets the speed to $1$ when we are going in the right direction.
+We have $K_p = 1$, $K_d = 4.5$, the angle error tolerance at $2 \deg$.
+As the tank gets closer to the flag, he slows down to not over shoot the flag.
+
 \section{Time Spent}
 Taylor spent about 20 hours, with about 2 hours getting used to the language (Scala).
 Tyler spent about 17 hours.
