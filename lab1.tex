@@ -22,6 +22,14 @@ At first, we had a guy moving really slow and he followed the fields exactly.
 But, as we speed him up, we found that he could get caught in the tangential fields on the four l's world.
 By having the walls repulsive with $\beta = 1$ and $s$ equal to the maxDistance from the center of the obstacle to the furthest out edge, making a disk, plus 5 ($s=maxDistance + 5)$ the agent could successfully navigate through the obstacles.
 
+There are also repulsive fields around our tanks as well as around the enemies.
+At first we didn't have any repulsive fields around our tanks, but we would run into a problem that a tank might get stuck behind another tank.
+The same problem would happen with enemies, if the enemy wasn't moving.
+Our tanks are configured as $(s, \beta, r) = (10, .2, 5)$ and the enemy tanks are configured as $(s, \beta, r) = (5, .4, 3)$.
+
+We have an attractive field for the flag that they are going to, with parameters $(s, \alpha, r) = (70, .5, 5)$. 
+There is also an attractive field for the home base (where they need to go after they get a flag), with parameters $(s, \alpha, r) = (50, 1, 5)$. 
+
 \subsection{four\_ls}
 
 \begin{figure}[h]
