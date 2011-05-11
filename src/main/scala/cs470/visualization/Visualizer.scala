@@ -4,35 +4,27 @@ import java.io.{FileOutputStream, PrintWriter}
 import cs470.domain.{Polygon, Point}
 import cs470.movement.{FindAgentPath}
 
-class Visualizer(pathFinder: FindAgentPath, filename: String, obstacles: Seq[Polygon], worldsize: Int, samples: Int) {
+object Color extends Enumeration {
+  type Color = Value
 
-  import PFVisualizer._
+  val BLACK = Value("-1")
+  val RED = Value("1")
+  val GREEN = Value("2")
+  val BLUE = Value("3")
+  val PURPLE = Value("4")
+  val AQUA = Value("5")
+  val BROWN = Value("6")
+  val ORANGE = Value("7")
+  val LIGHT_BROWN = Value("8")
+}
 
-  private val vec_len = 0.75 * worldsize / samples
+class PFVisualizer(pathFinder: FindAgentPath, filename: String, obstacles: Seq[Polygon], worldsize: Int, samples: Int) extends Visualizer(filename, obstacles, worldsize, "PF") {
 
-  LOG.debug("Opening file for visualization for potential fields to: " + filename)
-  private val file = new PrintWriter(new FileOutputStream(filename))
+  private lazy val vec_len = 0.75 * worldsize.asInstanceOf[Double] / samples.asInstanceOf[Double]
 
-  setGnuPlotHeader()
-  drawObjects()
-  plotField()
+  close()
 
-  LOG.debug("Saving PF visualization to file: " + filename)
-  file.close()
-  LOG.info("Visualization for potential fields saved to: " + filename)
-
-  private def drawObjects() {
-    write("unset arrow")
-    obstacles.foreach {
-      obstacle =>
-        obstacle.edges.foreach {
-          case (p1, p2) =>
-            write("set arrow from " + p1.x + ", " + p1.y + " to " + p2.x + ", " + p2.y + " nohead lt 3")
-        }
-    }
-  }
-
-  private def plotField() {
+  override def plot() {
     write("plot '-' with vectors head")
 
     val diff: Int = worldsize / samples
@@ -59,6 +51,53 @@ class Visualizer(pathFinder: FindAgentPath, filename: String, obstacles: Seq[Pol
     write("e")
 
   }
+}
+
+class SearchVisualizer(filename: String, obstacles: Seq[Polygon], worldsize: Int) extends Visualizer(filename, obstacles, worldsize, "search") {
+  private val delay = 0.01
+
+  def drawNodes(nodes: Seq[(Point, Point)]) {
+    nodes.foreach {
+      case (p1, p2) =>
+        drawLine(p1, p2, Color.ORANGE)
+    }
+
+    write("pause " + delay)
+  }
+
+  override def plot() {
+
+  }
+
+}
+
+abstract class Visualizer(filename: String, obstacles: Seq[Polygon], worldsize: Int, name: String) {
+
+  import cs470.visualization.Visualizer._
+
+  LOG.debug("Opening file for visualization for " + name + " to: " + filename)
+  private val file = new PrintWriter(new FileOutputStream(filename))
+
+  setGnuPlotHeader()
+  drawObjects()
+  plot()
+
+  LOG.debug("Saving " + name + " visualization to file: " + filename)
+
+  def drawLine(p1: Point, p2: Point, color: Color.Color) {
+    write("set arrow from " + p1.x + ", " + p1.y + " to " + p2.x + ", " + p2.y + " nohead lt " + color)
+  }
+
+  private def drawObjects() {
+    write("unset arrow")
+    obstacles.foreach {
+      obstacle =>
+        obstacle.edges.foreach {
+          case (p1, p2) =>
+            drawLine(p1, p2, Color.BLUE)
+        }
+    }
+  }
 
   private def setGnuPlotHeader() {
     val size2 = worldsize / 2
@@ -72,8 +111,15 @@ class Visualizer(pathFinder: FindAgentPath, filename: String, obstacles: Seq[Pol
   def write(s: String) {
     file.println(s)
   }
+
+  def plot() {}
+
+  def close() {
+    file.close()
+    LOG.info("Visualization for " + name + " saved to: " + filename)
+  }
 }
 
-object PFVisualizer {
-  val LOG = org.apache.log4j.Logger.getLogger("cs470.visualizer.pf")
+object Visualizer {
+  val LOG = org.apache.log4j.Logger.getLogger("cs470.visualizer")
 }

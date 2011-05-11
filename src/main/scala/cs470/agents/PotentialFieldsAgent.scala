@@ -7,7 +7,7 @@ import cs470.utils._
 import Angle._
 import java.lang.Math._
 import cs470.bzrc._
-import cs470.visualization.Visualizer
+import cs470.visualization.PFVisualizer
 
 class PotentialFieldAgent(host: String, port: Int) extends Agent(host, port) with Threading {
 
@@ -51,7 +51,7 @@ class PotentialFieldAgent(host: String, port: Int) extends Agent(host, port) wit
 
 					def path = {
 						if (LOG.isDebugEnabled) {
-							val vis = new Visualizer(findFlag, "pf" + flag.color + ".gpi", obstacles, worldsize, 25)
+							val vis = new PFVisualizer(findFlag, "pf" + flag.color + ".gpi", obstacles, worldsize, 25)
 						}
 						findFlag.getPathVector(tank.location)
 					}

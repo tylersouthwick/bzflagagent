@@ -4,7 +4,7 @@ import cs470.movement.{PotentialFieldGenerator, PotentialFieldConstants}
 import PotentialFieldConstants._
 import cs470.domain._
 import Constants._
-import cs470.visualization.Visualizer
+import cs470.visualization.PFVisualizer
 
 class PotentialFieldsVisualizerAgent(host : String, port : Int) extends Agent(host, port) {
 	val worldsize : Int = constants("worldsize")
@@ -34,10 +34,10 @@ class PotentialFieldsVisualizerAgent(host : String, port : Int) extends Agent(ho
 			def getPathVector(point: Point) = new Vector(getFieldForObstaclesTangential(point, true))
 		}
 
-		new Visualizer(obstaclesField, "pfObstacles.gpi", obstacles, worldsize, 25)
-		new Visualizer(obstaclesTangentialField, "pfObstaclesTangential.gpi", obstacles, worldsize, 25)
-		new Visualizer(flagField, "pfFlag.gpi", obstacles, worldsize, 25)
-		new Visualizer(flagAndObstaclesField, "pfFlagsAndObstacles.gpi", obstacles, worldsize, 25)
+		new PFVisualizer(obstaclesField, "pfObstacles.gpi", obstacles, worldsize, 25)
+		new PFVisualizer(obstaclesTangentialField, "pfObstaclesTangential.gpi", obstacles, worldsize, 25)
+		new PFVisualizer(flagField, "pfFlag.gpi", obstacles, worldsize, 25)
+		new PFVisualizer(flagAndObstaclesField, "pfFlagsAndObstacles.gpi", obstacles, worldsize, 25)
 	}
 }
 
