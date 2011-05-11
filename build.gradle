@@ -17,6 +17,8 @@ dependencies {
 	compile 'org.scala-lang:scala-library:2.8.1'
 	compile 'commons-cli:commons-cli:1.2'
 	compile 'log4j:log4j:1.2.16'
+
+	testCompile 'junit:junit:4.8.1'
 }
 
 jar {

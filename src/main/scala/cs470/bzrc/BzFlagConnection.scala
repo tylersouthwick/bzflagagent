@@ -97,11 +97,11 @@ class BzFlagConnection(host : String, port : Int) {
 
     def constants = new Constants(receiveItems("constants", new Constant(_)))
 
-	def occgrid(agent : Int) {
+	def occgrid(agent : Int) = {
 		send("occgrid " + agent)
-		receive { line =>
-			LOG.debug("occgrid :: " + line)
-		}
+		val occgrid = new Occgrid
+		receive (occgrid.read)
+		occgrid
 	}
 }
 

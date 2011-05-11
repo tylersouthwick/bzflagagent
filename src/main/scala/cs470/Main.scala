@@ -8,7 +8,7 @@ object Main {
 	val LOG = Logger.getLogger("cs470.Main")
     val DEFAULT_HOST = "localhost"
     val DEFAULT_PORT = "9000";
-    val DEFAULT_AGENT = "pf"
+    val DEFAULT_AGENT = "search"
 
     implicit def findAttribute(cmd : CommandLine) = new {
         def findAttribute (name : String, error : => String, default : String) = {
