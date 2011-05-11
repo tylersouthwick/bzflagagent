@@ -4,7 +4,7 @@ package cs470.domain
  * @author tylers2
  */
 
-class Occgrid {
+class Occgrid extends Traversable[Array[Occupent.Occupent]] {
 
 	private var step = 0
 	private var data : Array[Array[Occupent.Occupent]] = null
@@ -49,6 +49,11 @@ class Occgrid {
 		}.zipWithIndex.foreach { case (obstacle, idx) =>
 			rowData(idx) = obstacle
 		}
+	}
+
+
+	def foreach[U](f: (Array[Occupent.Occupent]) => U) {
+		data.foreach(f)
 	}
 
 	override def toString = {
