@@ -56,8 +56,12 @@ class PFVisualizer(pathFinder: FindAgentPath, filename: String, obstacles: Seq[P
 class SearchVisualizer(filename: String, obstacles: Seq[Polygon], worldsize: Int) extends Visualizer(filename, obstacles, worldsize, "search") {
   private val delay = 0.01
 
-  def drawSearchNodes(p1:Point,p2:Point){
-    drawLine(p1,p2,Color.ORANGE)
+  def drawSearchNodes(p1: Point, p2: Point) {
+    drawLine(p1, p2, Color.ORANGE)
+  }
+
+  def pause() {
+    write("pause " + delay)
   }
 
   def drawFinalPath(nodes: Seq[(Point, Point)]) {
@@ -65,8 +69,6 @@ class SearchVisualizer(filename: String, obstacles: Seq[Polygon], worldsize: Int
       case (p1, p2) =>
         drawLine(p1, p2, Color.BLACK)
     }
-
-    write("pause " + delay)
     close()
   }
 
