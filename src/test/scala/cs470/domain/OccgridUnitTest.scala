@@ -14,7 +14,5 @@ class OccgridUnitTest {
 			occgrid.read(line)
 			line = reader.readLine
 		}
-
-		println(occgrid)
 	}
 }

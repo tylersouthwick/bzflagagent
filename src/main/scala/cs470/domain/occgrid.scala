@@ -7,7 +7,7 @@ package cs470.domain
 class Occgrid {
 
 	private var step = 0
-	private var data : Array[Array[Char]] = null
+	private var data : Array[Array[Occupent.Occupent]] = null
 	private var row = 0
 	private var width = 0
 	private var height = 0
@@ -43,24 +43,27 @@ class Occgrid {
 	private def addToMatrix(line : String) {
 		val rowData = data(row)
 		row = row + 1
-		line.zipWithIndex.foreach { case (obstacle, idx) =>
+		line.map{
+			case '1' => Occupent.WALL
+			case '0' => Occupent.NONE
+		}.zipWithIndex.foreach { case (obstacle, idx) =>
 			rowData(idx) = obstacle
 		}
 	}
 
 	override def toString = {
 		val sb = new StringBuilder
-		data.foreach{row =>
-			row.foreach {column =>
-				sb.append (column) /*{
-					if (column) "1" else "0"
-				}*/
-			}
-			sb.append("\n")
-		}
+		sb.append("Occgrid [")
 		sb.append(width)
 		sb.append("x")
 		sb.append(height)
+		sb.append("]")
 		sb.toString()
 	}
+}
+
+object Occupent extends Enumeration {
+	type Occupent = Value
+
+	val NONE, WALL, ENEMY, TANK = Value
 }
