@@ -1,7 +1,7 @@
 package cs470.movement.search
 
-import collection.mutable.{HashMap, LinkedList}
 import cs470.domain.{Point, Occgrid}
+import collection.mutable.{Stack, HashMap, LinkedList}
 
 /**
  * @author tylers2
@@ -58,6 +58,16 @@ class Node(val parent : Node, occgrid : Occgrid, nodes : Nodes, x : Int, y : Int
 	def gridLocation = (x, y)
 
 	def occupant = occgrid.data(x)(y)
+
+	def path : Seq[Point] = {
+		val stack = new Stack[Point]
+		var parent = this
+		while (parent != null) {
+			stack.push(parent.location)
+			parent = parent.parent
+		}
+		stack
+	}
 
 	override def toString = "(" + x + ", " + y + ")"
 }

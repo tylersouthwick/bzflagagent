@@ -29,7 +29,7 @@ trait DepthFirstSearcher extends Searcher with SearchVisualizer {
 			//visualizer.drawSearchNodes(node map (child => (node.location, child.location)))
 			if (isGoal(node)) {
 				println("found!")
-				return buildPath(node)
+				return node.path
 			} else {
 				node.visited = true
 				node.filter(!_.visited).filter(!frontier.contains(_)).filter(_.occupant == Occupant.NONE).foreach(frontier.push)
@@ -41,13 +41,4 @@ trait DepthFirstSearcher extends Searcher with SearchVisualizer {
 
 	def time = new java.util.Date().getTime
 
-	def buildPath(node : Node) : Seq[Point] = {
-		val stack = new Stack[Point]
-		var parent = node
-		while (parent != null) {
-			stack.push(parent.location)
-			parent = parent.parent
-		}
-		stack
-	}
 }
