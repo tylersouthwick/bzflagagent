@@ -18,7 +18,7 @@ object Color extends Enumeration {
   val LIGHT_BROWN = Value("light_brown")
 }
 
-class PFVisualizer(pathFinder: FindAgentPath, filename: String, obstacles: Seq[Polygon], worldsize: Int, samples: Int) extends Visualizer(filename, obstacles, worldsize, "PF") {
+class PFVisualizer(pathFinder: FindAgentPath, filename: String, obstacles: Seq[Polygon], worldsize: Int, samples: Int) extends Visualizer(filename, obstacles, worldsize, "PF","Potential Fields") {
 
   private lazy val vec_len = 0.75 * worldsize.asInstanceOf[Double] / samples.asInstanceOf[Double]
 
@@ -53,7 +53,7 @@ class PFVisualizer(pathFinder: FindAgentPath, filename: String, obstacles: Seq[P
   }
 }
 
-class SearchVisualizer(filename: String, obstacles: Seq[Polygon], worldsize: Int) extends Visualizer(filename, obstacles, worldsize, "search") {
+class SearchVisualizer(filename: String, obstacles: Seq[Polygon], worldsize: Int,title:String) extends Visualizer(filename, obstacles, worldsize, "search",title) {
   private val delay = 0.1
   private val pauseView = 1000
   private var pauseViewCounter = 0
@@ -114,7 +114,7 @@ class SearchVisualizer(filename: String, obstacles: Seq[Polygon], worldsize: Int
 
 }
 
-abstract class Visualizer(filename: String, obstacles: Seq[Polygon], worldsize: Int, name: String) {
+abstract class Visualizer(filename: String, obstacles: Seq[Polygon], worldsize: Int, name: String, title: String) {
 
   import cs470.visualization.Visualizer._
 
@@ -148,7 +148,7 @@ abstract class Visualizer(filename: String, obstacles: Seq[Polygon], worldsize: 
     write("set yrange [%d:%d]".format(-size2, size2))
     write("unset key")
     write("set size square")
-    write("set title 'Potential Fields'")
+    write("set title '" + title + "'")
   }
 
   def write(s: String) {
