@@ -1,12 +1,13 @@
 package cs470.movement.search
 
 import java.util.{Comparator, PriorityQueue}
+import cs470.domain.Point
 
 trait UniformCostSearcher extends Searcher with SearchVisualizer {
 
 	def g(n : Node) : Double = n.cost
 
-	def doSearch(start: Node) {
+	def doSearch(start: Node) : Seq[Point] = {
 		val frontier = new PriorityQueue[Node](10, new Comparator[Node] {
 			def compare(o1: Node, o2: Node) = new java.lang.Double(g(o1)).compareTo(g(o2))
 		})
@@ -15,7 +16,7 @@ trait UniformCostSearcher extends Searcher with SearchVisualizer {
 		while (!frontier.isEmpty) {
 			val node = frontier.poll()
 			visualizer.drawSearchNodes(node map (child => (node.location, child.location)))
-			if (isGoal(node)) return
+			if (isGoal(node)) return node.path
 			node.visited = true
 			node.filter(!_.visited).filter(!frontier.contains(_)).foreach(frontier.add(_))
 		}

@@ -2,7 +2,7 @@ package cs470.movement.search
 
 import cs470.domain.{Point, Occgrid}
 
-trait Searcher {
+trait Searcher extends SearchVisualizer {
 
 	val occgrid : Occgrid
 	val goal : Point
@@ -17,10 +17,22 @@ trait Searcher {
 		println("end: " + end)
 		println("realStart: " + realStart)
 		val nodes = new Nodes(occgrid)
-		doSearch(nodes((realStart._1, realStart._2, 0, null)))
+		val begin = time
+		val points = doSearch(nodes((realStart._1, realStart._2, 0, null)))
+		val finished  = time
+		println("took " + (finished - begin) + "ms")
+		visualizer.drawFinalPath(points.zipWithIndex map {case (point, idx) => {
+			if (idx + 1 < points.length) {
+			(point, points(idx + 1))
+			} else {
+				(point, point)
+			}
+		}})
 	}
 
-	def doSearch(node : Node)
+	def doSearch(node : Node) : Seq[Point]
 
 	def isGoal(node : Node) = node.gridLocation._1 == end._1 && node.gridLocation._2 == end._2
+
+	def time = new java.util.Date().getTime
 }
