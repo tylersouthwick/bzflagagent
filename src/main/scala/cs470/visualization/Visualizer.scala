@@ -61,7 +61,7 @@ class SearchVisualizer(filename: String, obstacles: Seq[Polygon], worldsize: Int
   private val showEvery = {
 	  val prop = System.getProperty("vis.showEvery")
 	  if (prop == null) {
-		  50
+		  25
 	  } else {
 		  Integer.parseInt(prop)
 	  }

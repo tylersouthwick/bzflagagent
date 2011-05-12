@@ -8,11 +8,11 @@ class SearchLabAgent(host : String, port : Int) extends Agent(host, port) {
 	def run() {
 		val team = constants("team")
 
-		aStar.search()
-		uniformCost.search()
-		depthFirst.search()
-		breadthFirst.search()
-//		iterativeDeepening.search()
+//		aStar.search()
+//		uniformCost.search()
+//		depthFirst.search()
+//		breadthFirst.search()
+		iterativeDeepening.search()
 	}
 
 	lazy val greenFlag = store.flags.find(_.color == "green").get.location
