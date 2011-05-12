@@ -58,7 +58,14 @@ class SearchVisualizer(filename: String, obstacles: Seq[Polygon], worldsize: Int
   private val pauseView = 1000
   private var pauseViewCounter = 0
   private var howMany = 0
-  private val showEvery = 50
+  private val showEvery = {
+	  val prop = System.getProperty("vis.showEvery")
+	  if (prop == null) {
+		  50
+	  } else {
+		  Integer.parseInt(prop)
+	  }
+  }
   private var showEveryCounter = 0
 
   def drawSearchNodes(nodes: Traversable[(Point, Point)]) {
