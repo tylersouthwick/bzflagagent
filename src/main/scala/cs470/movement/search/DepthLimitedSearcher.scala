@@ -5,6 +5,8 @@ import cs470.domain.{Occupant, Point}
 
 trait DepthLimitedSearcher extends Searcher {
 
+  val limit = 1
+
 	def doSearch(start: Node) : Seq[Point] = {
 		val frontier = new Frontier {
 			val stack = Stack[Node]()
@@ -22,12 +24,12 @@ trait DepthLimitedSearcher extends Searcher {
 
 		while (!frontier.isEmpty) {
 			val node = frontier.pop
-			val children = node.filter(!_.visited).filter(!frontier.contains(_)).filter(_.occupant == Occupant.NONE)
-			visualizer.drawSearchNodes(children map (child => (node.location, child.location)))
 			if (isGoal(node)) {
 				println("found!")
 				return node.path
-			} else {
+			} else if(node.cost != limit) {
+        val children = node.filter(!_.visited).filter(!frontier.contains(_)).filter(_.occupant == Occupant.NONE)
+        visualizer.drawSearchNodes(children map (child => (node.location, child.location)))
 				node.visited = true
 				children.foreach(frontier.push)
 			}
