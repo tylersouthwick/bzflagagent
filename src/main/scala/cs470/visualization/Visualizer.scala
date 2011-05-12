@@ -54,33 +54,50 @@ class PFVisualizer(pathFinder: FindAgentPath, filename: String, obstacles: Seq[P
 }
 
 class SearchVisualizer(filename: String, obstacles: Seq[Polygon], worldsize: Int) extends Visualizer(filename, obstacles, worldsize, "search") {
-  private val delay = 0.000001
+  private val delay = 0.1
+  private val pauseView = 1000
+  private var pauseViewCounter = 0
+  private var howMany = 0
 
-  def drawSearchNodes(nodes : Traversable[(Point,Point)]) {
-	  nodes.foreach{case (p1, p2)=>
-		  drawLine(p1,p2,Color.ORANGE)
-	  }
-	  pause()
+  def drawSearchNodes(nodes: Traversable[(Point, Point)]) {
+    nodes.foreach {
+      case (p1, p2) =>
+        drawLine(p1, p2, Color.ORANGE)
+      //      drawPoint(p2, Color.ORANGE)
+    }
+
+    if (pauseViewCounter == pauseView) {
+      howMany = howMany + 1
+      pause()
+      pauseViewCounter = 0
+    } else {
+      pauseViewCounter = pauseViewCounter + 1
+    }
   }
 
-	def plotLines() {
-		write("plot '-' with lines")
-		write("0 0 0 0")
-		write("e")
-	}
+  def drawPoint(point: Point, color: Color.Color) {
+    //searchPoints.println(point.x + " " + point.y)
+    write("plot " + point.x + "," + point.y + " with points")
+  }
+
+  def plotLines() {
+    write("plot '-' with lines")
+    write("0 0 0 0")
+    write("e")
+  }
 
   def pause() {
-	  plotLines()
-	  //write("pause " + delay)
-	  //flush();
+    plotLines()
+    write("pause " + delay/howMany)
+    //flush();
   }
 
   def drawFinalPath(nodes: Seq[(Point, Point)]) {
     nodes.foreach {
       case (p1, p2) =>
-        drawLine(p1, p2, Color.ORANGE)
+        drawLine(p1, p2, Color.BLACK)
     }
-	  plotLines()
+    plotLines()
     close()
   }
 
@@ -133,9 +150,10 @@ abstract class Visualizer(filename: String, obstacles: Seq[Polygon], worldsize: 
 
   def plot() {}
 
-	def flush() {
-		file.flush()
-	}
+  def flush() {
+    file.flush()
+  }
+
   def close() {
     file.close()
     LOG.info("Visualization for " + name + " saved to: " + filename)
