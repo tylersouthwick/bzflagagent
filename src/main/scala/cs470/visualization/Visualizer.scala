@@ -7,15 +7,15 @@ import cs470.movement.{FindAgentPath}
 object Color extends Enumeration {
   type Color = Value
 
-  val BLACK = Value("-1")
-  val RED = Value("1")
-  val GREEN = Value("2")
-  val BLUE = Value("3")
-  val PURPLE = Value("4")
-  val AQUA = Value("5")
-  val BROWN = Value("6")
-  val ORANGE = Value("7")
-  val LIGHT_BROWN = Value("8")
+  val BLACK = Value("black")
+  val RED = Value("red")
+  val GREEN = Value("green")
+  val BLUE = Value("blue")
+  val PURPLE = Value("purple")
+  val AQUA = Value("aqua")
+  val BROWN = Value("brown")
+  val ORANGE = Value("orange")
+  val LIGHT_BROWN = Value("light_brown")
 }
 
 class PFVisualizer(pathFinder: FindAgentPath, filename: String, obstacles: Seq[Polygon], worldsize: Int, samples: Int) extends Visualizer(filename, obstacles, worldsize, "PF") {
@@ -58,7 +58,7 @@ class SearchVisualizer(filename: String, obstacles: Seq[Polygon], worldsize: Int
 
   def drawSearchNodes(nodes : Traversable[(Point,Point)]) {
 	  nodes.foreach{case (p1, p2)=>
-		  drawLine(p1,p2,Color.BLACK)
+		  drawLine(p1,p2,Color.ORANGE)
 	  }
 	  pause()
   }
@@ -71,14 +71,14 @@ class SearchVisualizer(filename: String, obstacles: Seq[Polygon], worldsize: Int
 
   def pause() {
 	  plotLines()
-	  write("pause " + delay)
-	  flush();
+	  //write("pause " + delay)
+	  //flush();
   }
 
   def drawFinalPath(nodes: Seq[(Point, Point)]) {
     nodes.foreach {
       case (p1, p2) =>
-        drawLine(p1, p2, Color.BLACK)
+        drawLine(p1, p2, Color.ORANGE)
     }
 	  plotLines()
     close()
@@ -104,7 +104,7 @@ abstract class Visualizer(filename: String, obstacles: Seq[Polygon], worldsize: 
   LOG.debug("Saving " + name + " visualization to file: " + filename)
 
   def drawLine(p1: Point, p2: Point, color: Color.Color) {
-    write("set arrow from " + p1.x + ", " + p1.y + " to " + p2.x + ", " + p2.y + " nohead lt " + color)
+    write("set arrow from " + p1.x + ", " + p1.y + " to " + p2.x + ", " + p2.y + " nohead lt 1 lc rgb \"" + color + "\"")
   }
 
   private def drawObjects() {

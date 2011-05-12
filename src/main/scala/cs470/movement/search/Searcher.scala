@@ -1,24 +1,46 @@
 package cs470.movement.search
 
 import cs470.domain.{Point, Occgrid}
+import cs470.bzrc.BzrcQueue
 
 trait Searcher extends SearchVisualizer {
 
-	val occgrid : Occgrid
 	val goal : Point
 	val start : Point
+	val tankId : Int
+	val q : BzrcQueue
+
+	def queue = q
+
+	val explored = new java.util.HashSet[String]
+
+	implicit def convertTuple(t : (Int, Int)) = t._1 + "_" + t._2
+
+	implicit def exploring(node : Node) = new {
+		def visited = explored.contains(convertTuple(node.gridLocation))
+		def visited_=(value : Boolean) {
+			val key = convertTuple(node.gridLocation)
+			if (value)
+				explored.add(key)
+			else
+				explored.remove(key)
+		}
+	}
+
+	lazy val occgrid = {
+		val o = queue.invokeAndWait(_.occgrid(tankId))
+		o.addEnemies(datastore.enemies.filter(_.status != "dead") map(_.location))
+		o
+	}
 
 	lazy val realStart = occgrid.convert(start)
-	protected lazy val end = occgrid.convert(goal)
+	lazy val end = occgrid.convert(goal)
 
 	final def search() {
 		println("start: " + start)
 		println("goal: " + goal)
-		println("end: " + end)
-		println("realStart: " + realStart)
-		val nodes = new Nodes(occgrid)
 		val begin = time
-		val points = doSearch(nodes((realStart._1, realStart._2, 0, null)))
+		val points = doSearch(Node(occgrid, realStart._1, realStart._2))
 		val finished  = time
 		println("took " + (finished - begin) + "ms")
 		visualizer.drawFinalPath(points.zipWithIndex map {case (point, idx) => {

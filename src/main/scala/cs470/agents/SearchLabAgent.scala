@@ -3,21 +3,17 @@ package cs470.agents
 import cs470.movement.search._
 
 class SearchLabAgent(host : String, port : Int) extends Agent(host, port) {
-	val tankId = 0
-	lazy val grid = queue.invokeAndWait(_.occgrid(tankId))
-
 	def run() {
 		val team = constants("team")
 
-//		aStar.search()
-//		uniformCost.search()
-//		depthFirst.search()
-//		breadthFirst.search()
-    iterativeDeepening.search()
+		aStar.search()
+		uniformCost.search()
+		depthFirst.search()
+		breadthFirst.search()
+		iterativeDeepening.search()
 	}
 
 	lazy val greenFlag = store.flags.find(_.color == "green").get.location
-	lazy val tank = store.tanks(tankId)
 
 	def depthFirst = new DepthFirstSearcher with AgentSearcher {
 		val filename = "depth_first.gpi"
@@ -40,10 +36,11 @@ class SearchLabAgent(host : String, port : Int) extends Agent(host, port) {
 	}
 
 	trait AgentSearcher {
+		val tankId = 0
 		val datastore = store
-		val start = tank.location
+		val start = store.tanks(tankId).location
 		val goal = greenFlag
-		val occgrid = grid
+		val q = queue
 	}
 }
 

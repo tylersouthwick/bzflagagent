@@ -24,18 +24,13 @@ class Occgrid extends Traversable[Array[Occupant.Occupant]] {
 		step = step + 1
 	}
 
-	def addTanks(points: Seq[Point]) {
-		addOccupants(points, Occupant.TANK)
+	def addEnemies(points: Traversable[Point]) {
+		addOccupants(points, Occupant.ENEMY)
 	}
 
-	def addEnemies(points: Seq[Point]) {
-		addOccupants(points, Occupant.TANK)
-	}
-
-	def addOccupants(points : Seq[Point], occupent : Occupant.Occupant) {
-		points.foreach {point =>
-			val x = point.x.intValue
-			val y = point.y.intValue
+	def addOccupants(points : Traversable[Point], occupent : Occupant.Occupant) {
+		points map(convert) foreach {case (x, y) =>
+			println("(" + x + "," + y + ")")
 			data(x)(y) = occupent
 		}
 	}
@@ -90,6 +85,6 @@ class Occgrid extends Traversable[Array[Occupant.Occupant]] {
 object Occupant extends Enumeration {
 	type Occupant = Value
 
-	val NONE, WALL, ENEMY, TANK = Value
+	val NONE, WALL, ENEMY = Value
 }
 

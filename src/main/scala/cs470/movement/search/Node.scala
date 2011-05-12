@@ -7,37 +7,23 @@ import collection.mutable.{Stack, HashMap, LinkedList}
  * @author tylers2
  */
 
-class Nodes(occgrid : Occgrid) extends (((Int, Int, Double, Node)) => Node) {
-
-	private val nodes = new HashMap[String, Node]
-
-	implicit def makeKey(t : (Int, Int, Double, Node)) = t._1 + "_" + t._2
-
-	def apply(location : (Int, Int, Double, Node)) = nodes.get(location) match {
-		case Some(node) => node
-		case None => {
-			val node = new Node(location._4, occgrid, this, location._1, location._2, location._3)
-			nodes(location) = node
-			node
-		}
-	}
-
+object Node {
+	def apply(occgrid : Occgrid, x : Int, y : Int) = new Node(null, occgrid, x, y, 0)
 }
 
-class Node(val parent : Node, occgrid : Occgrid, nodes : Nodes, x : Int, y : Int, val cost : Double) extends Traversable[Node] {
+class Node(val parent : Node, occgrid : Occgrid, x : Int, y : Int, val cost : Double) extends Traversable[Node] {
 
-	var visited = false
 	val sqrt2 = java.lang.Math.sqrt(2)
 
 	private def childrenPoints = {
-		val left = (x - 1, y, cost + 1, this)
-		val right = (x+1, y, cost + 1, this)
-		val up = (x, y+1 , cost + 1, this)
-		val down =(x, y-1, cost + 1, this)
-		val upLeft = (x-1, y+1, cost + sqrt2, this)
-		val upRight = (x+1, y+1, cost + sqrt2, this)
-		val downLeft = (x - 1, y - 1, cost + sqrt2, this)
-		val downRight = (x + 1, y - 1, cost + sqrt2, this)
+		val left = (x - 1, y, 1.0)
+		val right = (x+1, y, 1.0)
+		val up = (x, y+1 , 1.0)
+		val down =(x, y-1, 1.0)
+		val upLeft = (x-1, y+1, sqrt2)
+		val upRight = (x+1, y+1, sqrt2)
+		val downLeft = (x - 1, y - 1, sqrt2)
+		val downRight = (x + 1, y - 1, sqrt2)
 
 		Seq(left, right, up, down, upLeft, upRight, downLeft, downRight)
 	}
@@ -47,7 +33,7 @@ class Node(val parent : Node, occgrid : Occgrid, nodes : Nodes, x : Int, y : Int
 				val x = node._1
 				val y = node._2
 			(x >= 0 && x < occgrid.width) && (y >= 0 && y < occgrid.height)
-		}.map(nodes)
+		      }.map(t => new Node(this, occgrid, t._1, t._2, cost + t._3))
 
 	def foreach[U](f: (Node) => U) {
 		children.foreach(f)
