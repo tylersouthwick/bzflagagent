@@ -3,10 +3,9 @@ package cs470.movement.search
 import java.util.{Comparator, PriorityQueue}
 import cs470.domain.{Occupant, Point}
 
-trait UniformCostSearcher extends Searcher with SearchVisualizer {
+trait UniformCostSearcher extends Searcher with SearchVisualizer with HeuristicSearcher {
 
 	final def g(n : Node) = n.cost
-	def h(n : Node) : Double = 0
 	def f(n : Node) = g(n) + h(n)
 
 	val frontier = new Frontier {

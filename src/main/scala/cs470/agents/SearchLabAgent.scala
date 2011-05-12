@@ -3,7 +3,7 @@ package cs470.agents
 import cs470.movement.search._
 
 class SearchLabAgent(host : String, port : Int) extends Agent(host, port) {
-	val penelized = "true" == System.getProperty("penelized")
+	val penelized = true//"true" == System.getProperty("penelized")
 
 	def run() {
 		val team = constants("team")
@@ -33,26 +33,7 @@ class SearchLabAgent(host : String, port : Int) extends Agent(host, port) {
 
 	def aStar = {
 		if (penelized) {
-			new LabAStarSearcher {
-				override def h(n: Node) = super.h(n) * p(n)
-
-				def p(n : Node) = {
-					val current = n.parent
-					if (current.nextToOccupied) {
-						if (n.nextToOccupied) {
-							1.5
-						} else {
-							1.1
-						}
-					} else {
-						if (n.nextToOccupied) {
-							1.3
-						} else {
-							1.0
-						}
-					}
-				}
-			}
+			new LabAStarSearcher with PenelizedHeuristic
 		} else {
 			new LabAStarSearcher
 		}
@@ -75,6 +56,7 @@ class SearchLabAgent(host : String, port : Int) extends Agent(host, port) {
 		val filename = "a_star.gpi"
 		val title = "A* Search"
 	}
+
 }
 
 object SearchLabAgent extends AgentCreator {
