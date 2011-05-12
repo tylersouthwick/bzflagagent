@@ -1,8 +1,8 @@
 package cs470.visualization
 
-import java.io.{FileOutputStream, PrintWriter}
 import cs470.domain.{Polygon, Point}
 import cs470.movement.{FindAgentPath}
+import java.io.{BufferedOutputStream, FileOutputStream, PrintWriter}
 
 object Color extends Enumeration {
   type Color = Value
@@ -126,7 +126,7 @@ abstract class Visualizer(filename: String, obstacles: Seq[Polygon], worldsize: 
   import cs470.visualization.Visualizer._
 
   println("Opening file for visualization for " + name + " to: " + filename)
-  private val file = new PrintWriter(new FileOutputStream(filename))
+  private val file = new PrintWriter(new BufferedOutputStream(new FileOutputStream(filename)))
 
   setGnuPlotHeader()
   drawObjects()
