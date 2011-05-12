@@ -1,7 +1,7 @@
 package cs470.movement.search
 
-import cs470.domain.{Point, Occgrid}
 import collection.mutable.{Stack, HashMap, LinkedList}
+import cs470.domain.{Occupant, Point, Occgrid}
 
 /**
  * @author tylers2
@@ -9,11 +9,16 @@ import collection.mutable.{Stack, HashMap, LinkedList}
 
 object Node {
 	def apply(occgrid : Occgrid, x : Int, y : Int) = new Node(null, occgrid, x, y, 0, 0)
+
+	val sqrt2 = java.lang.Math.sqrt(2)
+	val penalizedMode = true
 }
 
 class Node(val parent : Node, occgrid : Occgrid, x : Int, y : Int, val cost : Double, val depth : Int) extends Traversable[Node] {
 
-	val sqrt2 = java.lang.Math.sqrt(2)
+	import Node._
+
+	lazy val nextToOccupied = !children.filter(_.occupant != Occupant.NONE).isEmpty
 
 	private def childrenPoints = {
 		val left = (x - 1, y, 1.0)
