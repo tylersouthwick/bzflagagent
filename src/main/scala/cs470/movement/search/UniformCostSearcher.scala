@@ -1,7 +1,7 @@
 package cs470.movement.search
 
 import java.util.{Comparator, PriorityQueue}
-import cs470.domain.Point
+import cs470.domain.{Occupant, Point}
 
 trait UniformCostSearcher extends Searcher with SearchVisualizer {
 
@@ -15,10 +15,10 @@ trait UniformCostSearcher extends Searcher with SearchVisualizer {
 
 		while (!frontier.isEmpty) {
 			val node = frontier.poll()
-			visualizer.drawSearchNodes(node map (child => (node.location, child.location)))
+			//visualizer.drawSearchNodes(node map (child => (node.location, child.location)))
 			if (isGoal(node)) return node.path
 			node.visited = true
-			node.filter(!_.visited).filter(!frontier.contains(_)).foreach(frontier.add(_))
+			node.filter(!_.visited).filter(!frontier.contains(_)).filter(_.occupant == Occupant.NONE).foreach(frontier.add(_))
 		}
 		throw new IllegalArgumentException("didn't find it")
 	}
