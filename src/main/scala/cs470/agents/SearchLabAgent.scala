@@ -7,9 +7,9 @@ class SearchLabAgent(host : String, port : Int) extends Agent(host, port) {
 		val team = constants("team")
 
 		aStar.search()
-//		uniformCost.search()
-//		depthFirst.search()
-//		breadthFirst.search()
+		uniformCost.search()
+		depthFirst.search()
+		breadthFirst.search()
 //		iterativeDeepening.search()
 	}
 

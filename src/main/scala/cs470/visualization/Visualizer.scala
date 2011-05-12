@@ -58,11 +58,18 @@ class SearchVisualizer(filename: String, obstacles: Seq[Polygon], worldsize: Int
   private val pauseView = 1000
   private var pauseViewCounter = 0
   private var howMany = 0
+  private val showEvery = 50
+  private var showEveryCounter = 0
 
   def drawSearchNodes(nodes: Traversable[(Point, Point)]) {
     nodes.foreach {
       case (p1, p2) =>
-        drawLine(p1, p2, Color.ORANGE)
+        if (showEvery == showEveryCounter) {
+          drawLine(p1, p2, Color.ORANGE)
+          showEveryCounter = 0
+        } else {
+          showEveryCounter = showEveryCounter + 1
+        }
       //      drawPoint(p2, Color.ORANGE)
     }
 
@@ -88,7 +95,7 @@ class SearchVisualizer(filename: String, obstacles: Seq[Polygon], worldsize: Int
 
   def pause() {
     plotLines()
-    write("pause " + delay/howMany)
+    write("pause " + delay)
     //flush();
   }
 
