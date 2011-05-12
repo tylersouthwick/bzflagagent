@@ -1,43 +1,53 @@
 package cs470.movement.search
 
 import collection.mutable.Stack
-import cs470.domain.Point
+import cs470.domain.{Occupant, Point}
 
 trait DepthFirstSearcher extends Searcher with SearchVisualizer {
 
-	val path = new Stack[(Int, Int)]
-
 	def doSearch(node : Node) {
-		if (depthFirstSearch(node)) {
-			val points = path.map(new Point(_))
-			visualizer.drawFinalPath(points.zipWithIndex map {case (point, idx) => {
-				if (idx == points.length) {
-					(point, point)
-				} else {
-					(point, points(idx + 1))
-				}
-			}})
-		} else {
-			throw new IllegalStateException("did not find path")
-		}
-	}
-
-	def depthFirstSearch(node : Node) : Boolean = {
-		val vis_nodes = node filter(!_.visited) map (child => (new Point(node.location),new Point(child.location)))
-		visualizer.drawSearchNodes(vis_nodes)
-		node filter(!_.visited) foreach {child =>
-			path.push(child.location)
-			child.visited = true
-			if (child.location._1 == end._1 && child.location._2 == end._2) {
-				throw new Exception("MAYBE END?")
+		val begin = time
+		val points = depthFirstSearch(node)
+		val end = time
+		println("took " + (end - begin) + "ms")
+		visualizer.drawFinalPath(points.zipWithIndex map {case (point, idx) => {
+			if (idx + 1 < points.length) {
+				(point, points(idx + 1))
 			} else {
-				if (depthFirstSearch(child)) {
-					return true
-				}
+				(point, point)
 			}
-			path.pop()
-		}
-		false
+		}})
 	}
 
+	def depthFirstSearch(start: Node) : Seq[Point] = {
+		val frontier = new Stack[Node]()
+		frontier.push(start)
+		val path = new Stack[Point]
+
+		while (!frontier.isEmpty) {
+			val node = frontier.pop()
+			//visualizer.drawSearchNodes(node map (child => (node.location, child.location)))
+			if (isGoal(node)) {
+				println("found!")
+				return buildPath(node)
+			} else {
+				node.visited = true
+				node.filter(!_.visited).filter(!frontier.contains(_)).filter(_.occupant == Occupant.NONE).foreach(frontier.push)
+			}
+		}
+
+		throw new IllegalStateException("did not find path")
+	}
+
+	def time = new java.util.Date().getTime
+
+	def buildPath(node : Node) : Seq[Point] = {
+		val stack = new Stack[Point]
+		var parent = node
+		while (parent != null) {
+			stack.push(parent.location)
+			parent = parent.parent
+		}
+		stack
+	}
 }

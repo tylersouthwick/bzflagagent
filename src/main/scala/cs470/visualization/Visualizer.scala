@@ -54,7 +54,7 @@ class PFVisualizer(pathFinder: FindAgentPath, filename: String, obstacles: Seq[P
 }
 
 class SearchVisualizer(filename: String, obstacles: Seq[Polygon], worldsize: Int) extends Visualizer(filename, obstacles, worldsize, "search") {
-  private val delay = 0.01
+  private val delay = 0.000001
 
   def drawSearchNodes(nodes : Traversable[(Point,Point)]) {
 	  nodes.foreach{case (p1, p2)=>
@@ -67,7 +67,7 @@ class SearchVisualizer(filename: String, obstacles: Seq[Polygon], worldsize: Int
 	  write("plot '-' with lines")
 	  write("0 0 0 0")
 	  write("e")
-	  write("pause " + delay)
+	  //write("pause " + delay)
 	  flush();
   }
 
