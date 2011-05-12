@@ -58,7 +58,7 @@ class SearchVisualizer(filename: String, obstacles: Seq[Polygon], worldsize: Int
 
   def drawSearchNodes(nodes : Traversable[(Point,Point)]) {
 	  nodes.foreach{case (p1, p2)=>
-		  drawLine(p1,p2,Color.BLACK)
+		  drawLine(p1,p2,Color.ORANGE)
 	  }
 	  pause()
   }
@@ -71,14 +71,14 @@ class SearchVisualizer(filename: String, obstacles: Seq[Polygon], worldsize: Int
 
   def pause() {
 	  plotLines()
-	  write("pause " + delay)
-	  flush();
+	  //write("pause " + delay)
+	  //flush();
   }
 
   def drawFinalPath(nodes: Seq[(Point, Point)]) {
     nodes.foreach {
       case (p1, p2) =>
-        drawLine(p1, p2, Color.BLACK)
+        drawLine(p1, p2, Color.ORANGE)
     }
 	  plotLines()
     close()
