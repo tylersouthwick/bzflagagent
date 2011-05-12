@@ -5,11 +5,13 @@ import cs470.domain.{Occupant, Point}
 
 trait UniformCostSearcher extends Searcher with SearchVisualizer {
 
-	def g(n : Node) : Double = n.cost
+	final def g(n : Node) = n.cost
+	def h(n : Node) : Double = 0
+	def f(n : Node) = g(n) + h(n)
 
 	def doSearch(start: Node) : Seq[Point] = {
 		val frontier = new PriorityQueue[Node](10, new Comparator[Node] {
-			def compare(o1: Node, o2: Node) = new java.lang.Double(g(o1)).compareTo(g(o2))
+			def compare(o1: Node, o2: Node) = new java.lang.Double(f(o1)).compareTo(f(o2))
 		})
 		frontier.add(start)
 
