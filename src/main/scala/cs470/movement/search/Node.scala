@@ -8,10 +8,10 @@ import collection.mutable.{Stack, HashMap, LinkedList}
  */
 
 object Node {
-	def apply(occgrid : Occgrid, x : Int, y : Int) = new Node(null, occgrid, x, y, 0)
+	def apply(occgrid : Occgrid, x : Int, y : Int) = new Node(null, occgrid, x, y, 0, 0)
 }
 
-class Node(val parent : Node, occgrid : Occgrid, x : Int, y : Int, val cost : Double) extends Traversable[Node] {
+class Node(val parent : Node, occgrid : Occgrid, x : Int, y : Int, val cost : Double, val depth : Int) extends Traversable[Node] {
 
 	val sqrt2 = java.lang.Math.sqrt(2)
 
@@ -33,7 +33,7 @@ class Node(val parent : Node, occgrid : Occgrid, x : Int, y : Int, val cost : Do
 				val x = node._1
 				val y = node._2
 			(x >= 0 && x < occgrid.width) && (y >= 0 && y < occgrid.height)
-		      }.map(t => new Node(this, occgrid, t._1, t._2, cost + t._3))
+		      }.map(t => new Node(this, occgrid, t._1, t._2, cost + t._3, depth + 1))
 
 	def foreach[U](f: (Node) => U) {
 		children.foreach(f)
