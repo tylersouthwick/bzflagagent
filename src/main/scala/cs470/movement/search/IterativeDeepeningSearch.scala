@@ -5,6 +5,7 @@ import java.util.LinkedList
 
 trait IterativeDeepeningSearch extends Searcher {
 
+	val title = "Iterative Deepening Depth First Search"
   private val limit = 1000000
   val LOG = org.apache.log4j.Logger.getLogger("cs470.movement.search.iddf")
 

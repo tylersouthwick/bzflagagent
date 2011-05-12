@@ -9,7 +9,6 @@ trait UniformCostSearcher extends Searcher with SearchVisualizer {
 	def h(n : Node) : Double = 0
 	def f(n : Node) = g(n) + h(n)
 
-
 	val frontier = new Frontier {
 		val frontier = new PriorityQueue[Node](10, new Comparator[Node] {
 			def compare(o1: Node, o2: Node) = new java.lang.Double(f(o1)).compareTo(f(o2))

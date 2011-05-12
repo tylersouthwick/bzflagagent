@@ -17,27 +17,26 @@ class SearchLabAgent(host : String, port : Int) extends Agent(host, port) {
 
 	def depthFirst = new DepthFirstSearcher with AgentSearcher {
 		val filename = "depth_first.gpi"
-    val title = "Depth First Search"
+		val title = "Depth First Search"
 	}
 
-  def iterativeDeepening = new IterativeDeepeningSearch with AgentSearcher {
-    val filename = "iterative_deepening.gpi"
-    val title = "Iterative Deepening Depth First Search"
-  }
+	def iterativeDeepening = new IterativeDeepeningSearch with AgentSearcher {
+		val filename = "iterative_deepening.gpi"
+	}
 
 	def uniformCost = new UniformCostSearcher with AgentSearcher {
 		val filename = "uniformCost.gpi"
-    val title = "Uniform Cost Search"
+		val title = "Uniform Cost Search"
 	}
 
 	def aStar = new A_StarSearcher with AgentSearcher {
 		val filename = "a_star.gpi"
-    val title = "A* Search"
+		val title = "A* Search"
 	}
 
 	def breadthFirst = new BreadthFirstSearcher with AgentSearcher {
 		val filename = "breadthFirst.gpi"
-    val title = "Breadth First Search"
+		val title = "Breadth First Search"
 	}
 
 	trait AgentSearcher {
@@ -46,8 +45,6 @@ class SearchLabAgent(host : String, port : Int) extends Agent(host, port) {
 		val start = store.tanks(tankId).location
 		val goal = greenFlag
 		val q = queue
-    val title = "test"
-
 	}
 }
 
