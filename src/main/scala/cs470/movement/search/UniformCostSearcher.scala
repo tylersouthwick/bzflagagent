@@ -29,8 +29,8 @@ trait UniformCostSearcher extends Searcher with SearchVisualizer {
 
 		while (!frontier.isEmpty) {
 			val node = frontier.pop
-			//if (node.parent != null)
-			//	visualizer.drawSearchNodes(Seq((node.parent.location, node.location)))
+			if (node.parent != null)
+				visualizer.drawSearchNodes(Seq((node.parent.location, node.location)))
 			if (isGoal(node)) return node.path
 			node.visited = true
 			node.filter(!_.visited).filter(!frontier.contains(_)).filter(_.occupant == Occupant.NONE).foreach(frontier.add)
