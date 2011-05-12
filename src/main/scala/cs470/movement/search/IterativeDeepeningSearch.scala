@@ -5,7 +5,8 @@ import java.util.LinkedList
 
 trait IterativeDeepeningSearch extends Searcher {
 
-  private val limit = 100000
+  private val limit = 1000000
+  val LOG = org.apache.log4j.Logger.getLogger("cs470.movement.search.iddf")
 
 	def doSearch(start: Node) : Seq[Point] = {
     (0 to limit).foreach{depth =>
@@ -17,6 +18,8 @@ trait IterativeDeepeningSearch extends Searcher {
 	}
 
   def DepthLimitedSearch(start:Node, depth: Int) : Node = {
+    LOG.debug("Looking at depth=" + depth)
+
     RecursiveDLS(start, depth)
   }
 
@@ -26,10 +29,13 @@ trait IterativeDeepeningSearch extends Searcher {
         return node
       }
 
-      node.foreach{child =>
+      node.visited = true
+
+      node filter(!_.visited) filter(_.occupant == Occupant.NONE) foreach{child =>
         RecursiveDLS(child,depth - 1)
       }
     }
+
     return node
   }
 
