@@ -1,6 +1,6 @@
 package cs470.movement.search
 
-import cs470.domain.{Point, Occgrid}
+import cs470.domain.Point
 import cs470.bzrc.BzrcQueue
 
 trait Searcher extends SearchVisualizer {
@@ -37,12 +37,12 @@ trait Searcher extends SearchVisualizer {
 	lazy val end = occgrid.convert(goal)
 
 	final def search() {
-		println("start: " + start)
-		println("goal: " + goal)
+		println("starting: " + title)
+		//println("start: " + start)
+		//println("goal: " + goal)
 		val begin = time
 		val points = doSearch(Node(occgrid, realStart._1, realStart._2))
 		val finished  = time
-		println("took " + (finished - begin) + "ms")
 		visualizer.drawFinalPath(points.zipWithIndex map {case (point, idx) => {
 			if (idx + 1 < points.length) {
 			(point, points(idx + 1))
@@ -50,6 +50,7 @@ trait Searcher extends SearchVisualizer {
 				(point, point)
 			}
 		}})
+		println("took " + (finished - begin) + "ms for " + title)
 	}
 
 	def doSearch(node : Node) : Seq[Point]
