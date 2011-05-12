@@ -1,6 +1,6 @@
 package cs470.movement.search
 
-import collection.mutable.{Stack, HashMap, LinkedList}
+import collection.mutable.Stack
 import cs470.domain.{Occupant, Point, Occgrid}
 
 /**
@@ -60,5 +60,5 @@ class Node(val parent : Node, occgrid : Occgrid, x : Int, y : Int, val cost : Do
 		stack
 	}
 
-	override def toString = "(" + x + ", " + y + ")"
+	override def toString() = "(" + x + ", " + y + ")"
 }
