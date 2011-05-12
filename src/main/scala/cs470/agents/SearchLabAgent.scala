@@ -1,9 +1,10 @@
 package cs470.agents
 
 import cs470.movement.search._
+import cs470.utils.Properties
 
 class SearchLabAgent(host : String, port : Int) extends Agent(host, port) {
-	val penelized = true//"true" == System.getProperty("penelized")
+	val penelized = Properties("penelized", false)
 
 	def run() {
 		val team = constants("team")

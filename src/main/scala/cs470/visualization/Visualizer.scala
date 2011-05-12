@@ -3,6 +3,7 @@ package cs470.visualization
 import cs470.domain.{Polygon, Point}
 import cs470.movement.{FindAgentPath}
 import java.io.{BufferedOutputStream, FileOutputStream, PrintWriter}
+import cs470.utils.Properties
 
 object Color extends Enumeration {
   type Color = Value
@@ -53,20 +54,16 @@ class PFVisualizer(pathFinder: FindAgentPath, filename: String, obstacles: Seq[P
   }
 }
 
+object SearchVisualizer {
+	private val showEvery = Properties("vis.showEvery", 25)
+}
 class SearchVisualizer(filename: String, obstacles: Seq[Polygon], worldsize: Int,title:String) extends Visualizer(filename, obstacles, worldsize, "search",title) {
   private val delay = 0.1
   private val pauseView = 1000
   private var pauseViewCounter = 0
   private var howMany = 0
-  private val showEvery = {
-	  val prop = System.getProperty("vis.showEvery")
-	  if (prop == null) {
-		  25
-	  } else {
-		  Integer.parseInt(prop)
-	  }
-  }
   private var showEveryCounter = 0
+	import SearchVisualizer.showEvery
 
   def drawSearchNodes(nodes: Traversable[(Point, Point)]) {
     nodes.foreach {
