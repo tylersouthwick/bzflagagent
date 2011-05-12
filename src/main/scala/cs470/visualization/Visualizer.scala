@@ -106,6 +106,11 @@ class SearchVisualizer(filename: String, obstacles: Seq[Polygon], worldsize: Int
     //flush();
   }
 
+	def clear() {
+		write("clear")
+		pause()
+	}
+
   def drawFinalPath(nodes: Seq[(Point, Point)]) {
     nodes.foreach {
       case (p1, p2) =>
