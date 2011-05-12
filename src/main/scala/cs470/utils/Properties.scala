@@ -4,7 +4,7 @@ package cs470.utils
  * finds system properties
  */
 object Properties {
-	val LOG = org.apache.log4j.Logger.getLogger("cs40.utils.Properties")
+	val LOG = org.apache.log4j.Logger.getLogger("cs470.utils.Properties")
 
 	def apply(s : String) = {
 		val property = System.getProperty(s)
@@ -15,6 +15,7 @@ object Properties {
 		}
 	}
 
+	def apply(s : String, default : String) = convert(s, default) (t => t)
 	def apply(s : String, default : Int) = convert(s, default) (Integer.parseInt(_))
 	def apply(s : String, default : Boolean) = convert(s, default) ("true" == _)
 

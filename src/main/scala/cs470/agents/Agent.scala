@@ -32,7 +32,9 @@ object Agents {
 	def start(agent: String, host: String, port: Int) {
 		LOG.info("Creating agent: " + agent)
 		val agents = all.filter(_.name == agent).map(_.create(host, port))
-		LOG.info("Created agents " + agents)
 		agents.foreach(_.run())
+		if (agents.isEmpty) {
+			LOG.error("Could not find an agent with name: " + agent)
+		}
 	}
 }

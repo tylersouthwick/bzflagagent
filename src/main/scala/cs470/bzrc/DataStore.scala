@@ -1,5 +1,9 @@
 package cs470.bzrc
 
+object DataStore {
+	val LOG = org.apache.log4j.Logger.getLogger(classOf[DataStore])
+}
+
 class DataStore(queue : BzrcQueue) {
 	val enemies = new RefreshableEnemies(queue)
 	val tanks = new RefreshableTanks(queue)
@@ -10,7 +14,10 @@ class DataStore(queue : BzrcQueue) {
 
 	RefreshableData.waitForNewData()
 
-	flags.foreach {flag =>
-		println("flag: " + flag)
+	import DataStore._
+	if (LOG.isDebugEnabled) {
+		flags.foreach {flag =>
+			LOG.debug("flag: " + flag)
+		}
 	}
 }

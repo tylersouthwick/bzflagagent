@@ -3,6 +3,8 @@ package cs470
 import agents.{SearchLabAgent, Agents}
 import org.apache.commons.cli._
 import org.apache.log4j.Logger
+import utils.Properties
+
 object Main {
 	val LOG = Logger.getLogger("cs470.Main")
     val DEFAULT_HOST = "localhost"
@@ -10,17 +12,11 @@ object Main {
     val DEFAULT_AGENT = SearchLabAgent.name
 
     implicit def findAttribute(cmd : CommandLine) = new {
-        def findAttribute (name : String, error : => String, default : String) = {
+        def findAttribute (name : String, error : => String, default : String) : String = {
             if (cmd.hasOption(name)) {
                 cmd.getOptionValue(name)
             } else {
-                val property = "ai." + name
-                LOG.debug("reading system property: " + property)
-                val v = System.getProperty(property)
-                if (v == null) {
-                    LOG.warn("using default " + name + ": " + default)
-                    default
-                } else v
+				Properties("ai." + name, default)
             }
         }
     }

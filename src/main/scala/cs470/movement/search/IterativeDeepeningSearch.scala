@@ -9,7 +9,7 @@ trait IterativeDeepeningSearch extends Searcher with DepthLimitedSearcher {
 
 	def doSearch(start: Node): Seq[Point] = {
 		(0 to limit).foreach { depth =>
-			println("depth: " + depth)
+			LOG.debug("depth: " + depth)
 			explored.clear()
 			val result = depthSearch(start, depth)
 			visualizer.clear()
@@ -17,7 +17,6 @@ trait IterativeDeepeningSearch extends Searcher with DepthLimitedSearcher {
 				println("final depth: " + result.depth)
 				return result.path
 			}
-			//println("next depth")
 			System.gc()
 		}
 

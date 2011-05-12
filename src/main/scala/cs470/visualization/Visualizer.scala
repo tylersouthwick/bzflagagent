@@ -127,14 +127,14 @@ abstract class Visualizer(filename: String, obstacles: Seq[Polygon], worldsize: 
 
   import cs470.visualization.Visualizer._
 
-  println("Opening file for visualization for " + name + " to: " + filename)
+  LOG.info("Opening file for visualization for " + name + " to: " + filename)
   private val file = new PrintWriter(new BufferedOutputStream(new FileOutputStream(filename)))
 
   setGnuPlotHeader()
   drawObjects()
   plot()
 
-  LOG.debug("Saving " + name + " visualization to file: " + filename)
+  LOG.info("Saving " + name + " visualization to file: " + filename)
 
   def drawLine(p1: Point, p2: Point, color: Color.Color) {
     write("set arrow from " + p1.x + ", " + p1.y + " to " + p2.x + ", " + p2.y + " nohead lt 1 lc rgb \"" + color + "\"")

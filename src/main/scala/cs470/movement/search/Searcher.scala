@@ -3,7 +3,13 @@ package cs470.movement.search
 import cs470.domain.Point
 import cs470.bzrc.BzrcQueue
 
+object Searcher {
+	val LOG = org.apache.log4j.Logger.getLogger(classOf[Searcher])
+}
+
 trait Searcher extends SearchVisualizer {
+
+	import Searcher.LOG
 
 	val goal : Point
 	val start : Point
@@ -37,7 +43,7 @@ trait Searcher extends SearchVisualizer {
 	lazy val end = occgrid.convert(goal)
 
 	final def search() {
-		println("starting: " + title)
+		LOG.info("Starting: " + title)
 		//println("start: " + start)
 		//println("goal: " + goal)
 		val begin = time
@@ -50,7 +56,7 @@ trait Searcher extends SearchVisualizer {
 				(point, point)
 			}
 		}})
-		println("took " + (finished - begin) + "ms for " + title)
+		LOG.debug(title + "took " + (finished - begin) + "ms")
 	}
 
 	def doSearch(node : Node) : Seq[Point]
