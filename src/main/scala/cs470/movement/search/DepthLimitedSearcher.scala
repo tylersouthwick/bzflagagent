@@ -27,7 +27,7 @@ trait DepthLimitedSearcher extends Searcher {
 			if (isGoal(node)) {
 				println("found!")
 				return node.path
-			} else if(node.cost != limit) {
+			} else if(node.depth != limit) {
         val children = node.filter(!_.visited).filter(!frontier.contains(_)).filter(_.occupant == Occupant.NONE)
         visualizer.drawSearchNodes(children map (child => (node.location, child.location)))
 				node.visited = true

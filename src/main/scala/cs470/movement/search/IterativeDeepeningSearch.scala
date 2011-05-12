@@ -11,8 +11,8 @@ trait IterativeDeepeningSearch extends Searcher {
 
 	def doSearch(start: Node) : Seq[Point] = {
     (0 to limit).foreach{depth =>
-      val result = DepthLimitedSearch(start,depth)
-      visualizer.flush()
+      val result = start //replace this with a call to the DepthLimitedSearcher
+      visualizer.flush
       if(isGoal(result)) return result.path
     }
 
@@ -21,27 +21,5 @@ trait IterativeDeepeningSearch extends Searcher {
 
 	}
 
-  def DepthLimitedSearch(start:Node, depth: Int) : Node = {
-    RecursiveDLS(start, depth)
-  }
-
-  def RecursiveDLS(node : Node, depth : Int)  : Node = {
-    if(depth >= 0) {
-      if(isGoal(node)){
-        return node
-      }
-
-//      node.visited = true
-
-      visualizer.drawSearchNodes(node map (child => (node.location, child.location)))
-
-
-      node filter(_.occupant == Occupant.NONE) foreach{child =>
-        RecursiveDLS(child,depth - 1)
-      }
-    }
-
-    return node
-  }
 
 }
