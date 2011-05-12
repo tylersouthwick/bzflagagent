@@ -12,13 +12,14 @@ trait DepthFirstSearcher extends Searcher {
 
 		while (!frontier.isEmpty) {
 			val node = frontier.pop()
-			//visualizer.drawSearchNodes(node map (child => (node.location, child.location)))
+			val children = node.filter(!_.visited).filter(!frontier.contains(_)).filter(_.occupant == Occupant.NONE)
+			visualizer.drawSearchNodes(children map (child => (node.location, child.location)))
 			if (isGoal(node)) {
 				println("found!")
 				return node.path
 			} else {
 				node.visited = true
-				node.filter(!_.visited).filter(!frontier.contains(_)).filter(_.occupant == Occupant.NONE).foreach(frontier.push)
+				children.foreach(frontier.push)
 			}
 		}
 
