@@ -1,6 +1,6 @@
 package cs470.agents
 
-import cs470.movement.search.{UniformCostSearcher, DepthFirstSearcher}
+import cs470.movement.search.{BreadthFirstSearcher, DepthFirstSearcher, UniformCostSearcher}
 
 class SearchLabAgent(host : String, port : Int) extends Agent(host, port) {
 	val tankId = 0
@@ -26,6 +26,14 @@ class SearchLabAgent(host : String, port : Int) extends Agent(host, port) {
 	def uniformCost = new UniformCostSearcher {
 		val datastore = store
 		val filename = "uniformCost.gpi"
+		val start = tank.location
+		val goal = greenFlag
+		val occgrid = grid
+	}
+
+  def breadthFirst = new BreadthFirstSearcher {
+		val datastore = store
+		val filename = "breadthFirst.gpi"
 		val start = tank.location
 		val goal = greenFlag
 		val occgrid = grid
