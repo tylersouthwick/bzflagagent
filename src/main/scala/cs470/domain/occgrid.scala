@@ -30,7 +30,6 @@ class Occgrid extends Traversable[Array[Occupant.Occupant]] {
 
 	def addOccupants(points : Traversable[Point], occupent : Occupant.Occupant) {
 		points map(convert) foreach {case (x, y) =>
-			println("(" + x + "," + y + ")")
 			data(x)(y) = occupent
 		}
 	}
