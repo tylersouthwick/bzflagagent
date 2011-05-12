@@ -17,10 +17,11 @@ trait UniformCostSearcher extends Searcher with SearchVisualizer {
 
 		while (!frontier.isEmpty) {
 			val node = frontier.poll()
-			//visualizer.drawSearchNodes(node map (child => (node.location, child.location)))
+			val children = node.filter(!_.visited).filter(!frontier.contains(_)).filter(_.occupant == Occupant.NONE)
+			visualizer.drawSearchNodes(children map (child => (node.location, child.location)))
 			if (isGoal(node)) return node.path
 			node.visited = true
-			node.filter(!_.visited).filter(!frontier.contains(_)).filter(_.occupant == Occupant.NONE).foreach(frontier.add(_))
+			children.foreach(frontier.add(_))
 		}
 		throw new IllegalArgumentException("didn't find it")
 	}
