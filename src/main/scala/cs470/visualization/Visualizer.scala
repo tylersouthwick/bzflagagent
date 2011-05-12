@@ -63,11 +63,15 @@ class SearchVisualizer(filename: String, obstacles: Seq[Polygon], worldsize: Int
 	  pause()
   }
 
+	def plotLines() {
+		write("plot '-' with lines")
+		write("0 0 0 0")
+		write("e")
+	}
+
   def pause() {
-	  write("plot '-' with lines")
-	  write("0 0 0 0")
-	  write("e")
-	  //write("pause " + delay)
+	  plotLines()
+	  write("pause " + delay)
 	  flush();
   }
 
@@ -76,6 +80,7 @@ class SearchVisualizer(filename: String, obstacles: Seq[Polygon], worldsize: Int
       case (p1, p2) =>
         drawLine(p1, p2, Color.BLACK)
     }
+	  plotLines()
     close()
   }
 
