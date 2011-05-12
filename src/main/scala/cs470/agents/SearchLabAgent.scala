@@ -9,10 +9,11 @@ class SearchLabAgent(host : String, port : Int) extends Agent(host, port) {
 	def run() {
 		val team = constants("team")
 
-		aStar.search()
-		uniformCost.search()
-		depthFirst.search()
-		breadthFirst.search()
+//		aStar.search()
+//		uniformCost.search()
+//		depthFirst.search()
+//		breadthFirst.search()
+    iterativeDeepening.search()
 	}
 
 	lazy val greenFlag = store.flags.find(_.color == "green").get.location
@@ -21,6 +22,10 @@ class SearchLabAgent(host : String, port : Int) extends Agent(host, port) {
 	def depthFirst = new DepthFirstSearcher with AgentSearcher {
 		val filename = "depth_first.gpi"
 	}
+
+  def iterativeDeepening = new IterativeDeepeningSearch with AgentSearcher {
+    val filename = "iterative_deepening.gpi"
+  }
 
 	def uniformCost = new UniformCostSearcher with AgentSearcher {
 		val filename = "uniformCost.gpi"
