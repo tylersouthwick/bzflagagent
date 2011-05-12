@@ -1,5 +1,7 @@
 package cs470.domain
 
+import collection.mutable.{HashMap, LinkedList}
+
 /**
  * @author tylers2
  */
@@ -72,8 +74,7 @@ class Occgrid extends Traversable[Array[Occupant.Occupant]] {
 		data.foreach(f)
 	}
 
-
-	def start = new Node(this, 0, 0)
+	def convert(location : Point) = (location.x.intValue - offset._1, location.y.intValue - offset._2)
 
 	override def toString() = {
 		val sb = new StringBuilder
@@ -92,31 +93,3 @@ object Occupant extends Enumeration {
 	val NONE, WALL, ENEMY, TANK = Value
 }
 
-class Node(occgrid : Occgrid, x : Int, y : Int) extends Traversable[Node] {
-
-	private def nodes = {
-		val left = (x - 1, y)
-		val right = (x+1, y)
-		val up = (x, y+1)
-		val down =(x, y-1)
-		val upLeft = (x-1, y+1)
-		val upRight = (x+1, y+1)
-		val downLeft = (x - 1, y - 1)
-		val downRight = (x + 1, y - 1)
-
-		Seq(left, right, up, down, upLeft, upRight, downLeft, downRight)
-	}
-
-	def foreach[U](f: (Node) => U) {
-		nodes.filter { node =>
-				//verify that the node is within the grid
-			(node._1 < 0 || node._1 > occgrid.width) || (node._2 < 0 || node._2 > occgrid.height)
-		}.map{node =>
-			new Node(occgrid, node._1, node._2)
-		}.foreach(f)
-	}
-
-	def location = (x + occgrid.offset._1, y + occgrid.offset._2)
-
-	def occupant = occgrid.data(x)(y)
-}

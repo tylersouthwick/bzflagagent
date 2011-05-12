@@ -56,12 +56,19 @@ class PFVisualizer(pathFinder: FindAgentPath, filename: String, obstacles: Seq[P
 class SearchVisualizer(filename: String, obstacles: Seq[Polygon], worldsize: Int) extends Visualizer(filename, obstacles, worldsize, "search") {
   private val delay = 0.01
 
-  def drawSearchNodes(p1: Point, p2: Point) {
-    drawLine(p1, p2, Color.ORANGE)
+  def drawSearchNodes(nodes : Traversable[(Point,Point)]) {
+	  nodes.foreach{case (p1, p2)=>
+		  drawLine(p1,p2,Color.BLACK)
+	  }
+	  pause()
   }
 
   def pause() {
-    write("pause " + delay)
+	  write("plot '-' with lines")
+	  write("0 0 0 0")
+	  write("e")
+	  write("pause " + delay)
+	  flush();
   }
 
   def drawFinalPath(nodes: Seq[(Point, Point)]) {
@@ -82,7 +89,7 @@ abstract class Visualizer(filename: String, obstacles: Seq[Polygon], worldsize: 
 
   import cs470.visualization.Visualizer._
 
-  LOG.debug("Opening file for visualization for " + name + " to: " + filename)
+  println("Opening file for visualization for " + name + " to: " + filename)
   private val file = new PrintWriter(new FileOutputStream(filename))
 
   setGnuPlotHeader()
@@ -121,6 +128,9 @@ abstract class Visualizer(filename: String, obstacles: Seq[Polygon], worldsize: 
 
   def plot() {}
 
+	def flush() {
+		file.flush()
+	}
   def close() {
     file.close()
     LOG.info("Visualization for " + name + " saved to: " + filename)

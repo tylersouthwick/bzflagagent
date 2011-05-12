@@ -9,6 +9,10 @@ object Point {
 
 class Point(val x: Double, val y: Double) {
 
+	def this(t : (Int, Int)) {
+		this(t._1, t._2)
+	}
+
   override def toString = "(" + x + ", " + y + ")"
 
   def -(other: Point) = {
