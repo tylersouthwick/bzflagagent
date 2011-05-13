@@ -4,8 +4,6 @@ import cs470.movement.search._
 import cs470.utils.Properties
 
 class SearchLabAgent(host : String, port : Int) extends Agent(host, port) {
-	val penelized = Properties("penelized", false)
-
 	def run() {
 		val team = constants("team")
 
@@ -36,14 +34,22 @@ class SearchLabAgent(host : String, port : Int) extends Agent(host, port) {
 		val name = "iterativeDeepening"
 	}
 
-	def uniformCost = new UniformCostSearcher with AgentSearcher with SearcherName {
+	def uniformCost = {
+		if (PenelizedHeuristic.penalizedMode) {
+			new LabUniformCostSearcher with PenelizedHeuristic
+		} else {
+			new LabUniformCostSearcher
+		}
+	}
+
+	class LabUniformCostSearcher extends UniformCostSearcher with AgentSearcher with SearcherName {
 		val filename = "uniformCost.gpi"
 		val title = "Uniform Cost Search"
 		val name = "uniformCost"
 	}
 
 	def aStar = {
-		if (penelized) {
+		if (PenelizedHeuristic.penalizedMode) {
 			new LabAStarSearcher with PenelizedHeuristic
 		} else {
 			new LabAStarSearcher
