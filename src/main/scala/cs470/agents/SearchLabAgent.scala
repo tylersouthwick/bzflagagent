@@ -10,7 +10,10 @@ class SearchLabAgent(host : String, port : Int) extends Agent(host, port) {
 		val searchers = Seq(aStar, uniformCost, depthFirst, breadthFirst, iterativeDeepening)
 		println("Valid searchers: " + searchers)
 		Properties("searchers") match {
-			case None => SearchLabAgent.LOG.error("No searchers defined")
+			case None => {
+				SearchLabAgent.LOG.warn("No searchers defined: running all")
+				searchers.foreach(_.search())
+			}
 			case Some(prop) => {
 				prop.split(",").foreach{d =>
 					searchers.filter(_.name == d).foreach(_.search())
