@@ -48,7 +48,7 @@ trait Searcher extends SearchVisualizer {
 		//println("goal: " + goal)
 		val begin = time
 		val result = doSearch(Node(occgrid, realStart._1, realStart._2))
-		LOG.info("cost: " + result.cost)
+		LOG.info("Cost of " + title + ": " + result.cost + " (depth=" + result.depth + ")")
 		val points = result.path
 		val finished  = time
 		visualizer.drawFinalPath(points.zipWithIndex map {case (point, idx) => {
