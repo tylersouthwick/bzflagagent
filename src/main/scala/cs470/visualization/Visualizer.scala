@@ -56,14 +56,14 @@ class PFVisualizer(pathFinder: FindAgentPath, filename: String, obstacles: Seq[P
 
 object SearchVisualizer {
 	private val showEvery = Properties("vis.showEvery", 25)
+  private val pauseView = Properties("vis.pauseView", 1000)
 }
 class SearchVisualizer(filename: String, obstacles: Seq[Polygon], worldsize: Int,title:String) extends Visualizer(filename, obstacles, worldsize, "search",title) {
   private val delay = 0.1
-  private val pauseView = 1000
   private var pauseViewCounter = 0
-  private var howMany = 0
   private var showEveryCounter = 0
 	import SearchVisualizer.showEvery
+  import SearchVisualizer.pauseView
 
   def drawSearchNodes(nodes: Traversable[(Point, Point)]) {
     nodes.foreach {
@@ -78,7 +78,6 @@ class SearchVisualizer(filename: String, obstacles: Seq[Polygon], worldsize: Int
     }
 
     if (pauseViewCounter == pauseView) {
-      howMany = howMany + 1
       pause()
       pauseViewCounter = 0
     } else {
