@@ -31,7 +31,7 @@ trait BreadthFirstSearcher extends Searcher {
         count + 1
       }
       val node = frontier.get
-//      visualizer.drawSearchNodes(node map (child => (node.location, child.location)))
+      visualizer.drawSearchNodes(node map (child => (node.location, child.location)))
       if (isGoal(node)) {
         LOG.info("Found goal!")
         return node
