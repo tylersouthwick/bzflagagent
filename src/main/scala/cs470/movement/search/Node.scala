@@ -11,7 +11,6 @@ object Node {
 	def apply(occgrid : Occgrid, x : Int, y : Int) = new Node(null, occgrid, x, y, 0, 0)
 
 	val sqrt2 = java.lang.Math.sqrt(2)
-	val penalizedMode = true
 }
 
 class Node(val parent : Node, occgrid : Occgrid, x : Int, y : Int, val cost : Double, val depth : Int) extends Traversable[Node] {

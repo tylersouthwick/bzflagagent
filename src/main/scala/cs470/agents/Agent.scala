@@ -30,7 +30,7 @@ object Agents {
 	val LOG = org.apache.log4j.Logger.getLogger("cs470.agents.Agents")
 
 	def start(agent: String, host: String, port: Int) {
-		LOG.info("Creating agent: " + agent)
+		LOG.debug("Creating agent: " + agent)
 		val agents = all.filter(_.name == agent).map(_.create(host, port))
 		agents.foreach(_.run())
 		if (agents.isEmpty) {
