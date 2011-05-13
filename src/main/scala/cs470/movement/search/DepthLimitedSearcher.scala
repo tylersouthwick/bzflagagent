@@ -9,7 +9,7 @@ trait DepthLimitedSearcher extends Searcher {
 		val frontier = new Frontier {
 			val stack = Stack[Node]()
 
-			def pop = stack.pop()
+			def get = stack.pop()
 
 			def addNode(node: Node) {
 				stack.push(node)

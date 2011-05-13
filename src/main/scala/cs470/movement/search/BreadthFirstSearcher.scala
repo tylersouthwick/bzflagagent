@@ -9,7 +9,7 @@ trait BreadthFirstSearcher extends Searcher {
 		val frontier = new Frontier {
 			val list = new LinkedList[Node]()
 
-			def pop = list.pop
+			def get = list.pop
 
 			def addNode(node: Node) {
 				list.push(node)

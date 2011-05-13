@@ -18,7 +18,7 @@ trait UniformCostSearcher extends Searcher with SearchVisualizer with HeuristicS
 		}
 
 		def isEmpty = frontier.isEmpty
-		def pop = frontier.poll
+		def get = frontier.poll
 	}
 
 	def doSearch(start: Node) : Node = {
