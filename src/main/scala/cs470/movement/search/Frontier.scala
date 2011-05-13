@@ -6,16 +6,17 @@ trait Frontier {
 
 	def convertTuple(t : (Int, Int)) = t._1 + "_" + t._2
 
+	implicit def convertNode(node : Node) = convertTuple(node.gridLocation)
+
 	def isEmpty : Boolean
 
 	//we only want a node that has the lowest cost
 	def contains(node : Node) = {
-		val key = convertTuple(node.gridLocation)
-		frontierNodes.get(key) match {
+		frontierNodes.get(node) match {
 			case None => false
 			case Some(n) => {
 				if (n.cost > node.cost) {
-					frontierNodes.remove(key)
+					frontierNodes.remove(node)
 					false
 				} else {
 					true
@@ -25,7 +26,7 @@ trait Frontier {
 	}
 
 	def add(node :Node) {
-		frontierNodes(convertTuple(node.gridLocation)) = node
+		frontierNodes(node) = node
 		addNode(node)
 	}
 
@@ -33,7 +34,7 @@ trait Frontier {
 
 	final def pop : Node = {
 		val node = get
-		frontierNodes.get(convertTuple(node.gridLocation)) match {
+		frontierNodes.get(node) match {
 			case None => pop
 			case Some(n) => node
 		}
