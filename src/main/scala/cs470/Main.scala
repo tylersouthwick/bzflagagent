@@ -32,7 +32,7 @@ object Main {
 
 	def doMain(args : Array[String]) {
 		val parser = new PosixParser
-		val cmd = parser.parse(options, args)
+		val cmd = parser.parse(options, args, true)
 
 		setupLog4j()
 

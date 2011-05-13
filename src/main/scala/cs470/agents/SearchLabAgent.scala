@@ -9,27 +9,37 @@ class SearchLabAgent(host : String, port : Int) extends Agent(host, port) {
 	def run() {
 		val team = constants("team")
 
-		aStar.search()
-		uniformCost.search()
-		depthFirst.search()
-		breadthFirst.search()
-		iterativeDeepening.search()
+		val searchers = Seq(aStar, uniformCost, depthFirst, breadthFirst, iterativeDeepening)
+		println("Valid searchers: " + searchers)
+		Properties("searchers") match {
+			case None => SearchLabAgent.LOG.error("No searchers defined")
+			case Some(prop) => {
+				prop.split(",").foreach{d =>
+					searchers.filter(_.name == d).foreach(_.search())
+				}
+			}
+		}
+
+		System.exit(-1)
 	}
 
 	lazy val greenFlag = store.flags.find(_.color == "green").get.location
 
-	def depthFirst = new DepthFirstSearcher with AgentSearcher {
+	def depthFirst = new DepthFirstSearcher with AgentSearcher with SearcherName {
 		val filename = "depth_first.gpi"
 		val title = "Depth First Search"
+		val name = "depthFirst"
 	}
 
-	def iterativeDeepening = new IterativeDeepeningSearch with AgentSearcher {
+	def iterativeDeepening = new IterativeDeepeningSearch with AgentSearcher with SearcherName {
 		val filename = "iterative_deepening.gpi"
+		val name = "iterativeDeepening"
 	}
 
-	def uniformCost = new UniformCostSearcher with AgentSearcher {
+	def uniformCost = new UniformCostSearcher with AgentSearcher with SearcherName {
 		val filename = "uniformCost.gpi"
 		val title = "Uniform Cost Search"
+		val name = "uniformCost"
 	}
 
 	def aStar = {
@@ -40,9 +50,10 @@ class SearchLabAgent(host : String, port : Int) extends Agent(host, port) {
 		}
 	}
 
-	def breadthFirst = new BreadthFirstSearcher with AgentSearcher {
+	def breadthFirst = new BreadthFirstSearcher with AgentSearcher with SearcherName {
 		val filename = "breadthFirst.gpi"
 		val title = "Breadth First Search"
+		val name = "breadthFirst"
 	}
 
 	trait AgentSearcher {
@@ -53,14 +64,23 @@ class SearchLabAgent(host : String, port : Int) extends Agent(host, port) {
 		val q = queue
 	}
 
-	class LabAStarSearcher extends A_StarSearcher with AgentSearcher {
+	trait SearcherName {
+		val name : String
+
+		override def toString = name
+	}
+
+	class LabAStarSearcher extends A_StarSearcher with AgentSearcher with SearcherName {
 		val filename = "a_star.gpi"
 		val title = "A* Search"
+		val name = "aStar"
 	}
 
 }
 
 object SearchLabAgent extends AgentCreator {
+	val LOG = org.apache.log4j.Logger.getLogger(classOf[SearchLabAgent])
+
 	def create(host: String, port: Int) = new SearchLabAgent(host, port)
 
 	def name = "search"
