@@ -5,19 +5,19 @@ import cs470.domain.{Occupant, Point}
 
 trait DepthFirstSearcher extends Searcher {
 
-	def doSearch(start: Node) : Node = {
-		val frontier = new Frontier {
-			val stack = new Stack[Node]()
+	val frontier : Frontier = new Frontier {
+		val stack = new Stack[Node]()
 
-			def get = stack.pop()
+		def get = stack.pop()
 
-			def addNode(node: Node) {
-				stack.push(node)
-			}
-
-			def isEmpty = stack.isEmpty
+		def addNode(node: Node) {
+			stack.push(node)
 		}
 
+		def isEmpty = stack.isEmpty
+	}
+
+	def doSearch(start: Node) : Node = {
 		frontier.push(start)
 		val path = new Stack[Point]
 
