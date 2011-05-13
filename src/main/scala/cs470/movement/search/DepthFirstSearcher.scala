@@ -26,7 +26,6 @@ trait DepthFirstSearcher extends Searcher {
 			val children = node.filter(!_.visited).filter(!frontier.contains(_)).filter(_.occupant == Occupant.NONE)
 			visualizer.drawSearchNodes(children map (child => (node.location, child.location)))
 			if (isGoal(node)) {
-				println("found!")
 				return node
 			} else {
 				node.visited = true
