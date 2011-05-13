@@ -2,6 +2,8 @@ package cs470.movement.search
 
 import cs470.domain.Point
 import cs470.bzrc.BzrcQueue
+import cs470.utils.Properties
+import java.io.{FileOutputStream, BufferedOutputStream, PrintWriter}
 
 object Searcher {
 	val LOG = org.apache.log4j.Logger.getLogger(classOf[Searcher])
@@ -15,6 +17,7 @@ trait Searcher extends SearchVisualizer {
 	val start : Point
 	val tankId : Int
 	val q : BzrcQueue
+  val name :String
 
 	def queue = q
 
@@ -59,6 +62,17 @@ trait Searcher extends SearchVisualizer {
 			}
 		}})
 		LOG.debug(title + "took " + (finished - begin) + "ms")
+
+    if(Properties("printNodes",false)){
+      val file = new PrintWriter(new BufferedOutputStream(new FileOutputStream(name + ".nodes.txt")))
+      file.println("Cost:   " + result.cost)
+      file.println("Length: " + result.depth)
+      points.foreach{point =>
+        file.println(point)
+      }
+      file.close()
+    }
+
 	}
 
 	def doSearch(node : Node) : Node
