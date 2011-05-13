@@ -47,7 +47,9 @@ trait Searcher extends SearchVisualizer {
 		//println("start: " + start)
 		//println("goal: " + goal)
 		val begin = time
-		val points = doSearch(Node(occgrid, realStart._1, realStart._2))
+		val result = doSearch(Node(occgrid, realStart._1, realStart._2))
+		LOG.info("cost: " + result.cost)
+		val points = result.path
 		val finished  = time
 		visualizer.drawFinalPath(points.zipWithIndex map {case (point, idx) => {
 			if (idx + 1 < points.length) {
@@ -59,7 +61,7 @@ trait Searcher extends SearchVisualizer {
 		LOG.debug(title + "took " + (finished - begin) + "ms")
 	}
 
-	def doSearch(node : Node) : Seq[Point]
+	def doSearch(node : Node) : Node
 
 	def isGoal(node : Node) = node.gridLocation._1 == end._1 && node.gridLocation._2 == end._2
 

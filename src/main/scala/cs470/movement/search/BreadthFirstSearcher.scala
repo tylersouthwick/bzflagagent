@@ -5,7 +5,7 @@ import java.util.LinkedList
 
 trait BreadthFirstSearcher extends Searcher {
 
-	def doSearch(start: Node) : Seq[Point] = {
+	def doSearch(start: Node) : Node = {
 		val frontier = new Frontier {
 			val list = new LinkedList[Node]()
 
@@ -25,7 +25,7 @@ trait BreadthFirstSearcher extends Searcher {
 			visualizer.drawSearchNodes(node map (child => (node.location, child.location)))
 			if (isGoal(node)) {
 				println("found!")
-				return node.path
+				return node
 			} else {
 				node.visited = true
 				node.filter(!_.visited).filter(!frontier.contains(_)).filter(_.occupant == Occupant.NONE).foreach(frontier.push)

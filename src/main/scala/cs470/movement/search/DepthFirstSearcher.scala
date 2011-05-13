@@ -5,7 +5,7 @@ import cs470.domain.{Occupant, Point}
 
 trait DepthFirstSearcher extends Searcher {
 
-	def doSearch(start: Node) : Seq[Point] = {
+	def doSearch(start: Node) : Node = {
 		val frontier = new Frontier {
 			val stack = new Stack[Node]()
 
@@ -27,7 +27,7 @@ trait DepthFirstSearcher extends Searcher {
 			visualizer.drawSearchNodes(children map (child => (node.location, child.location)))
 			if (isGoal(node)) {
 				println("found!")
-				return node.path
+				return node
 			} else {
 				node.visited = true
 				children.foreach(frontier.push)

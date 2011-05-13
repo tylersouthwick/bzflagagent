@@ -7,7 +7,7 @@ trait IterativeDeepeningSearch extends Searcher with DepthLimitedSearcher {
 	private val limit = 10000
 	val LOG = org.apache.log4j.Logger.getLogger("cs470.movement.search.iddf")
 
-	def doSearch(start: Node): Seq[Point] = {
+	def doSearch(start: Node) : Node = {
 		(0 to limit).foreach { depth =>
 			LOG.debug("depth: " + depth)
 			explored.clear()
@@ -15,7 +15,7 @@ trait IterativeDeepeningSearch extends Searcher with DepthLimitedSearcher {
 			visualizer.clear()
 			if (result != null && isGoal(result)) {
 				println("final depth: " + result.depth)
-				return result.path
+				return result
 			}
 			System.gc()
 		}

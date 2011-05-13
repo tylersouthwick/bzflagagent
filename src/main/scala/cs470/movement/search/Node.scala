@@ -20,7 +20,7 @@ class Node(val parent : Node, occgrid : Occgrid, x : Int, y : Int, val cost : Do
 
 	lazy val nextToOccupied = !children.filter(_.occupant != Occupant.NONE).isEmpty
 
-	private def childrenPoints = {
+	private val childrenPoints = {
 		val left = (x - 1, y, 1.0)
 		val right = (x+1, y, 1.0)
 		val up = (x, y+1 , 1.0)

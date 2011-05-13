@@ -21,7 +21,7 @@ trait UniformCostSearcher extends Searcher with SearchVisualizer with HeuristicS
 		def pop = frontier.poll
 	}
 
-	def doSearch(start: Node) : Seq[Point] = {
+	def doSearch(start: Node) : Node = {
 
 		frontier.add(start)
 
@@ -29,7 +29,7 @@ trait UniformCostSearcher extends Searcher with SearchVisualizer with HeuristicS
 			val node = frontier.pop
 			if (node.parent != null)
 				visualizer.drawSearchNodes(Seq((node.parent.location, node.location)))
-			if (isGoal(node)) return node.path
+			if (isGoal(node)) return node
 			node.visited = true
 			node.filter(!_.visited).filter(!frontier.contains(_)).filter(_.occupant == Occupant.NONE).foreach(frontier.add)
 		}
