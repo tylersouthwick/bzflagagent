@@ -35,8 +35,8 @@ class SearchLabAgent(host : String, port : Int) extends Agent(host, port) {
 	}
 
 	def uniformCost = {
-		if (PenelizedHeuristic.penalizedMode) {
-			new LabUniformCostSearcher with PenelizedHeuristic
+		if (PenalizedUniformCostSearch.penalizedMode) {
+			new LabUniformCostSearcher with PenalizedUniformCostSearch
 		} else {
 			new LabUniformCostSearcher
 		}
@@ -49,8 +49,8 @@ class SearchLabAgent(host : String, port : Int) extends Agent(host, port) {
 	}
 
 	def aStar = {
-		if (PenelizedHeuristic.penalizedMode) {
-			new LabAStarSearcher with PenelizedHeuristic
+		if (PenalizedUniformCostSearch.penalizedMode) {
+			new LabAStarSearcher with PenalizedUniformCostSearch
 		} else {
 			new LabAStarSearcher
 		}
