@@ -22,7 +22,10 @@ object Properties {
 
 	private def convert[T](s : String, default : T)(callback : (String) => T) : T = this(s) match {
 		case None => use(s, default)
-		case Some(s) => callback(s)
+		case Some(value) => {
+			LOG.info("User provided value [" + value + "] for property [" + s + "]")
+			callback(value)
+		}
 	}
 
 	private def use[T](s : String, value : T) = {
