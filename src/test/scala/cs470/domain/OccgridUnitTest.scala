@@ -6,7 +6,7 @@ import java.io.{InputStreamReader, BufferedReader}
 object OccgridUnitTest {
 	def createOccgrid = {
 		val reader = new BufferedReader(new InputStreamReader(classOf[OccgridUnitTest].getResourceAsStream("/occgrid.dat")))
-		val occgrid = new Occgrid
+		val occgrid = new OccgridCommand
 		var line : String = reader.readLine
 		while (line != null) {
 			occgrid.read(line)

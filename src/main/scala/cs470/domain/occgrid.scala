@@ -6,14 +6,27 @@ import collection.mutable.{HashMap, LinkedList}
  * @author tylers2
  */
 
-class Occgrid extends Traversable[Array[Occupant.Occupant]] {
+trait Occgrid {
+	def data(x : Int)(y : Int) : Occupant.Occupant
+	def offset : (Int, Int)
+	def width : Int
+	def height : Int
+}
+
+/**
+ * The implementation for the occgrid command to the game server.
+ **/
+class OccgridCommand extends Occgrid with Traversable[Array[Occupant.Occupant]] {
 
 	private var step = 0
-	var data : Array[Array[Occupant.Occupant]] = null
+	private var myData : Array[Array[Occupant.Occupant]] = null
 	private var row = 0
 	var width = 0
 	var height = 0
 	var offset = (0, 0)
+
+
+	def data(x: Int)(y: Int) = myData(x)(y)
 
 	def read(line : String) {
 		step match {
@@ -30,7 +43,7 @@ class Occgrid extends Traversable[Array[Occupant.Occupant]] {
 
 	def addOccupants(points : Traversable[Point], occupent : Occupant.Occupant) {
 		points map(convert) foreach {case (x, y) =>
-			data(x)(y) = occupent
+			myData(x)(y) = occupent
 		}
 	}
 
@@ -50,11 +63,11 @@ class Occgrid extends Traversable[Array[Occupant.Occupant]] {
 		width = Integer.parseInt(dim(0))
 		height = Integer.parseInt(dim(1))
 
-		data = Array.ofDim(width, height)
+		myData = Array.ofDim(width, height)
 	}
 
 	private def addToMatrix(line : String) {
-		val rowData = data(row)
+		val rowData = myData(row)
 		row = row + 1
 		line.map{
 			case '1' => Occupant.WALL
@@ -65,7 +78,7 @@ class Occgrid extends Traversable[Array[Occupant.Occupant]] {
 	}
 
 	def foreach[U](f: (Array[Occupant.Occupant]) => U) {
-		data.foreach(f)
+		myData.foreach(f)
 	}
 
 	def convert(location : Point) = (location.x.intValue - offset._1, location.y.intValue - offset._2)

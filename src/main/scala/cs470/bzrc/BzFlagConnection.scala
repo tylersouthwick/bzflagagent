@@ -99,7 +99,7 @@ class BzFlagConnection(host : String, port : Int) {
 
 	def occgrid(agent : Int) = {
 		send("occgrid " + agent)
-		val occgrid = new Occgrid
+		val occgrid = new OccgridCommand
 		receive (occgrid.read)
 		occgrid
 	}
