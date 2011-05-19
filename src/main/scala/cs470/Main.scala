@@ -1,6 +1,6 @@
 package cs470
 
-import agents.{SearchLabAgent, Agents}
+import agents.{MultiAgent, SearchLabAgent, Agents}
 import org.apache.commons.cli._
 import org.apache.log4j.Logger
 import utils.Properties
