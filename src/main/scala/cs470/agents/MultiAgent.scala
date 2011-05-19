@@ -18,5 +18,5 @@ object MultiAgent extends AgentCreator {
 
   def name = "multi"
 
-  def create(host: String, port: Int) = new DummyAgent(host, port)
+  def create(host: String, port: Int) = new MultiAgent(host, port)
 }
