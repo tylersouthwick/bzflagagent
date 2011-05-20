@@ -9,9 +9,9 @@ object Point {
 
 class Point(val x: Double, val y: Double) {
 
-	def this(t : (Int, Int)) {
-		this(t._1, t._2)
-	}
+  def this(t: (Int, Int)) {
+    this (t._1, t._2)
+  }
 
   override def toString = "(" + x + ", " + y + ")"
 
@@ -31,6 +31,10 @@ class Point(val x: Double, val y: Double) {
     new Point(x * mult, y * mult)
   }
 
+  def *(mult: Point) = {
+    x * mult.x + y * mult.y
+  }
+
   def distance(goal: Point) = {
     val dx = goal.x - x
     val dy = goal.y - y
@@ -48,6 +52,8 @@ class Point(val x: Double, val y: Double) {
   def magnitude = {
     distance(new Point(0, 0))
   }
+
+  def perpendicular = new Point(-y, x)
 }
 
 class Vector(vector: Point) {
@@ -64,7 +70,7 @@ class Vector(vector: Point) {
     new Vector(x * mult, y * mult)
   }
 
-	def +(v : Vector) = new Vector(x + v.x, y + v.y)
+  def +(v: Vector) = new Vector(x + v.x, y + v.y)
 
   def magnitude = {
     vector.distance(new Point(0, 0))
@@ -74,7 +80,7 @@ class Vector(vector: Point) {
     vector + point
   }
 
-	def angle = new Radian(java.lang.Math.atan2(y, x))
+  def angle = new Radian(java.lang.Math.atan2(y, x))
 }
 
 class Polygon(points: Seq[Point]) {
@@ -82,6 +88,8 @@ class Polygon(points: Seq[Point]) {
   def convexHull = this
 
   def inConvexInterior(point: Point) = false
+
+  val vertices = points
 
   val edges = points.zipWithIndex.map {
     case (point, idx) =>
@@ -93,6 +101,31 @@ class Polygon(points: Seq[Point]) {
 
   val center = {
     (points.foldLeft(new Point(0, 0))((a, b) => a + b)) / points.size
+  }
+
+  val topLeft = {
+    points.foldLeft(null: Point) {
+      (tl, point) =>
+        if (tl == null) {
+          point
+        } else if (point.x < tl.x || point.y > tl.y) {
+          point
+        } else {
+          tl
+        }
+    }
+  }
+  val bottomRight = {
+    points.foldLeft(null: Point) {
+      (tl, point) =>
+        if (tl == null) {
+          point
+        } else if (point.x > tl.x || point.y < tl.y) {
+          point
+        } else {
+          tl
+        }
+    }
   }
 
   val maxDistance = {

@@ -2,6 +2,10 @@ package cs470.agents
 
 import cs470.bzrc.Tank
 import cs470.utils._
+import cs470.visualization.SearchVisualizer
+import java.io.{PrintWriter, BufferedOutputStream, FileOutputStream}
+import cs470.domain.UsableOccgrid
+import cs470.domain.Constants._
 
 class MultiAgent(host: String, port: Int) extends Agent(host, port) with Threading {
 
@@ -9,8 +13,20 @@ class MultiAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 
   def run() {
     LOG.info("Running multiagent")
-  }
 
+    val worldsize : Int = constants("worldsize")
+    val tankradius : Double = constants("tankradius")
+
+    val occgrid = new UsableOccgrid(100,obstacles,tankradius,worldsize,enemies)
+    val file = new PrintWriter(new BufferedOutputStream(new FileOutputStream("multi.out.gpi")))
+
+    file.println(occgrid.toString())
+    file.println(occgrid.print)
+
+    file.close()
+
+    System.exit(0)
+  }
 }
 
 object MultiAgent extends AgentCreator {

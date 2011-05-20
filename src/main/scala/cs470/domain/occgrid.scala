@@ -20,68 +20,117 @@ trait Occgrid {
 }
 
 
-class UsableOccgrid(resolution: Int, obstacles: Seq[Polygon],tankRadius:Double, val worldSize: Int, enemies: RefreshableEnemies) extends Occgrid with Traversable[Array[Occupant.Occupant]] {
+class UsableOccgrid(resolution: Int, obstacles: Seq[Polygon], tankRadius: Double, val worldSize: Int, enemies: RefreshableEnemies) extends Occgrid with Traversable[Array[Occupant.Occupant]] {
   val alpha = math.floor(worldSize / resolution)
   val width = resolution
   val height = resolution
-  val offset = (0, 0)
+  val offset: (Int, Int) = (resolution / 2, resolution / 2)
 
-  private val myData : Array[Array[Occupant.Occupant]] = Array.ofDim(width, height);
+  private var myData: Array[Array[Occupant.Occupant]] = Array.ofDim(width, height);
 
-  def data(x:Int)(y: Int) = myData(x)(y)
+  def data(x: Int)(y: Int) = myData(y)(x)
 
-  def inGridPoint(xs: Double, ys: Double, x: Double, y: Double) = {
-    if (xs <= x && x <= xs + alpha && ys <= y && y <= y + alpha) {
+  fillArray
+
+  def inCircle(xs: Double, ys: Double, point: Point, radius: Double) = {
+    val radii_squared = (alpha / 2 + radius)
+    val distance_squared = (new Point(xs, ys)).distance(point)
+
+    if (radii_squared > distance_squared) {
       true
     } else {
       false
     }
   }
 
-  def inCircle(xs: Int, ys: Int, point: Point, theta: Double) = {
-    import scala.math._
-    val x = point.x
-    val y = point.y
-    val p1 = x + cos(theta) * tankRadius
-    val p2 = y + sin(theta) * tankRadius
+  def inPolygon(x: Double, y: Double, poly: Polygon): Boolean = {
+    val bx1 = x;
+    val by1 = y;
+    val bx2 = x + alpha;
+    val by2 = y - alpha;
 
-    inGridPoint(xs, ys, p1, p2)
+    val ax1 = poly.topLeft.x
+    val ay1 = poly.topLeft.y
+    val ax2 = poly.bottomRight.x
+    val ay2 = poly.bottomRight.y
+
+    if (ax1 <= bx2 && ax2 >= bx1 && ay1 >= by2 && ay2 <= by1) {
+      true
+    } else {
+      false
+    }
   }
 
-  def checkEnemy(x: Int, y: Int) : Occupant.Occupant = {
-    import math._
-    val angles = Seq(Pi / 4, 3 * Pi / 4, 5 * Pi / 4, 7 * Pi / 4)
-    enemies.foreach {
-      enemy =>
-        angles.foreach {
-          angle =>
-            if (inCircle(x, y, enemy.location, angle)) return Occupant.ENEMY
-        }
+  def checkObstacle(x: Double, y: Double): Boolean = {
+    obstacles.foreach {
+      obstacle =>
+        if (inPolygon(x, y, obstacle)) return true
     }
 
-    Occupant.NONE
+    false
+  }
+
+  def checkEnemy(x: Double, y: Double): Boolean = {
+    enemies.foreach {
+      enemy =>
+        if (inCircle(x, y, enemy.location, tankRadius)) return true
+    }
+
+    false
   }
 
   def foreach[U](f: (Array[Occupant.Occupant]) => U) {
     myData.foreach(f)
   }
 
+  def convert(location: Point) = ((location.x.intValue - offset._1) * alpha, (-location.y.intValue + offset._2) * alpha)
+
   def fillArray = {
 
-    (0 to width).foreach {
+    (0 to width - 1).foreach {
       x =>
-        (0 to height).foreach {
+        (0 to height - 1).foreach {
           y =>
-            if(checkEnemy(x,y) == Occupant.ENEMY) {
-              myData(x)(y) = Occupant.ENEMY
+            val tmp = convert(new Point(x, y))
+            if (checkEnemy(tmp._1, tmp._2)) {
+              myData(y)(x) = Occupant.ENEMY
+            } else if (checkObstacle(tmp._1, tmp._2)) {
+              myData(y)(x) = Occupant.WALL
             } else {
-              myData(x)(y) = Occupant.NONE
+              myData(y)(x) = Occupant.NONE
             }
 
         }
     }
 
     myData
+  }
+
+  def print: String = {
+    val sb = new StringBuilder
+
+    myData.foreach {
+      rows =>
+        rows.foreach {
+          case Occupant.ENEMY => sb.append("\tE")
+          case Occupant.WALL => sb.append("\tW")
+          case Occupant.NONE => sb.append("\t ")
+          case _ => sb.append("\t!")
+        }
+        sb.append("\n")
+    }
+
+    sb.toString()
+  }
+
+  override def toString() = {
+    val sb = new StringBuilder
+    sb.append("Occgrid [")
+    sb.append(width)
+    sb.append("x")
+    sb.append(height)
+    sb.append("]")
+    sb.toString()
   }
 
 }
@@ -114,10 +163,10 @@ class OccgridCommand extends Occgrid with Traversable[Array[Occupant.Occupant]] 
     addOccupants(points, Occupant.ENEMY)
   }
 
-  def addOccupants(points: Traversable[Point], occupent: Occupant.Occupant) {
+  def addOccupants(points: Traversable[Point], occupant: Occupant.Occupant) {
     points map (convert) foreach {
       case (x, y) =>
-        myData(x)(y) = occupent
+        myData(x)(y) = occupant
     }
   }
 
