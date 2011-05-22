@@ -36,11 +36,7 @@ trait Searcher extends SearchVisualizer {
 		}
 	}
 
-	lazy val occgrid = {
-		val o = queue.invokeAndWait(_.occgrid(tankId))
-		o.addEnemies(datastore.enemies.filter(_.status != "dead") map(_.location))
-		o
-	}
+	def occgrid : cs470.domain.Occgrid
 
 	lazy val realStart = occgrid.convert(start)
 	lazy val end = occgrid.convert(goal)

@@ -65,12 +65,18 @@ class SearchLabAgent(host : String, port : Int) extends Agent(host, port) {
 		val name = "breadthFirst"
 	}
 
+	val tankId = 0
 	trait AgentSearcher {
 		val tankId = 0
 		val datastore = store
 		val start = store.tanks(tankId).location
 		val goal = greenFlag
 		val q = queue
+		lazy val occgrid = {
+			val o = queue.invokeAndWait(_.occgrid(tankId))
+			o.addEnemies(datastore.enemies.filter(_.status != "dead") map(_.location))
+			o
+		}
 	}
 
 	trait SearcherName {

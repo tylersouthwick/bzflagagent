@@ -10,6 +10,8 @@ import cs470.bzrc.{RefreshableEnemies, DataStore}
  */
 
 trait Occgrid {
+  implicit def double2int(d : Double) = d.toInt
+
   def data(x: Int)(y: Int): Occupant.Occupant
 
   def offset: (Int, Int)
@@ -17,6 +19,8 @@ trait Occgrid {
   def width: Int
 
   def height: Int
+
+  def convert(location: Point) : (Int, Int)
 }
 
 
