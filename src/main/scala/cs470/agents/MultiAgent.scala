@@ -4,30 +4,46 @@ import cs470.bzrc.Tank
 import cs470.utils._
 import cs470.visualization.SearchVisualizer
 import java.io.{PrintWriter, BufferedOutputStream, FileOutputStream}
-import cs470.domain.UsableOccgrid
 import cs470.domain.Constants._
+import cs470.movement.search.{A_StarSearcher, Searcher}
+import cs470.domain.{Point, UsableOccgrid}
 
 class MultiAgent(host: String, port: Int) extends Agent(host, port) with Threading {
 
   import MultiAgent._
 
+  trait AgentSearcher extends A_StarSearcher {
+    val worldSize : Int = constants("worldsize")
+    val tankRadius : Double = constants("tankradius")
+
+    val datastore = store
+    val start = store.tanks(tankId).location
+    val q = queue
+    lazy val occgrid = new UsableOccgrid(100,obstacles,tankRadius,worldSize,enemies)
+
+  }
+
   def run() {
+
     LOG.info("Running multiagent")
 
-    val worldsize : Int = constants("worldsize")
-    val tankradius : Double = constants("tankradius")
+    val safePoint = flags.find(_.color == "green").get.location - new Point(15,15)
 
-    val occgrid = new UsableOccgrid(100,obstacles,tankradius,worldsize,enemies)
-    val file = new PrintWriter(new BufferedOutputStream(new FileOutputStream("multi.out.gpi")))
+    val searcher = new AgentSearcher {
+      val name = "aStarSafePoint"
+      val tankId = 0
+      val goal = safePoint
+      val title = "To Safe point"
+      val filename = "Safe point searcher"
+    }
 
-    file.println(occgrid.toString())
-    file.println(occgrid.print)
-
-    file.close()
+    searcher.search()
 
     System.exit(0)
   }
 }
+
+
 
 object MultiAgent extends AgentCreator {
   val LOG = org.apache.log4j.Logger.getLogger("cs470.agents.MultiAgent")

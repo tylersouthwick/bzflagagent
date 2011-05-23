@@ -10,7 +10,7 @@ import cs470.bzrc.{RefreshableEnemies, DataStore}
  */
 
 trait Occgrid {
-  implicit def double2int(d : Double) = d.toInt
+  implicit def double2int(d: Double) = d.toInt
 
   def data(x: Int)(y: Int): Occupant.Occupant
 
@@ -20,7 +20,9 @@ trait Occgrid {
 
   def height: Int
 
-  def convert(location: Point) : (Int, Int)
+  def convert(location: Point): (Int, Int)
+
+  def getLocation(x: Int, y: Int) : Point
 }
 
 
@@ -87,7 +89,15 @@ class UsableOccgrid(resolution: Int, obstacles: Seq[Polygon], tankRadius: Double
     myData.foreach(f)
   }
 
-  def convert(location: Point) = ((location.x.intValue - offset._1) * alpha, (-location.y.intValue + offset._2) * alpha)
+    def convert(location: Point) = {
+    val t:(Int,Int) = (location.x.intValue / alpha + offset._1, offset._2 + location.y.intValue / alpha)
+//    Console.out.println(t)
+    t
+  }
+
+  override def getLocation(x: Int, y: Int) = {
+    new Point((x- offset._1) * alpha, (-y+ offset._2) * alpha)
+  }
 
   def fillArray = {
 
@@ -95,10 +105,10 @@ class UsableOccgrid(resolution: Int, obstacles: Seq[Polygon], tankRadius: Double
       x =>
         (0 to height - 1).foreach {
           y =>
-            val tmp = convert(new Point(x, y))
-            if (checkEnemy(tmp._1, tmp._2)) {
+            val tmp = getLocation(x, y)
+            if (checkEnemy(tmp.x, tmp.y)) {
               myData(y)(x) = Occupant.ENEMY
-            } else if (checkObstacle(tmp._1, tmp._2)) {
+            } else if (checkObstacle(tmp.x, tmp.y)) {
               myData(y)(x) = Occupant.WALL
             } else {
               myData(y)(x) = Occupant.NONE
@@ -153,6 +163,7 @@ class OccgridCommand extends Occgrid with Traversable[Array[Occupant.Occupant]] 
 
 
   def data(x: Int)(y: Int) = myData(x)(y)
+
 
   def read(line: String) {
     step match {
@@ -210,6 +221,10 @@ class OccgridCommand extends Occgrid with Traversable[Array[Occupant.Occupant]] 
   }
 
   def convert(location: Point) = (location.x.intValue - offset._1, location.y.intValue - offset._2)
+
+  override def getLocation(x: Int, y: Int) = {
+    new Point(x + offset._1, y + offset._2)
+  }
 
   override def toString() = {
     val sb = new StringBuilder
