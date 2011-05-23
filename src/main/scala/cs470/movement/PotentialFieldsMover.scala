@@ -10,9 +10,13 @@ import cs470.bzrc._
 import cs470.visualization.PFVisualizer
 import cs470.agents.PotentialFieldAgent
 
+object PotentialFieldsMover {
+	val LOG = org.apache.log4j.Logger.getLogger(classOf[PotentialFieldsMover])
+}
+
 abstract class PotentialFieldsMover(store : DataStore) {
 
-	import PotentialFieldAgent._
+	import PotentialFieldsMover._
 
 	val constants = store.constants
 	val Kp = 1
