@@ -35,6 +35,7 @@ abstract class PotentialFieldsMover(store : DataStore) {
 		def move(pdVector : => Vector) {
 			//	tank.speed(vector.magnitude / maxMagnitude)
 			//val (angle, time) = tank.moveAngle(vector.angle)
+      println("Vector: " + pdVector)
 
 			def pdController(error0: Radian, vector: Vector) {
 				val targetAngle = vector.angle
