@@ -31,55 +31,49 @@ abstract class PotentialFieldsMover(store : DataStore) {
 
 	import RefreshableData.waitForNewData
 
-	def moveAlongPotentialField() {
-		def move(pdVector : => Vector) {
-			//	tank.speed(vector.magnitude / maxMagnitude)
-			//val (angle, time) = tank.moveAngle(vector.angle)
-      println("Vector: " + pdVector)
+	private def pdVector = path
+	private def pdController(error0: Radian, vector: Vector) {
+		val targetAngle = vector.angle
+		val angle = tank.angle
+		LOG.debug("targetAngle: " + targetAngle.degree)
+		LOG.debug("angle: " + angle.degree)
+		val error = targetAngle - angle
 
-			def pdController(error0: Radian, vector: Vector) {
-				val targetAngle = vector.angle
-				val angle = tank.angle
-				LOG.debug("targetAngle: " + targetAngle.degree)
-				LOG.debug("angle: " + angle.degree)
-				val error = targetAngle - angle
+		LOG.debug("error: " + error.degree)
+		val rv = (Kp * error + Kd * (error - error0) / 200);
+		LOG.debug("rv: " + rv)
+		val v = if (rv > maxVel) 1 else rv / maxVel
+		LOG.debug("v: " + v)
 
-				LOG.debug("error: " + error.degree)
-				val rv = (Kp * error + Kd * (error - error0) / 200);
-				LOG.debug("rv: " + rv)
-				val v = if (rv > maxVel) 1 else rv / maxVel
-				LOG.debug("v: " + v)
-
-				if (abs(error) < tol && abs(v) < tolv) {
-					LOG.debug("Done Turning");
-					tank.setAngularVelocity(0f)
-					val speed = {
-						val m = vector.magnitude
-						LOG.debug("magnitude: " + m)
-						val result = m / 30.0
-						if (result > maxVelocity) {
-							maxVelocity
-						} else {
-							result
-						}
-					}
-					LOG.debug("setting speed: " + speed)
-					tank.speed(speed)
-					waitForNewData()
+		if (abs(error) < tol && abs(v) < tolv) {
+			LOG.debug("Done Turning");
+			tank.setAngularVelocity(0f)
+			val speed = {
+				val m = vector.magnitude
+				LOG.debug("magnitude: " + m)
+				val result = m / 30.0
+				if (result > maxVelocity) {
+					maxVelocity
 				} else {
-					//Agents.LOG.debug("Setting velocity to " + v)
-					tank.setAngularVelocity(v)
-					//slow it down to turn
-					LOG.debug("setting speed: " + turningSpeed)
-					tank.speed(turningSpeed)
-					waitForNewData()
-					pdController(error, pdVector)
+					result
 				}
 			}
-
-			pdController(radian(0), pdVector)
+			LOG.debug("setting speed: " + speed)
+			tank.speed(speed)
+			waitForNewData()
+		} else {
+			//Agents.LOG.debug("Setting velocity to " + v)
+			tank.setAngularVelocity(v)
+			//slow it down to turn
+			LOG.debug("setting speed: " + turningSpeed)
+			tank.speed(turningSpeed)
+			waitForNewData()
+			pdController(error, pdVector)
 		}
-		move(path)
+	}
+
+	def moveAlongPotentialField() {
+		pdController(radian(0), pdVector)
 	}
 
 }
