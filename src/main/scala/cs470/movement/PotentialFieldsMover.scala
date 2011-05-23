@@ -1,4 +1,4 @@
-package cs470.agents
+package cs470.movement
 
 import cs470.domain._
 import Constants._
