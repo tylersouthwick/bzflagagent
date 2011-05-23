@@ -27,23 +27,22 @@ class SearchPath(store: DataStore) extends FindAgentPath(store) {
     val tankId = 0
     val goal = searchGoal
     val title = "To Safe point"
-    val filename = "Safe point searcher"
+    val filename = "safePoint.out"
   }
 
   lazy val result = searcher.search
 
   def getPathVector(point: Point) = {
-    //    val r = result.foldLeft(new Point(0,0)){(v,p) =>
     val r = result.map {
       p => (p, p.distance(point))
     }.zipWithIndex
-    //    val minPointIdx = r.min(_._1._2 compareTo _._1._2)._2
-    //    val minPointIdx = r.min((x,y) => x._1._2 compareTo y._1._2)._2
+
     implicit object blah extends Ordering[((Point, Double), Int)] {
       def compare(x: ((Point, Double), Int), y: ((Point, Double), Int)) = {
         x._1._2 compareTo y._1._2
       }
     }
+
     val minPointIdx = r.min._2
 
     if (result.size > minPointIdx - 1) {
@@ -51,43 +50,6 @@ class SearchPath(store: DataStore) extends FindAgentPath(store) {
     } else {
       new Vector(result(minPointIdx + 1) - point)
     }
-
-    //       if(point.distance(searchGoal) > p.distance(searchGoal)){
-    //         v + regectivePF(point,p,4,20,1)
-    //       } else {
-    //         v + AttractivePF(point,p,4,20,1)
-    //       }
-    //}
-
   }
-
-  def AttractivePF(current: Point, goal: Point, r1: Double, s: Double, alpha: Double) = {
-    val r2 = r1 + s
-    val as = alpha * s
-    val d = current.distance(goal)
-    val theta = current.getAngle(goal)
-
-    if (d < r1)
-      new Point(0, 0)
-    else if (d > r2)
-      new Point(0, 0) //Point(as * cos(theta), as * sin(theta))
-    else
-      new Point(alpha * (d - r1) * cos(theta), alpha * (d - r1) * sin(theta))
-  }
-
-  def regectivePF(current: Point, goal: Point, r1: Double, s: Double, beta: Double) = {
-    val r2 = r1 + s
-    val d = current.distance(goal)
-    val theta = current.getAngle(goal)
-    val i = 30
-
-    if (d < r1)
-      new Point(-signum(cos(theta)) * i, -signum(sin(theta)) * i)
-    else if (d > r2)
-      new Point(0, 0)
-    else
-      new Point(-beta * (r2 - d) * cos(theta), -beta * (r2 - d) * sin(theta))
-  }
-
 }
 
