@@ -77,6 +77,8 @@ class SearchVisualizer(filename: String, obstacles: Seq[Polygon], worldsize: Int
       //      drawPoint(p2, Color.ORANGE)
     }
 
+    flush()
+
     if (pauseViewCounter == pauseView) {
       pause()
       pauseViewCounter = 0
@@ -94,12 +96,13 @@ class SearchVisualizer(filename: String, obstacles: Seq[Polygon], worldsize: Int
     write("plot '-' with lines")
     write("0 0 0 0")
     write("e")
+    flush();
   }
 
   def pause() {
     plotLines()
     write("pause " + delay)
-    //flush();
+    flush();
   }
 
 	def clear() {

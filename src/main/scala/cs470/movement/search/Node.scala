@@ -43,7 +43,7 @@ class Node(val parent : Node, occgrid : Occgrid, x : Int, y : Int, val cost : Do
 		children.foreach(f)
 	}
 
-	def location = new Point(x + occgrid.offset._1, y + occgrid.offset._2)
+	def location = occgrid.getLocation(x,y)
 
 	def gridLocation = (x, y)
 
