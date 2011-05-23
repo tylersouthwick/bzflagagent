@@ -27,7 +27,7 @@ abstract class PotentialFieldsMover(store : DataStore) {
 	val turningSpeed = 0.6
 	val tank : Tank
 
-	val finder : TankPathFinder
+	def path : Vector
 
 	import RefreshableData.waitForNewData
 
@@ -78,12 +78,8 @@ abstract class PotentialFieldsMover(store : DataStore) {
 
 			pdController(radian(0), pdVector)
 		}
-    move(finder.path)
+		move(path)
 	}
 
 }
 
-trait TankPathFinder {
-	def path : Vector
-	val color : String
-}
