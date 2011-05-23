@@ -1,48 +1,34 @@
 package cs470.agents
 
-import cs470.bzrc.Tank
 import cs470.utils._
-import cs470.visualization.SearchVisualizer
-import java.io.{PrintWriter, BufferedOutputStream, FileOutputStream}
-import cs470.domain.Constants._
-import cs470.movement.search.{A_StarSearcher, Searcher}
-import cs470.domain.{Point, UsableOccgrid}
+import cs470.movement.{TankPathFinder, SearchPath, PotentialFieldsMover}
 
 class MultiAgent(host: String, port: Int) extends Agent(host, port) with Threading {
 
   import MultiAgent._
 
-  trait AgentSearcher extends A_StarSearcher {
-    val worldSize : Int = constants("worldsize")
-    val tankRadius : Double = constants("tankradius")
-
-    val datastore = store
-    val start = store.tanks(tankId).location
-    val q = queue
-    lazy val occgrid = new UsableOccgrid(100,obstacles,tankRadius,worldSize,enemies)
-
-  }
 
   def run() {
 
     LOG.info("Running multiagent")
 
-    val safePoint = flags.find(_.color == "green").get.location - new Point(15,15)
+    val mytank = store.tanks(0)
+    val searcher = new SearchPath(store)
 
-    val searcher = new AgentSearcher {
-      val name = "aStarSafePoint"
-      val tankId = 0
-      val goal = safePoint
-      val title = "To Safe point"
-      val filename = "Safe point searcher"
+    loop {
+    val mover = new PotentialFieldsMover(store) {
+      val finder = new TankPathFinder {
+        val color = mytank.callsign
+
+        def path = searcher.getPathVector(mytank.location)
+      }
+      val tank = mytank
     }
 
-    searcher.search()
-
-    System.exit(0)
+      mover.moveAlongPotentialField()
+    }
   }
 }
-
 
 
 object MultiAgent extends AgentCreator {

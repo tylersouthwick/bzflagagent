@@ -8,6 +8,7 @@ import Angle._
 import java.lang.Math._
 import cs470.bzrc._
 import cs470.visualization.PFVisualizer
+import cs470.agents.PotentialFieldAgent
 
 abstract class PotentialFieldsMover(store : DataStore) {
 
@@ -77,6 +78,7 @@ abstract class PotentialFieldsMover(store : DataStore) {
 
 			pdController(radian(0), pdVector)
 		}
+    move(finder.path)
 	}
 
 }
