@@ -27,6 +27,8 @@ class Point(val x: Double, val y: Double) {
     new Point(x / div, y / div)
   }
 
+  def *(mult: Int) : Point = *(mult.asInstanceOf[Double])
+
   def *(mult: Double) = {
     new Point(x * mult, y * mult)
   }

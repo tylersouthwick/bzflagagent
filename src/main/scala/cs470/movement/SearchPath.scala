@@ -9,6 +9,12 @@ import scala.math._
 import cs470.bzrc.DataStore
 
 class SearchPath(store: DataStore) extends FindAgentPath(store) {
+  implicit object blah extends Ordering[((Point, Double), Int)] {
+    def compare(x: ((Point, Double), Int), y: ((Point, Double), Int)) = {
+      x._1._2 compareTo y._1._2
+    }
+  }
+
   val searchGoal = flags.find(_.color == "green").get.location - new Point(15, 15)
 
   trait AgentSearcher extends A_StarSearcher with PenalizedUniformCostSearch {
@@ -19,7 +25,6 @@ class SearchPath(store: DataStore) extends FindAgentPath(store) {
     val start = store.tanks(tankId).location
     val q = queue
     lazy val occgrid = new UsableOccgrid(100, obstacles, tankRadius, worldSize, enemies)
-
   }
 
   val searcher = new AgentSearcher {
@@ -33,22 +38,20 @@ class SearchPath(store: DataStore) extends FindAgentPath(store) {
   lazy val result = searcher.search
 
   def getPathVector(point: Point) = {
-    val r = result.map {
+    val minPointIdx = result.map {
       p => (p, p.distance(point))
-    }.zipWithIndex
+    }.zipWithIndex.min._2
 
-    implicit object blah extends Ordering[((Point, Double), Int)] {
-      def compare(x: ((Point, Double), Int), y: ((Point, Double), Int)) = {
-        x._1._2 compareTo y._1._2
-      }
-    }
+    println("Minpoint: " + minPointIdx)
 
-    val minPointIdx = r.min._2
-
-    if (result.size > minPointIdx - 1) {
+    val points = java.lang.Math.min(result.size - minPointIdx, 5)
+    if (points == 0) {
       new Vector(new Point(0, 0))
     } else {
-      new Vector(result(minPointIdx + 1) - point)
+      val slice = result.slice(minPointIdx + 1, minPointIdx + points + 1)
+      println(slice)
+      new Vector(slice.foldLeft(new Point(0, 0))(_ + _) - point * points)
+      //      new Vector(result(minPointIdx + 1) - point)
     }
   }
 }

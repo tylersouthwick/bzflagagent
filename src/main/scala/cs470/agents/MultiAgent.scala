@@ -13,8 +13,9 @@ class MultiAgent(host: String, port: Int) extends Agent(host, port) with Threadi
     LOG.info("Running multiagent")
 
     val mytank = store.tanks(0)
+    val searchPath = new SearchPath(store)
     val mover = new PotentialFieldsMover(store) {
-      val path = new SearchPath(store).getPathVector(mytank.location)
+      def path = searchPath.getPathVector(mytank.location)
       val tank = mytank
     }
 
