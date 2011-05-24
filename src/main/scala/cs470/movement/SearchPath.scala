@@ -14,7 +14,7 @@ object SearchPath {
 	val LOG = org.apache.log4j.Logger.getLogger(classOf[SearchPath])
 }
 
-class SearchPath(store: DataStore, searchGoal : Point,tankIdd : Int) extends PotentialFieldGenerator(store) {
+class SearchPath(store: DataStore, searchGoal : Point,tankIdd : Int,searchTitle : String,searchName:String) extends PotentialFieldGenerator(store) {
   implicit object blah extends Ordering[((Point, Double), Int)] {
     def compare(x: ((Point, Double), Int), y: ((Point, Double), Int)) = {
       x._1._2 compareTo y._1._2
@@ -36,8 +36,8 @@ class SearchPath(store: DataStore, searchGoal : Point,tankIdd : Int) extends Pot
     val name = "aStarSafePoint"
     val tankId = 0
     val goal = searchGoal
-    val title = "To Safe point"
-    val filename = "safePoint.gpi"
+    val title = searchTitle
+    val filename = searchName
 	  println("goal: " + occgrid.convert(searchGoal))
 
 	  val o = new java.io.PrintWriter(new FileOutputStream(new File("world.dat")))

@@ -18,7 +18,7 @@ class MultiAgent(host: String, port: Int) extends Agent(host, port) with Threadi
       val tank = mytank
 
       val mover = {
-        val toSafePoint = new SearchPath(store, opponentFlag, tank.id)
+        val toSafePoint = new SearchPath(store, opponentFlag, tank.id, "To safe point", "toSafePointPath.gpi")
         new cs470.visualization.PFVisualizer(toSafePoint, "toSafePoint.gpi", obstacles, constants("worldsize"), 25)
 
         new PotentialFieldsMover(store) {
@@ -28,7 +28,7 @@ class MultiAgent(host: String, port: Int) extends Agent(host, port) with Threadi
         }
       }
 
-      val maxDistance = 1.0
+      val maxDistance = 30.0
       def inRange = !store.enemies.filter(_.location.distance(tank.location) < maxDistance).isEmpty
 
       while (!inRange) {
@@ -46,7 +46,7 @@ class MultiAgent(host: String, port: Int) extends Agent(host, port) with Threadi
       val goalFlag = bases.find(_.color == constants("team")).get.points.center
 
       val mover = {
-        val toHomeBase = new SearchPath(store, goalFlag, tank.id)
+        val toHomeBase = new SearchPath(store, goalFlag, tank.id, "To Home Base","toHomeBasePath.gpi")
         new cs470.visualization.PFVisualizer(toHomeBase, "toHomeBase.gpi", obstacles, constants("worldsize"), 25)
 
         new PotentialFieldsMover(store) {
