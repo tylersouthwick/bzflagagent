@@ -6,7 +6,6 @@ import cs470.utils._
 import Angle._
 import cs470.bzrc._
 import cs470.movement.pfFindFlag
-import cs470.visualization.PFVisualizer
 
 class SniperAgent(tank : Tank, store : DataStore) extends MultiAgentBase(tank, store) with Threading {
 	val offset = 50

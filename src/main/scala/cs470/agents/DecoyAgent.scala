@@ -20,7 +20,9 @@ class DecoyAgent(tank: Tank, store: DataStore) extends MultiAgentBase(tank, stor
     val searcher = new PotentialFieldGenerator(store) {
       def getPathVector(point: Point) = new Vector(target - point)
     }
-    new cs470.visualization.PFVisualizer(searcher, "go_" + dir + ".gpi", obstacles, constants("worldsize"), 25)
+
+	if (LOG.isDebugEnabled)
+      new cs470.visualization.PFVisualizer(searcher, "go_" + dir + ".gpi", obstacles, constants("worldsize"), 25)
 
     new PotentialFieldsMover(store) {
       val tank = mytank

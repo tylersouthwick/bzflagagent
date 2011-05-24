@@ -50,9 +50,8 @@ class PotentialFieldAgent(host: String, port: Int) extends Agent(host, port) wit
 					private val findFlag = new pfFindFlag(store, flag.color)
 
 					def path = {
-						if (LOG.isDebugEnabled) {
-							val vis = new PFVisualizer(findFlag, "pf" + flag.color + ".gpi", obstacles, worldsize, 25)
-						}
+						if (LOG.isDebugEnabled)
+							new PFVisualizer(findFlag, "pf" + flag.color + ".gpi", obstacles, worldsize, 25)
 						findFlag.getPathVector(tank.location)
 					}
 
