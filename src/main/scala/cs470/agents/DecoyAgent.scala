@@ -9,11 +9,11 @@ import cs470.movement.{PotentialFieldGenerator, SearchPath, PotentialFieldsMover
 import cs470.domain.Vector
 
 class DecoyAgent(tank: Tank, store: DataStore) extends MultiAgentBase(tank, store) {
-  val prePositionPoint = opponentFlag - new Point(shotrange + 10, 0)
+  val prePositionPoint = opponentFlag - new Point(shotrange + 50, 0)
   override val LOG = org.apache.log4j.Logger.getLogger(classOf[DecoyAgent])
 
   def alternate(dir: String, direction: Int) {
-    val target = prePositionPoint + new Point(0, direction * 130)
+    val target = prePositionPoint + new Point(25, direction * 100)
 
     LOG.info("Moving decoy (" + tank.callsign + ") " + dir + " to " + target)
 

@@ -62,24 +62,25 @@ abstract class PotentialFieldsMover(store: DataStore) {
 
     def Kgoal = if (distance > 10) 1 else .1
 
-    if (minimizeTurning && abs(PI - abs(error)) < .01) {
-      LOG.debug("Reversing");
-      tank.setAngularVelocity(0f)
-      val speed = {
-        val m = vector.magnitude
-        LOG.debug("magnitude: " + m)
-        val result = m / 30.0
-        if (result > maxVelocity) {
-          maxVelocity
-        } else {
-          result
-        }
-      }
-      LOG.debug("setting speed: " + -speed)
-      tank.speed(-speed * Kgoal)
-      waitForNewData()
+    //    if (minimizeTurning && abs(PI - abs(error)) < .01) {
+    //      LOG.debug("Reversing");
+    //      tank.setAngularVelocity(0f)
+    //      val speed = {
+    //        val m = vector.magnitude
+    //        LOG.debug("magnitude: " + m)
+    //        val result = m / 30.0
+    //        if (result > maxVelocity) {
+    //          maxVelocity
+    //        } else {
+    //          result
+    //        }
+    //      }
+    //      LOG.debug("setting speed: " + -speed)
+    //      tank.speed(-speed * Kgoal)
+    //      waitForNewData()
 
-    } else if (abs(error) < tol && abs(v) < tolv) {
+    //    } else if (abs(error) < tol && abs(v) < tolv) {
+    if (abs(error) < tol && abs(v) < tolv) {
       LOG.debug("Done Turning");
       tank.setAngularVelocity(0f)
       val speed = {
