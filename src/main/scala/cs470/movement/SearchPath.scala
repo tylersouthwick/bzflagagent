@@ -14,21 +14,19 @@ object SearchPath {
 	val LOG = org.apache.log4j.Logger.getLogger(classOf[SearchPath])
 }
 
-class SearchPath(store: DataStore) extends PotentialFieldGenerator(store) {
+class SearchPath(store: DataStore, searchGoal : Point,tankIdd : Int) extends PotentialFieldGenerator(store) {
   implicit object blah extends Ordering[((Point, Double), Int)] {
     def compare(x: ((Point, Double), Int), y: ((Point, Double), Int)) = {
       x._1._2 compareTo y._1._2
     }
   }
 
-  val searchGoal = flags.find(_.color == "green").get.location
-
   trait AgentSearcher extends A_StarSearcher with PenalizedUniformCostSearch {
     val worldSize: Int = store.constants("worldsize")
     val tankRadius: Double = store.constants("tankradius")
 
     val datastore = store
-    val start = store.tanks(tankId).location
+    val start = store.tanks(tankIdd).location
     val q = queue
     lazy val occgrid = new UsableOccgrid(Properties("discreteSize", 100), obstacles, tankRadius, worldSize, enemies)
 
@@ -92,7 +90,7 @@ class SearchPath(store: DataStore) extends PotentialFieldGenerator(store) {
 
 	  //val walls = getFieldForObstacles(point, 3, .2)
 
-	  new Vector(forward + /*previous + walls + */randomVector)
+	  new Vector(forward /*+ previous + walls + randomVector*/)
   }
 }
 
