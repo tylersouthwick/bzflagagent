@@ -40,7 +40,7 @@ abstract class MultiAgentBase(tank: Tank, store: DataStore) {
   def gotoPrePosition() {
     LOG.info("Moving " + tank.callsign + " to preposition")
     val mover = {
-      val toSafePoint = new SearchPath(store, prePositionPoint, tank.id, "prePosition_" + tank.tankId, "prePosition_" + tank.tankId)
+      val toSafePoint = new SearchPath(store, prePositionPoint, tank.id, "prePosition_" + tank.tankId + ".gpi", "prePosition_" + tank.tankId)
       new cs470.visualization.PFVisualizer(toSafePoint, "toPrePosition_" + tank.id + ".gpi", obstacles, constants("worldsize"), 25)
 
       new PotentialFieldsMover(store) {
