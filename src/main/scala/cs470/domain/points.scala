@@ -58,7 +58,7 @@ class Point(val x: Double, val y: Double) {
   def perpendicular = new Point(-y, x)
 }
 
-class Vector(vector: Point) {
+class Vector(val vector: Point) {
   val x = vector.x
   val y = vector.y
 

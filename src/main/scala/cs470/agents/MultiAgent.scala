@@ -2,72 +2,130 @@ package cs470.agents
 
 import cs470.utils._
 import cs470.domain.Constants._
-import cs470.movement.{SearchPath, PotentialFieldsMover}
+import cs470.domain.Point
+import cs470.bzrc.{Tank, DataStore}
+import cs470.movement.{FindAgentPath, SearchPath, PotentialFieldsMover}
 
 class MultiAgent(host: String, port: Int) extends Agent(host, port) with Threading {
 
-  import MultiAgent._
+	import MultiAgent._
 
-  def run() {
+	def run() {
+		actor {
+			new SniperAgent(store.tanks(0), store).apply()
+		}
+		actor {
+			new DecoyAgent(store.tanks(1), store).apply()
+		}
+		LOG.info("running multi agent")
+	}
+}
 
-    LOG.info("Running multiagent")
-    val opponentFlag = flags.find(_.color == "green").get.location
+abstract class MultiAgentBase(tank : Tank, store : DataStore) {
 
-    {
-      val mytank = store.tanks(0)
-      val tank = mytank
+	val flags = store.flags
+	val constants = store.constants
+	val obstacles = store.obstacles
+	val bases = store.bases
 
-      val mover = {
-        val toSafePoint = new SearchPath(store, opponentFlag, tank.id)
-        new cs470.visualization.PFVisualizer(toSafePoint, "toSafePoint.gpi", obstacles, constants("worldsize"), 25)
+	val opponentFlag = flags.find(_.color == "green").get.location
+	val mytank = tank
 
-        new PotentialFieldsMover(store) {
-          def path = toSafePoint.getPathVector(mytank.location)
+	val shotrange: Int = constants("shotrange")
 
-          val tank = mytank
-        }
-      }
+	val prePositionPoint : Point
 
-      val maxDistance = 1.0
-      def inRange = !store.enemies.filter(_.location.distance(tank.location) < maxDistance).isEmpty
+	def gotoPrePosition() {
+		val mover = {
+			val toSafePoint = new SearchPath(store, prePositionPoint, tank.id)
+			new cs470.visualization.PFVisualizer(toSafePoint, "toPrePosition_" + tank.id + ".gpi", obstacles, constants("worldsize"), 25)
 
-      while (!inRange) {
-        mover.moveAlongPotentialField(inRange)
-      }
+			new PotentialFieldsMover(store) {
+				def path = toSafePoint.getPathVector(mytank.location)
 
-      tank.setAngularVelocity(0)
-      tank.speed(0)
-      LOG.info("Stopping agent: " + tank.callsign)
-    }
+				val tank = mytank
+			}
+		}
 
-    {
-      val mytank = store.tanks(0)
-      val tank = mytank
-      val goalFlag = bases.find(_.color == constants("team")).get.points.center
+		mover.moveAlongPotentialField()
 
-      val mover = {
-        val toHomeBase = new SearchPath(store, goalFlag, tank.id)
-        new cs470.visualization.PFVisualizer(toHomeBase, "toHomeBase.gpi", obstacles, constants("worldsize"), 25)
+		tank.setAngularVelocity(0)
+		tank.speed(0)
+		println("Stopping agent: " + tank.callsign)
+	}
 
-        new PotentialFieldsMover(store) {
-          def path = toHomeBase.getPathVector(mytank.location)
+	def returnHome() {
+		val goalFlag = bases.find(_.color == constants("team")).get.points.center
 
-          val tank = mytank
-        }
-      }
+		val mover = {
+			val toHomeBase = new SearchPath(store, goalFlag, tank.id)
+			new cs470.visualization.PFVisualizer(toHomeBase, "toHomeBase.gpi", obstacles, constants("worldsize"), 25)
+
+			new PotentialFieldsMover(store) {
+				def path = toHomeBase.getPathVector(mytank.location)
+
+				val tank = mytank
+			}
+		}
 
 
-      loop {
-        mover.moveAlongPotentialField(false)
-      }
-    }
-  }
+		mover.moveAlongPotentialField()
+	}
+
+	def apply() {
+		//find current state
+		gotoPrePosition()
+	}
+}
+
+import cs470.domain.Vector
+
+class SniperAgent(tank : Tank, store : DataStore) extends MultiAgentBase(tank, store) {
+	val prePositionPoint = opponentFlag - new Point(shotrange, shotrange)
+
+	override def apply() {
+		super.apply()
+
+	}
+}
+
+class DecoyAgent(tank : Tank, store : DataStore) extends MultiAgentBase(tank, store) {
+	val prePositionPoint = opponentFlag - new Point(shotrange, 0)
+
+	def alternate(direction : Int) {
+		val point = prePositionPoint + new Point(0, direction * 50)
+		def findPath(location : Point) = new Vector(location - point)
+		new cs470.visualization.PFVisualizer(new FindAgentPath {
+			def getPathVector(point: Point) = findPath(point)
+		}, "go_" + direction + ".gpi", obstacles, constants("worldsize"), 25)
+		new PotentialFieldsMover(store) {
+			val tank = mytank
+			def path = findPath(tank.location)
+		}.moveAlongPotentialField()
+	}
+
+	def north() {
+		alternate(1)
+	}
+
+	def south() {
+		alternate(-1)
+	}
+
+	override def apply() {
+		super.apply()
+
+		while (true) {
+			north();
+			south();
+		}
+	}
 }
 
 object MultiAgent extends AgentCreator {
-  val LOG = org.apache.log4j.Logger.getLogger("cs470.agents.MultiAgent")
+	val LOG = org.apache.log4j.Logger.getLogger("cs470.agents.MultiAgent")
 
-  def name = "multi"
+	def name = "multi"
 
-  def create(host: String, port: Int) = new MultiAgent(host, port)
+	def create(host: String, port: Int) = new MultiAgent(host, port)
 }

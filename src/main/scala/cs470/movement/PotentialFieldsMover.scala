@@ -2,13 +2,10 @@ package cs470.movement
 
 import cs470.domain._
 import Constants._
-import cs470.movement._
 import cs470.utils._
 import Angle._
 import java.lang.Math._
 import cs470.bzrc._
-import cs470.visualization.PFVisualizer
-import cs470.agents.PotentialFieldAgent
 
 object PotentialFieldsMover {
 	val LOG = org.apache.log4j.Logger.getLogger(classOf[PotentialFieldsMover])
@@ -37,13 +34,7 @@ abstract class PotentialFieldsMover(store : DataStore) {
 
 	private def pdVector = path
 
-	private def pdController(stop : => Boolean, error0: Radian, vector: Vector) {
-		if (stop) {
-			tank.speed(0)
-			tank.setAngularVelocity(0)
-			return
-		}
-
+	private def pdController(error0: Radian, vector: Vector) {
 		LOG.debug("vector: " + vector)
 		val targetAngle = vector.angle
 		val angle = tank.angle
@@ -95,12 +86,16 @@ abstract class PotentialFieldsMover(store : DataStore) {
 			LOG.debug("setting speed: " + turningSpeed)
 			tank.speed(turningSpeed)
 			waitForNewData()
-			pdController(stop, error, pdVector)
+			pdController(error, pdVector)
 		}
 	}
 
-	def moveAlongPotentialField(stop : => Boolean) {
-		pdController(stop, radian(0), pdVector)
+	val origin = new Point(0, 0)
+	def moveAlongPotentialField() {
+		println("starting move")
+		while (java.lang.Math.floor(pdVector.vector.distance(origin)) > 0)
+			pdController(radian(0), pdVector)
+		println("ending move")
 	}
 
 }

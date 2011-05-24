@@ -8,7 +8,6 @@ import cs470.domain.Constants._
 import scala.math._
 import cs470.bzrc.DataStore
 import cs470.utils._
-import java.io.{File, FileOutputStream}
 
 object SearchPath {
 	val LOG = org.apache.log4j.Logger.getLogger(classOf[SearchPath])
@@ -38,8 +37,9 @@ class SearchPath(store: DataStore, searchGoal : Point,tankIdd : Int) extends Pot
     val goal = searchGoal
     val title = "To Safe point"
     val filename = "safePoint.gpi"
-	  println("goal: " + occgrid.convert(searchGoal))
+	  println("goal [" + searchGoal + "]: " + occgrid.convert(searchGoal))
 
+		import java.io._
 	  val o = new java.io.PrintWriter(new FileOutputStream(new File("world.dat")))
 	  o.print(occgrid.print)
 	  o.close()
