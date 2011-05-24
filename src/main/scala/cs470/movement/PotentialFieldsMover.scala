@@ -28,7 +28,7 @@ abstract class PotentialFieldsMover(store : DataStore) {
 	val maxMagnitude = 100.0
 	val maxVelocity = Properties("maxVelocity", 1)
 	val team = constants("team")
-	val angularTolerance = degree(50).radian
+	val angularTolerance = degree(60).radian
 	val tank : Tank
 
 	def path : Vector
@@ -49,7 +49,13 @@ abstract class PotentialFieldsMover(store : DataStore) {
 		val angle = tank.angle
 		LOG.debug("targetAngle: " + targetAngle.degree)
 		LOG.debug("angle: " + angle.degree)
-		val error = targetAngle - angle
+		val uncorrectedError = (targetAngle - angle).radian
+
+    //Correct for right turns
+
+    val moddedError = uncorrectedError % (2*PI)
+    val errorM = moddedError % PI
+    val error = new Radian(if(errorM == moddedError) errorM else -errorM)
 
 		LOG.debug("error: " + error.degree)
 		val rv = (Kp * error + Kd * (error - error0) / 200);
@@ -80,9 +86,9 @@ abstract class PotentialFieldsMover(store : DataStore) {
 			//slow it down to turn
 			val turningSpeed = {
 				if (abs(error) > angularTolerance) {
-					0.00
+					0.2
 				} else {
-					.8
+					1.0
 				}
 			}
 

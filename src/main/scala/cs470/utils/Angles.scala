@@ -54,6 +54,7 @@ class Radian(private val rad : Double) extends Angle {
 
 	def +(angle: Angle) = new Radian(rad + angle.radian.rad)
 	def -(angle: Angle) = new Radian(rad - angle.radian.rad)
+  def *(value : Double) = new Radian(rad * value)
 
 	def abs = new Radian(value.abs)
 

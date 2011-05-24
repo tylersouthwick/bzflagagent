@@ -28,7 +28,7 @@ class MultiAgent(host: String, port: Int) extends Agent(host, port) with Threadi
         }
       }
 
-      val maxDistance = 30.0
+      val maxDistance = 1.0
       def inRange = !store.enemies.filter(_.location.distance(tank.location) < maxDistance).isEmpty
 
       while (!inRange) {
