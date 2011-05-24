@@ -81,50 +81,6 @@ abstract class MultiAgentBase(tank: Tank, store: DataStore) {
   }
 }
 
-import cs470.domain.Vector
-
-class DecoyAgent(tank: Tank, store: DataStore) extends MultiAgentBase(tank, store) {
-  val prePositionPoint = opponentFlag - new Point(shotrange + 10, 0)
-  override val LOG = org.apache.log4j.Logger.getLogger(classOf[DecoyAgent])
-
-  def alternate(dir: String, direction: Int) {
-    val target = prePositionPoint + new Point(0, direction * 130)
-
-    LOG.info("Moving decoy (" + tank.callsign + ") " + dir + " to " + target)
-
-    val searcher = new PotentialFieldGenerator(store) {
-      def getPathVector(point: Point) = new Vector(target - point)
-    }
-    new cs470.visualization.PFVisualizer(searcher, "go_" + dir + ".gpi", obstacles, constants("worldsize"), 25)
-
-    new PotentialFieldsMover(store) {
-      val tank = mytank
-      val goal = target
-      override val moveWhileTurning = true
-      override val howClose = 30
-      def path = searcher.getPathVector(tank.location)
-    }.moveAlongPotentialField()
-  }
-
-  def north() {
-    alternate("north", 1)
-  }
-
-  def south() {
-    alternate("south", -1)
-  }
-
-  override def apply() {
-    LOG.info("Starting decoy")
-    super.apply()
-
-    while (true) {
-      north()
-      south()
-    }
-  }
-}
-
 object MultiAgent extends AgentCreator {
   val LOG = org.apache.log4j.Logger.getLogger("cs470.agents.MultiAgent")
 
