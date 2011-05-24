@@ -36,7 +36,9 @@ abstract class PotentialFieldsMover(store : DataStore) {
 	import RefreshableData.waitForNewData
 
 	private def pdVector = path
+
 	private def pdController(error0: Radian, vector: Vector) {
+		LOG.debug("vector: " + vector)
 		val targetAngle = vector.angle
 		val angle = tank.angle
 		LOG.debug("targetAngle: " + targetAngle.degree)
