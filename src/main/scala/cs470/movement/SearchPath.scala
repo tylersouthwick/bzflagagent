@@ -55,7 +55,7 @@ class SearchPath(store: DataStore, searchGoal : Point,tankIdd : Int) extends Pot
   def getPathVector(point: Point) = {
     val minPointIdx = result.map {
       p => (p, p.distance(point))
-    }.zipWithIndex.min._2 + 5
+    }.zipWithIndex.min._2 + 3
 
     SearchPath.LOG.debug("Minpoint: " + minPointIdx)
 
