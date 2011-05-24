@@ -1,12 +1,12 @@
 package cs470.agents
 
 import cs470.utils._
+import cs470.domain.Constants._
 import cs470.movement.{SearchPath, PotentialFieldsMover}
 
 class MultiAgent(host: String, port: Int) extends Agent(host, port) with Threading {
 
   import MultiAgent._
-
 
   def run() {
 
@@ -14,6 +14,9 @@ class MultiAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 
     val mytank = store.tanks(0)
     val searchPath = new SearchPath(store)
+
+    new cs470.visualization.PFVisualizer(searchPath, "searchPath.gpi", obstacles, constants("worldsize"), 25)
+
     val mover = new PotentialFieldsMover(store) {
       def path = searchPath.getPathVector(mytank.location)
       val tank = mytank
