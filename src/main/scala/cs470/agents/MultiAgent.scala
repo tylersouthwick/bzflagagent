@@ -3,7 +3,6 @@ package cs470.agents
 import cs470.utils._
 import cs470.domain.Constants._
 import cs470.movement.{SearchPath, PotentialFieldsMover}
-import javax.management.remote.rmi._RMIConnection_Stub
 
 class MultiAgent(host: String, port: Int) extends Agent(host, port) with Threading {
 
