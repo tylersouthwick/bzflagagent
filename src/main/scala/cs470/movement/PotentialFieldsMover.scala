@@ -80,9 +80,9 @@ abstract class PotentialFieldsMover(store : DataStore) {
 			//slow it down to turn
 			val turningSpeed = {
 				if (abs(error) > angularTolerance) {
-					0.05
+					0.00
 				} else {
-					.4
+					.8
 				}
 			}
 

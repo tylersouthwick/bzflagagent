@@ -47,9 +47,9 @@ class SearchPath(store: DataStore, searchGoal : Point,tankIdd : Int) extends Pot
 
   lazy val result = searcher.search
   val r = Properties("searcher.r", 5)
-  val s = Properties("searcher.s", 50)
-  val alpha = Properties("searcher.alpha", .8)
-	val futurePoints = Properties("searcher.futurePoints", 10)
+  val s = Properties("searcher.s", 30)
+  val alpha = Properties("searcher.alpha", 5.8)
+	val futurePoints = Properties("searcher.futurePoints", 8)
 	val previousPoints = Properties("searcher.previousPoints", 2)
 
   def getPathVector(point: Point) = {
@@ -64,11 +64,11 @@ class SearchPath(store: DataStore, searchGoal : Point,tankIdd : Int) extends Pot
 		if (points == 0) {
 			new Point(0, 0)
 		} else {
-			val slice = result.slice(minPointIdx, minPointIdx + points)
+			val slice = result.slice(minPointIdx+5, minPointIdx + points)
 			SearchPath.LOG.debug(slice)
 			// new Vector(slice.foldLeft(new Point(0, 0))(_ + _) - point * points)
 			slice.zipWithIndex.foldLeft(new Point(0, 0)) { case (vector, (p, idx)) =>
-				vector + AttractivePF(point, p, r, s, alpha / java.lang.Math.pow((idx + 1), 2))
+				vector + AttractivePF(point, p, r, s, alpha /*/ java.lang.Math.pow((idx + 1), 2)*/)
 			}
 		}
 	}
