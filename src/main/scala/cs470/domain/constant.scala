@@ -17,13 +17,13 @@ object Constants {
 	private[Constants] val LOG = org.apache.log4j.Logger.getLogger(classOf[Constants])
 }
 
-class Constants(constants : Seq[Constant]) extends Function1[String, String] {
+class Constants(constants : Seq[Constant]) extends (String => String) {
 	val map = new ListMap[String, String]
 	import Constants._
 
-	LOG.debug("Constants:")
+	LOG.info("Constants:")
 	constants.foreach {constant =>
-		LOG.debug("\t" + constant)
+		LOG.info("\t" + constant)
 		map += constant.name -> constant.value
 	}
 

@@ -13,15 +13,16 @@ class MultiAgent(host: String, port: Int) extends Agent(host, port) with Threadi
     LOG.info("Running multiagent")
 
     val mytank = store.tanks(0)
-    val searchPath = new SearchPath(store)
 
-    new cs470.visualization.PFVisualizer(searchPath, "searchPath.gpi", obstacles, constants("worldsize"), 25)
+	val mover = {
+	  val searchPath = new SearchPath(store)
+	  new cs470.visualization.PFVisualizer(searchPath, "searchPath.gpi", obstacles, constants("worldsize"), 50)
 
-    val mover = new PotentialFieldsMover(store) {
-      def path = searchPath.getPathVector(mytank.location)
-      val tank = mytank
-    }
-
+	  new PotentialFieldsMover(store) {
+		  def path = searchPath.getPathVector(mytank.location)
+		  val tank = mytank
+	  }
+	}
     loop {
       mover.moveAlongPotentialField()
     }

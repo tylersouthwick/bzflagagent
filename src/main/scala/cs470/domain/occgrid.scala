@@ -32,7 +32,7 @@ class UsableOccgrid(resolution: Int, obstacles: Seq[Polygon], tankRadius: Double
   val height = resolution
   val offset: (Int, Int) = (resolution / 2, resolution / 2)
 
-  private var myData: Array[Array[Occupant.Occupant]] = Array.ofDim(width, height);
+  private val myData: Array[Array[Occupant.Occupant]] = Array.ofDim(width, height);
 
   def data(x: Int)(y: Int) = myData(y)(x)
 
@@ -96,7 +96,7 @@ class UsableOccgrid(resolution: Int, obstacles: Seq[Polygon], tankRadius: Double
   }
 
   override def getLocation(x: Int, y: Int) = {
-    new Point((x- offset._1) * alpha, (-y+ offset._2) * alpha)
+    new Point((x- offset._1) * alpha, (y- offset._2) * alpha)
   }
 
   def fillArray = {
@@ -107,7 +107,8 @@ class UsableOccgrid(resolution: Int, obstacles: Seq[Polygon], tankRadius: Double
           y =>
             val tmp = getLocation(x, y)
             if (checkEnemy(tmp.x, tmp.y)) {
-              myData(y)(x) = Occupant.ENEMY
+              //myData(y)(x) = Occupant.ENEMY
+				myData(y)(x) = Occupant.NONE
             } else if (checkObstacle(tmp.x, tmp.y)) {
               myData(y)(x) = Occupant.WALL
             } else {

@@ -1,13 +1,22 @@
 package cs470.utils
 
+import java.io.{PrintWriter, File, FileOutputStream}
+
 /**
  * finds system properties
  */
 object Properties {
 	val LOG = org.apache.log4j.Logger.getLogger("cs470.utils.Properties")
 
+	private val file = new PrintWriter(new FileOutputStream(new File("availableProperties.dat")))
+	private def availableProperty(prop : String) {
+		file.println(prop)
+		file.flush()
+	}
+
 	def apply(s : String) = {
 		val property = System.getProperty(s)
+		availableProperty(s)
 		if (property == null) {
 			None
 		} else {

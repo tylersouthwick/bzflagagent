@@ -21,14 +21,14 @@ abstract class PotentialFieldsMover(store : DataStore) {
 	val constants = store.constants
 	val Kp = 1
 	val Kd = 4.5
-	val tol = degree(2).radian
+	val tol = degree(5).radian
 	val tolv = .1
 	val maxVel: Double = constants("tankangvel")
 	val worldsize: Int = constants("worldsize")
 	val maxMagnitude = 100.0
-	val maxVelocity = Properties("maxVelocity",.4)
+	val maxVelocity = Properties("maxVelocity", 1)
 	val team = constants("team")
-	val turningSpeed = Properties("angspeed", 0.2)
+	val angularTolerance = degree(50).radian
 	val tank : Tank
 
 	def path : Vector
@@ -70,7 +70,16 @@ abstract class PotentialFieldsMover(store : DataStore) {
 		} else {
 			//Agents.LOG.debug("Setting velocity to " + v)
 			tank.setAngularVelocity(v)
+
 			//slow it down to turn
+			val turningSpeed = {
+				if (abs(error) > angularTolerance) {
+					0.05
+				} else {
+					.4
+				}
+			}
+
 			LOG.debug("setting speed: " + turningSpeed)
 			tank.speed(turningSpeed)
 			waitForNewData()

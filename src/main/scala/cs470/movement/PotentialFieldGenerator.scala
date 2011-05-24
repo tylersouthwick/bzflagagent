@@ -61,6 +61,20 @@ abstract class PotentialFieldGenerator(store: DataStore) extends FindAgentPath(s
 	private val s2 = .1
 	def randomVector = new Point(s2 + scala.util.Random.nextGaussian, s2 + scala.util.Random.nextGaussian)
 
+	def AttractivePF2(current: Point, goal: Point, r1: Double, s: Double, alpha: Double) = {
+		val r2 = r1 + s
+		val as = alpha * s
+		val d = current.distance(goal)
+		val theta = current.getAngle(goal)
+
+		if (d < r1)
+			new Point(0, 0)
+		else if (d > r2)
+			new Point(0,0)
+		else
+			new Point(alpha * (d - r1) * cos(theta), alpha * (d - r1) * sin(theta))
+	}
+
 	def AttractivePF(current: Point, goal: Point, r1: Double, s: Double, alpha: Double) = {
 		val r2 = r1 + s
 		val as = alpha * s
@@ -83,11 +97,13 @@ abstract class PotentialFieldGenerator(store: DataStore) extends FindAgentPath(s
 		)
 	}
 
-	def getFieldForObstacles(point : Point) = {
+	def getFieldForObstacles(point : Point, s : Double, alpha : Double) : Point = {
 		obstacles.foldLeft(new Point(0, 0))((total, obstacle) =>
-			total + RegectivePF(point, obstacle.center, obstacle.maxDistance + r.obstacle, s.obstacle, alpha.obstacle)
+			total + ReflectivePF(point, obstacle.center, obstacle.maxDistance + r.obstacle, s, alpha)
 		)
 	}
+
+	def getFieldForObstacles(point : Point) : Point = getFieldForObstacles(point, s.obstacle, alpha.obstacle)
 
 	def getFieldForObstaclesTangential(point : Point, clockwise : Boolean) = {
 		obstacles.foldLeft(new Point(0, 0))((total, obstacle) =>
@@ -101,7 +117,12 @@ abstract class PotentialFieldGenerator(store: DataStore) extends FindAgentPath(s
 		)
 	}
 
+	@deprecated
 	def RegectivePF(current: Point, goal: Point, r1: Double, s: Double, beta: Double) = {
+		ReflectivePF(current, goal, r1, s, beta)
+	}
+
+	def ReflectivePF(current: Point, goal: Point, r1: Double, s: Double, beta: Double) = {
 		val r2 = r1 + s
 		val d = current.distance(goal)
 		val theta = current.getAngle(goal)
