@@ -74,15 +74,6 @@ abstract class MultiAgentBase(tank : Tank, store : DataStore) {
 
 import cs470.domain.Vector
 
-class SniperAgent(tank : Tank, store : DataStore) extends MultiAgentBase(tank, store) {
-	val prePositionPoint = opponentFlag - new Point(shotrange, shotrange)
-
-	override def apply() {
-		super.apply()
-
-	}
-}
-
 class DecoyAgent(tank : Tank, store : DataStore) extends MultiAgentBase(tank, store) {
 	val prePositionPoint = opponentFlag - new Point(shotrange, 0)
 
