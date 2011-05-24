@@ -37,7 +37,13 @@ abstract class PotentialFieldsMover(store : DataStore) {
 
 	private def pdVector = path
 
-	private def pdController(error0: Radian, vector: Vector) {
+	private def pdController(stop : => Boolean, error0: Radian, vector: Vector) {
+		if (stop) {
+			tank.speed(0)
+			tank.setAngularVelocity(0)
+			return
+		}
+
 		LOG.debug("vector: " + vector)
 		val targetAngle = vector.angle
 		val angle = tank.angle
@@ -83,12 +89,12 @@ abstract class PotentialFieldsMover(store : DataStore) {
 			LOG.debug("setting speed: " + turningSpeed)
 			tank.speed(turningSpeed)
 			waitForNewData()
-			pdController(error, pdVector)
+			pdController(stop, error, pdVector)
 		}
 	}
 
-	def moveAlongPotentialField() {
-		pdController(radian(0), pdVector)
+	def moveAlongPotentialField(stop : => Boolean) {
+		pdController(stop, radian(0), pdVector)
 	}
 
 }

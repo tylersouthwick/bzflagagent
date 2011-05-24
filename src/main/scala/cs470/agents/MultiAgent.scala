@@ -3,6 +3,7 @@ package cs470.agents
 import cs470.utils._
 import cs470.domain.Constants._
 import cs470.movement.{SearchPath, PotentialFieldsMover}
+import javax.management.remote.rmi._RMIConnection_Stub
 
 class MultiAgent(host: String, port: Int) extends Agent(host, port) with Threading {
 
@@ -13,6 +14,7 @@ class MultiAgent(host: String, port: Int) extends Agent(host, port) with Threadi
     LOG.info("Running multiagent")
 
     val mytank = store.tanks(0)
+	  val tank = mytank
 
 	val mover = {
 	  val searchPath = new SearchPath(store)
@@ -23,9 +25,15 @@ class MultiAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 		  val tank = mytank
 	  }
 	}
-    loop {
-      mover.moveAlongPotentialField()
+	  val maxDistance = 30.0
+	  def inRange = !store.enemies.filter(_.location.distance(tank.location) < maxDistance).isEmpty
+    while (!inRange) {
+      		mover.moveAlongPotentialField(inRange)
     }
+
+	  tank.setAngularVelocity(0)
+	  tank.speed(0)
+	  println("Stopping agent")
   }
 }
 
