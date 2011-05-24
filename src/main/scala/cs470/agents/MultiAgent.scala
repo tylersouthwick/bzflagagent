@@ -4,7 +4,8 @@ import cs470.utils._
 import cs470.domain.Constants._
 import cs470.domain.Point
 import cs470.bzrc.{Tank, DataStore}
-import cs470.movement.{FindAgentPath, SearchPath, PotentialFieldsMover}
+import cs470.movement.search.Searcher
+import cs470.movement.{PotentialFieldGenerator, FindAgentPath, SearchPath, PotentialFieldsMover}
 
 class MultiAgent(host: String, port: Int) extends Agent(host, port) with Threading {
 
@@ -28,10 +29,10 @@ abstract class MultiAgentBase(tank : Tank, store : DataStore) {
 	val obstacles = store.obstacles
 	val bases = store.bases
 
-	val opponentFlag = flags.find(_.color == "green").get.location
+	val opponentFlag = bases.find(_.color == "green").get.points.center
 	val mytank = tank
 
-	val shotrange: Int = constants("shotrange")
+	val shotrange: Int = 200//constants("shotrange")
 
 	val prePositionPoint : Point
 
@@ -92,32 +93,38 @@ class SniperAgent(tank : Tank, store : DataStore) extends MultiAgentBase(tank, s
 class DecoyAgent(tank : Tank, store : DataStore) extends MultiAgentBase(tank, store) {
 	val prePositionPoint = opponentFlag - new Point(shotrange, 0)
 
-	def alternate(direction : Int) {
-		val point = prePositionPoint + new Point(0, direction * 50)
-		def findPath(location : Point) = new Vector(location - point)
-		new cs470.visualization.PFVisualizer(new FindAgentPath {
-			def getPathVector(point: Point) = findPath(point)
-		}, "go_" + direction + ".gpi", obstacles, constants("worldsize"), 25)
+	def alternate(dir : String, direction : Int) {
+		println("going " + dir)
+
+		println("prePositionPoint: " + prePositionPoint)
+		println("opponentFlag: " + opponentFlag)
+		val target = prePositionPoint + new Point(0, direction * 100)
+		println("target: " + target)
+		val searcher = new PotentialFieldGenerator(store) {
+			def getPathVector(point: Point) = new Vector(target - point)
+		}
+		new cs470.visualization.PFVisualizer(searcher, "go_" + dir + ".gpi", obstacles, constants("worldsize"), 25)
+
 		new PotentialFieldsMover(store) {
 			val tank = mytank
-			def path = findPath(tank.location)
+			def path = searcher.getPathVector(tank.location)
 		}.moveAlongPotentialField()
 	}
 
 	def north() {
-		alternate(1)
+		alternate("north", 1)
 	}
 
 	def south() {
-		alternate(-1)
+		alternate("south", -1)
 	}
 
 	override def apply() {
-		super.apply()
+		//super.apply()
 
 		while (true) {
-			north();
-			south();
+			north()
+			south()
 		}
 	}
 }
