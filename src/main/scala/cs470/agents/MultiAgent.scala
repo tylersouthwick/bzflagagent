@@ -11,11 +11,11 @@ class MultiAgent(host: String, port: Int) extends Agent(host, port) with Threadi
   import MultiAgent._
 
   def run() {
-    //		actor {
-    //			new SniperAgent(store.tanks(0), store).apply()
-    //		}
     actor {
-      new DecoyAgent(store.tanks(0), store).apply()
+      new SniperAgent(store.tanks(0), store).apply()
+    }
+    actor {
+      new DecoyAgent(store.tanks(1), store).apply()
     }
     LOG.info("running multi agent")
   }
@@ -54,7 +54,7 @@ abstract class MultiAgentBase(tank: Tank, store: DataStore) {
 
     mover.moveAlongPotentialField()
 
-    LOG.info("Preposition was achieved by " + tank.callsign)
+    LOG.info("PrePosition was achieved by " + tank.callsign)
   }
 
  def returnHome() {
@@ -82,15 +82,6 @@ abstract class MultiAgentBase(tank: Tank, store: DataStore) {
 }
 
 import cs470.domain.Vector
-
-//class SniperAgent(tank: Tank, store: DataStore) extends MultiAgentBase(tank, store) {
-//  val prePositionPoint = opponentFlag - new Point(shotrange, shotrange)
-//
-//  override def apply() {
-//    super.apply()
-//
-//  }
-//}
 
 class DecoyAgent(tank: Tank, store: DataStore) extends MultiAgentBase(tank, store) {
   val prePositionPoint = opponentFlag - new Point(shotrange + 10, 0)
