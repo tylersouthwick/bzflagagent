@@ -37,7 +37,7 @@ class Point(val x: Double, val y: Double) {
     x * mult.x + y * mult.y
   }
 
-  def distance(goal: Point) = {
+  def distance(goal: Point) : Double = {
     val dx = goal.x - x
     val dy = goal.y - y
 

@@ -64,8 +64,9 @@ class SearchPath(store: DataStore, searchGoal : Point,tankIdd : Int,searchTitle 
 
     val forward = {
 		val points = java.lang.Math.min(result.size - minPointIdx, futurePoints)
-		if (points == 0) {
-			new Point(0, 0)
+		if (points <= 0) {
+//			new Point(0, 0)
+      AttractivePF(point, result(result.size - 1), r, s, alpha)
 		} else {
 			val slice = result.slice(minPointIdx, minPointIdx + points)
 			SearchPath.LOG.debug(slice)
