@@ -26,9 +26,9 @@ abstract class PotentialFieldsMover(store : DataStore) {
 	val maxVel: Double = constants("tankangvel")
 	val worldsize: Int = constants("worldsize")
 	val maxMagnitude = 100.0
-	val maxVelocity = Properties("maxVelocity",.3)
+	val maxVelocity = Properties("maxVelocity",.4)
 	val team = constants("team")
-	val turningSpeed = Properties("angspeed", 0.4)
+	val turningSpeed = Properties("angspeed", 0.2)
 	val tank : Tank
 
 	def path : Vector
