@@ -27,7 +27,11 @@ abstract class PotentialFieldsMover(store: DataStore) {
   val team = constants("team")
   val angularTolerance = degree(90).radian
   val tank: Tank
+
+
   val moveWhileTurning = false
+  val minimizeTurning = true
+  val howClose = 5
 
   def path: Vector
 
@@ -58,7 +62,24 @@ abstract class PotentialFieldsMover(store: DataStore) {
 
     def Kgoal = if (distance > 10) 1 else .1
 
-    if (abs(error) < tol && abs(v) < tolv) {
+    if (minimizeTurning && abs(PI - abs(error)) < .01) {
+      LOG.debug("Reversing");
+      tank.setAngularVelocity(0f)
+      val speed = {
+        val m = vector.magnitude
+        LOG.debug("magnitude: " + m)
+        val result = m / 30.0
+        if (result > maxVelocity) {
+          maxVelocity
+        } else {
+          result
+        }
+      }
+      LOG.debug("setting speed: " + -speed)
+      tank.speed(-speed * Kgoal)
+      waitForNewData()
+
+    } else if (abs(error) < tol && abs(v) < tolv) {
       LOG.debug("Done Turning");
       tank.setAngularVelocity(0f)
       val speed = {
@@ -113,10 +134,8 @@ abstract class PotentialFieldsMover(store: DataStore) {
 
   private def distance = goal.distance(tank.location)
 
-  //pdVector.vector.distance(origin) //new Point(vector.x,vector.y))
   private def inRange(vector: Vector) = {
-    //    java.lang.Math.floor(distance) > 0
-    distance > 5
+    distance > howClose
   }
 
   private def doPdController(vector: Vector) = {
@@ -127,7 +146,7 @@ abstract class PotentialFieldsMover(store: DataStore) {
   }
 
   def moveAlongPotentialField() {
-    LOG.info("Starting movemenet for " + tank.callsign)
+    LOG.info("Moving " + tank.callsign)
     while (doPdController(pdVector)) {
     }
     LOG.info("Ending move for " + tank.callsign)

@@ -48,6 +48,7 @@ abstract class MultiAgentBase(tank: Tank, store: DataStore) {
         val goal = prePositionPoint
         val tank = mytank
         override val moveWhileTurning = true
+        override val howClose = 30
       }
     }
 
@@ -92,16 +93,13 @@ import cs470.domain.Vector
 //}
 
 class DecoyAgent(tank: Tank, store: DataStore) extends MultiAgentBase(tank, store) {
-  val prePositionPoint = opponentFlag - new Point(shotrange, 0)
+  val prePositionPoint = opponentFlag - new Point(shotrange + 10, 0)
   override val LOG = org.apache.log4j.Logger.getLogger(classOf[DecoyAgent])
 
   def alternate(dir: String, direction: Int) {
-    LOG.info("Going " + dir)
+    val target = prePositionPoint + new Point(0, direction * 130)
 
-//    LOG.info("prePositionPoint: " + prePositionPoint)
-//    LOG.info("opponentFlag: " + opponentFlag)
-    val target = prePositionPoint + new Point(0, direction * 100)
-    LOG.info("Moving " + tank.callsign + " to target: " + target)
+    LOG.info("Moving decoy (" + tank.callsign + ") " + dir + " to " + target)
 
     val searcher = new PotentialFieldGenerator(store) {
       def getPathVector(point: Point) = new Vector(target - point)
@@ -110,8 +108,9 @@ class DecoyAgent(tank: Tank, store: DataStore) extends MultiAgentBase(tank, stor
 
     new PotentialFieldsMover(store) {
       val tank = mytank
-
       val goal = target
+      override val moveWhileTurning = true
+      override val howClose = 30
       def path = searcher.getPathVector(tank.location)
     }.moveAlongPotentialField()
   }
