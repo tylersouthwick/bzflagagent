@@ -13,7 +13,7 @@ object SearchPath {
 	val LOG = org.apache.log4j.Logger.getLogger(classOf[SearchPath])
 }
 
-class SearchPath(store: DataStore, searchGoal : Point,tankIdd : Int) extends PotentialFieldGenerator(store) {
+class SearchPath(store: DataStore, searchGoal : Point,tankIdd : Int,searchTitle : String,searchName:String) extends PotentialFieldGenerator(store) {
   implicit object blah extends Ordering[((Point, Double), Int)] {
     def compare(x: ((Point, Double), Int), y: ((Point, Double), Int)) = {
       x._1._2 compareTo y._1._2
@@ -25,7 +25,7 @@ class SearchPath(store: DataStore, searchGoal : Point,tankIdd : Int) extends Pot
     val tankRadius: Double = store.constants("tankradius")
 
     val datastore = store
-    val start = store.tanks(tankIdd).location
+    val start = store.tanks.find(_.tankId == tankIdd).get.location
     val q = queue
     lazy val occgrid = new UsableOccgrid(Properties("discreteSize", 100), obstacles, tankRadius, worldSize, enemies)
 
@@ -35,14 +35,17 @@ class SearchPath(store: DataStore, searchGoal : Point,tankIdd : Int) extends Pot
     val name = "aStarSafePoint"
     val tankId = 0
     val goal = searchGoal
-    val title = "To Safe point"
-    val filename = "safePoint.gpi"
+    val title = searchTitle
+    val filename = searchName
 	  println("goal [" + searchGoal + "]: " + occgrid.convert(searchGoal))
+	  println("goal: " + occgrid.convert(searchGoal))
 
+	  /*
 		import java.io._
 	  val o = new java.io.PrintWriter(new FileOutputStream(new File("world.dat")))
 	  o.print(occgrid.print)
 	  o.close()
+	  */
   }
 
   lazy val result = searcher.search

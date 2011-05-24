@@ -4,8 +4,7 @@ import cs470.utils._
 import cs470.domain.Constants._
 import cs470.domain.Point
 import cs470.bzrc.{Tank, DataStore}
-import cs470.movement.search.Searcher
-import cs470.movement.{PotentialFieldGenerator, FindAgentPath, SearchPath, PotentialFieldsMover}
+import cs470.movement.{PotentialFieldGenerator, SearchPath, PotentialFieldsMover}
 
 class MultiAgent(host: String, port: Int) extends Agent(host, port) with Threading {
 
@@ -38,7 +37,7 @@ abstract class MultiAgentBase(tank : Tank, store : DataStore) {
 
 	def gotoPrePosition() {
 		val mover = {
-			val toSafePoint = new SearchPath(store, prePositionPoint, tank.id)
+			val toSafePoint = new SearchPath(store, prePositionPoint, tank.id, "prePosition_" + tank.tankId, "prePosition_" + tank.tankId)
 			new cs470.visualization.PFVisualizer(toSafePoint, "toPrePosition_" + tank.id + ".gpi", obstacles, constants("worldsize"), 25)
 
 			new PotentialFieldsMover(store) {
@@ -49,17 +48,12 @@ abstract class MultiAgentBase(tank : Tank, store : DataStore) {
 		}
 
 		mover.moveAlongPotentialField()
-
-		tank.setAngularVelocity(0)
-		tank.speed(0)
-		println("Stopping agent: " + tank.callsign)
 	}
 
 	def returnHome() {
 		val goalFlag = bases.find(_.color == constants("team")).get.points.center
-
 		val mover = {
-			val toHomeBase = new SearchPath(store, goalFlag, tank.id)
+			val toHomeBase = new SearchPath(store, goalFlag, tank.id, "returnHome_" + tank.tankId, "returnHome_" + tank.tankId)
 			new cs470.visualization.PFVisualizer(toHomeBase, "toHomeBase.gpi", obstacles, constants("worldsize"), 25)
 
 			new PotentialFieldsMover(store) {
@@ -68,7 +62,6 @@ abstract class MultiAgentBase(tank : Tank, store : DataStore) {
 				val tank = mytank
 			}
 		}
-
 
 		mover.moveAlongPotentialField()
 	}
@@ -120,7 +113,7 @@ class DecoyAgent(tank : Tank, store : DataStore) extends MultiAgentBase(tank, st
 	}
 
 	override def apply() {
-		//super.apply()
+		super.apply()
 
 		while (true) {
 			north()

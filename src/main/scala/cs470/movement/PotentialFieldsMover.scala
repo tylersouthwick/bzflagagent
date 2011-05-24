@@ -11,7 +11,7 @@ object PotentialFieldsMover {
 	val LOG = org.apache.log4j.Logger.getLogger(classOf[PotentialFieldsMover])
 }
 
-abstract class PotentialFieldsMover(store : DataStore) {
+abstract class PotentialFieldsMover(store: DataStore) {
 
 	import PotentialFieldsMover._
 
@@ -26,9 +26,9 @@ abstract class PotentialFieldsMover(store : DataStore) {
 	val maxVelocity = Properties("maxVelocity", 1)
 	val team = constants("team")
 	val angularTolerance = degree(90).radian
-	val tank : Tank
+	val tank: Tank
 
-	def path : Vector
+	def path: Vector
 
 	import RefreshableData.waitForNewData
 
@@ -42,11 +42,10 @@ abstract class PotentialFieldsMover(store : DataStore) {
 		LOG.debug("angle: " + angle.degree)
 		val uncorrectedError = (targetAngle - angle).radian
 
-    //Correct for right turns
-
-    val moddedError = uncorrectedError % (2*PI)
-    val errorM = moddedError % PI
-    val error = new Radian(if(errorM == moddedError) errorM else -errorM)
+		//Correct for right turns
+		val moddedError = uncorrectedError % (2 * PI)
+		val errorM = moddedError % PI
+		val error = new Radian(if (errorM == moddedError) errorM else -errorM)
 
 		LOG.debug("error: " + error.degree)
 		val rv = (Kp * error + Kd * (error - error0) / 200);
@@ -78,11 +77,11 @@ abstract class PotentialFieldsMover(store : DataStore) {
 			val turningSpeed = {
 				if (abs(error) > angularTolerance) {
 					0.0
-				} else if(abs(error) > angularTolerance/2) {
-          0.2
-        } else if(abs(error) > angularTolerance/4) {
-          0.4
-        } else {
+				} else if (abs(error) > angularTolerance / 2) {
+					0.2
+				} else if (abs(error) > angularTolerance / 4) {
+					0.4
+				} else {
 					1.0
 				}
 			}
@@ -90,15 +89,31 @@ abstract class PotentialFieldsMover(store : DataStore) {
 			LOG.debug("setting speed: " + turningSpeed)
 			tank.speed(turningSpeed)
 			waitForNewData()
-			pdController(error, pdVector)
+			if (!inRange(vector))
+				pdController(error, pdVector)
 		}
 	}
 
-	val origin = new Point(0, 0)
+	private val origin = new Point(0, 0)
+
+	private def inRange(vector: Vector) = {
+		val distance = pdVector.vector.distance(origin)
+		//println("vector: " + vector)
+		//println("distance: " + distance)
+		java.lang.Math.floor(distance) > 0
+	}
+
+	private def doPdController(vector: Vector) = {
+		if (inRange(vector)) {
+			pdController(radian(0), vector)
+			true
+		} else false
+	}
+
 	def moveAlongPotentialField() {
 		println("starting move")
-		while (java.lang.Math.floor(pdVector.vector.distance(origin)) > 0)
-			pdController(radian(0), pdVector)
+		while (doPdController(pdVector)) {
+		}
 		println("ending move")
 	}
 
