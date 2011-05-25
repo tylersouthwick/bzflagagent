@@ -8,7 +8,7 @@ import Angle._
 import cs470.bzrc._
 import cs470.movement.{SearchPath, PotentialFieldsMover, PotentialFieldGenerator, pfFindFlag}
 
-class SniperAgent(tank: Tank, store: DataStore) extends MultiAgentBase(tank, store) with Threading {
+class SniperAgent(tank: Tank, store: DataStore, decoy : DecoyAgent) extends MultiAgentBase(tank, store) with Threading {
   val offset = 50
   val prePositionPoint = opponentFlag - new Point(shotrange - offset, 0)
   override val LOG = org.apache.log4j.Logger.getLogger(classOf[SniperAgent])
@@ -20,6 +20,7 @@ class SniperAgent(tank: Tank, store: DataStore) extends MultiAgentBase(tank, sto
       super.apply()
 
       //Wait for decoy to get into position
+      decoy.waitUntilReady()
 
       gotoSniperPosition()
 

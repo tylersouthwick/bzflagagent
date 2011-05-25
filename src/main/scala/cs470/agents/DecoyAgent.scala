@@ -9,6 +9,7 @@ import cs470.movement.{PotentialFieldGenerator, SearchPath, PotentialFieldsMover
 import cs470.domain.Vector
 
 class DecoyAgent(tank: Tank, store: DataStore) extends MultiAgentBase(tank, store) {
+	val ready = new java.util.concurrent.Semaphore(0)
   val prePositionPoint = new Point(100,-50)//opponentFlag - new Point(shotrange + 50, 0)
   override val LOG = org.apache.log4j.Logger.getLogger(classOf[DecoyAgent])
 
@@ -47,10 +48,16 @@ class DecoyAgent(tank: Tank, store: DataStore) extends MultiAgentBase(tank, stor
     LOG.info("Starting decoy")
     super.apply()
 
+	ready.release()
+
     while (true) {
       north()
       south()
     }
+  }
+
+  def waitUntilReady() {
+  	ready.acquire()
   }
 }
 

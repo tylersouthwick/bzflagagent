@@ -11,20 +11,18 @@ class MultiAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 	import MultiAgent._
 
 	def run() {
-		store.tanks.foreach { tank =>
-			val agent = {
-				if (tank.tankId % 2 == 1) {
-					LOG.info(tank.callsign + " is a SNIPER")
-					new SniperAgent(tank, store)
-				} else {
-					LOG.info(tank.callsign + " is a DECOY")
-					new DecoyAgent(tank, store)
-				}
-			}
-			actor {
-				agent()
-			}
+		val tanks = store.tanks
+		if (tanks.size != 2) {
+			LOG.error("Invalid number of tanks.  There must be 2 tanks")
+			System.exit(-1)
 		}
+
+		val decoy = new DecoyAgent(tanks(0), store)
+		val sniper = new SniperAgent(tanks(1), store, decoy)
+
+		actor{decoy()}
+		actor{sniper()}
+
 		LOG.info("running multi agent")
 	}
 }
