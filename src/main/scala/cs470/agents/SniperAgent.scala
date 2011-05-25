@@ -10,7 +10,8 @@ import cs470.movement.{SearchPath, PotentialFieldsMover, PotentialFieldGenerator
 
 class SniperAgent(tank: Tank, store: DataStore, decoy : DecoyAgent) extends MultiAgentBase(tank, store) with Threading {
   val offset = 50
-  val prePositionPoint = opponentFlag - new Point(shotrange - offset, 0)
+  val prePositionPoint = new Point(45, -315)//opponentFlag - new Point(shotrange + offset, 0)
+  val sniperPosition = new Point(180, -230)
   override val LOG = org.apache.log4j.Logger.getLogger(classOf[SniperAgent])
 
   def enemies = store.enemies.filter(_.color == "green").filter(_.status == "alive")
@@ -41,12 +42,10 @@ class SniperAgent(tank: Tank, store: DataStore, decoy : DecoyAgent) extends Mult
   }
 
   def gotoSniperPosition() {
-    val target = tank.location + new Point(offset + 5, 0)
-
     LOG.info("Moving sniper (" + tank.callsign + ") to sniper position")
 
     val searcher = new PotentialFieldGenerator(store) {
-      def getPathVector(point: Point) = new Vector(AttractivePF(point, target, 5, 10, 1))
+      def getPathVector(point: Point) = new Vector(AttractivePF(point, sniperPosition, 5, 10, 1))
     }
 
     if (LOG.isDebugEnabled)
@@ -54,7 +53,7 @@ class SniperAgent(tank: Tank, store: DataStore, decoy : DecoyAgent) extends Mult
 
     new PotentialFieldsMover(store) {
       val tank = mytank
-      val goal = target
+      val goal = sniperPosition
       override val moveWhileTurning = true
       override val howClose = 30
 

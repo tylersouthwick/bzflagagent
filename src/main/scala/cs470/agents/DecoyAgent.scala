@@ -10,11 +10,11 @@ import cs470.domain.Vector
 
 class DecoyAgent(tank: Tank, store: DataStore) extends MultiAgentBase(tank, store) {
 	val ready = new java.util.concurrent.Semaphore(0)
-  val prePositionPoint = new Point(100,-50)//opponentFlag - new Point(shotrange + 50, 0)
+  val prePositionPoint = new Point(100, 50)
   override val LOG = org.apache.log4j.Logger.getLogger(classOf[DecoyAgent])
 
   def alternate(dir: String, direction: Int) {
-    val target = prePositionPoint + new Point(25, direction * 100)
+    val target = prePositionPoint + new Point(0, direction * 200)
 
     LOG.info("Moving decoy (" + tank.callsign + ") " + dir + " to " + target)
 
