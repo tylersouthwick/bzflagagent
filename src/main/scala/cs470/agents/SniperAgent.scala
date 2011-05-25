@@ -90,7 +90,7 @@ class SniperAgent(tank: Tank, store: DataStore, decoy : DecoyAgent) extends Mult
 
   import java.lang.Math._
 
-  def gotoFlag() {
+  private def doGotoFlag() {
     LOG.info("Moving sniper [" + tank.callsign + "] to get " + goalFlag.color + " flag")
     val mover = {
 
@@ -112,6 +112,10 @@ class SniperAgent(tank: Tank, store: DataStore, decoy : DecoyAgent) extends Mult
     }
 
     mover.moveAlongPotentialField()
+  }
+
+  def gotoFlag() {
+    while (tank.flag.isEmpty) doGotoFlag()
 
     LOG.info("Sniper [" + tank.callsign + "] captured the " + goalFlag.color + " flag")
   }
