@@ -18,7 +18,6 @@ Once the sniper made its way to the presposition, it waited for the decoy to ass
 
 At this point, the sniper goes for the flag, being attracted to it with a potential field.  Upon capturing the flag, a search path is found to the goal.  The same procedure as described above was used to guide the sniper back to the goal with the retrieved flag.
 
-\section{Use of Potential Fields}
 
 \section{Search Path}
 In order to search the world, we needed to discretize it.  This was done by building off of the occgrid concept, but creating it ourselves.  This occgrid could have an arbitrary resolution, and would populate the world with information about obstacles (enemies can be added if needed).  We found that adding the enemy was essentially of no use, since they would block the path to the points and therefore cause it to be impossible to find a route.  This occgrid is shown in Fig.~\ref{fig:occgrid}
@@ -32,7 +31,7 @@ We calculated the search path by using the A* algorithm.  The starting point was
 	\label{fig:searchpaths}
 \end{figure}
 
-\section{Movement along Search path}
+\section{Movement along Search path (with Potential Fields)}
 The path gave the optimal route to these points, but the tanks can only be moved by manipulating the angular and forward velocities.  In order to follow the search path, a series of potential fields were created.  We found that if we were to use potential fields for the entire search path, there would be much computation that would do nothing, and it would adversely affect the resultant vectors.  So, in order to alleviate this, we decided to use a subset of the points.  This subset was defined based off of the node closest to the current point of the tank.  The specified number of nodes were skipped (which, for the resolution our occgrid was at turned out to be 3), and then, for the occgrid we used, 7 points were used to create the potential fields.  
 \begin{figure}[h!tb]
 	\subfigure[Decoy]{\includegraphics[width=.30\textwidth]{graphics/red0_safePoint}}
@@ -52,6 +51,17 @@ As an example, consider Fig.~\ref{fig:graph_pf_generator}.  Since the tank is di
 \end{figure}
 
 \section{Future Improvements}
+
+There are two major improvements that would aid us in the final project: 1) improved agent communication and 2) modularized out code to facilitate tuning.
+Our implementation puts each agent on a separate thread, and another thread that does the network communications.
+Right now for agent communication we have shared memory that they can use.
+As we add more agents (assuming that for the final project we will have more than 2), it will be desirable to use a more scalable/flexible system.
+There is a framework within Scala called Actors to facilitate this as it uses message passing.
+It will be a lot easier with messages to broadcast state changes.
+
+It would also be helpful to modularize out some of our code as we were just copying and pasting different things (such as the PD controllers).
+This violates the DRY principle and has led to have some tricky little bugs that have cropped in.
+By modularizing it out, we could make it easier to tune the parameters of the PD controllers for different situations.
 
 \section{Code Demonstration}
 We demonstrated our code to Daniel Brown and Ryan Hintze. While watching theirs, we saw a difference in how the search path was followed.  Theirs would pick a point and go towards it, compared to the potential fields that ours used.  Ours seems to make a much smoother path, especially when it came to the jagged part of the maze. Theirs maneuvered the maze and had no issue killing the guards, collecting the flag, and returning home.
