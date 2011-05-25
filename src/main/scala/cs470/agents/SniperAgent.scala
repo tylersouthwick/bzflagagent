@@ -5,7 +5,7 @@ import cs470.domain.Point
 import cs470.utils._
 import Angle._
 import cs470.bzrc._
-import cs470.movement.pfFindFlag
+import cs470.movement.{PotentialFieldsMover, PotentialFieldGenerator, pfFindFlag}
 
 class SniperAgent(tank : Tank, store : DataStore) extends MultiAgentBase(tank, store) with Threading {
 	val offset = 50
@@ -18,13 +18,39 @@ class SniperAgent(tank : Tank, store : DataStore) extends MultiAgentBase(tank, s
 		loop {
 			super.apply()
 
+      gotoSniperPosition()
+
 			tank.speed(0)
 
 			enemies.foreach(killEnemy)
 
 			gotoFlag()
+
 		}
 	}
+
+  def gotoSniperPosition() {
+    val target = tank.location + new Point(25, 25)
+
+    LOG.info("Moving sniper (" + tank.callsign + ") to sniper position")
+
+    val searcher = new PotentialFieldGenerator(store) {
+      def getPathVector(point: Point) = new Vector(AttractivePF(point, target, 5, 10, 1))
+
+    }
+
+    if (LOG.isDebugEnabled)
+      new cs470.visualization.PFVisualizer(searcher, "go_.gpi", obstacles, constants("worldsize"), 25)
+
+    new PotentialFieldsMover(store) {
+      val tank = mytank
+      val goal = target
+      override val moveWhileTurning = true
+      override val howClose = 30
+
+      def path = searcher.getPathVector(tank.location)
+    }.moveAlongPotentialField()
+  }
 
 	import cs470.domain.Vector
 	def killEnemy(enemy : Enemy) {
