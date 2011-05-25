@@ -19,11 +19,12 @@ object Color extends Enumeration {
   val LIGHT_BROWN = Value("light_brown")
 }
 
-class PFVisualizer(pathFinder: FindAgentPath, filename: String, obstacles: Seq[Polygon], worldsize: Int, samples: Int) extends Visualizer(filename, obstacles, worldsize, "PF","Potential Fields") {
+trait PFVisualizer extends Visualizer {
+  val pathFinder: FindAgentPath
+
+  val samples: Int
 
   private lazy val vec_len = 0.75 * worldsize.asInstanceOf[Double] / samples.asInstanceOf[Double]
-
-  close()
 
   override def plot() {
     write("plot '-' with vectors head")
@@ -54,16 +55,13 @@ class PFVisualizer(pathFinder: FindAgentPath, filename: String, obstacles: Seq[P
   }
 }
 
-object SearchVisualizer {
-	private val showEvery = Properties("vis.showEvery", 25)
+trait SearchVisualizer extends Visualizer {
+
+  private val showEvery = Properties("vis.showEvery", 25)
   private val pauseView = Properties("vis.pauseView", 1000)
-}
-class SearchVisualizer(filename: String, obstacles: Seq[Polygon], worldsize: Int,title:String) extends Visualizer(filename, obstacles, worldsize, "search",title) {
   private val delay = 0.1
   private var pauseViewCounter = 0
   private var showEveryCounter = 0
-	import SearchVisualizer.showEvery
-  import SearchVisualizer.pauseView
 
   def drawSearchNodes(nodes: Traversable[(Point, Point)]) {
     nodes.foreach {
@@ -74,7 +72,6 @@ class SearchVisualizer(filename: String, obstacles: Seq[Polygon], worldsize: Int
         } else {
           showEveryCounter = showEveryCounter + 1
         }
-      //      drawPoint(p2, Color.ORANGE)
     }
 
     flush()
@@ -88,7 +85,6 @@ class SearchVisualizer(filename: String, obstacles: Seq[Polygon], worldsize: Int
   }
 
   def drawPoint(point: Point, color: Color.Color) {
-    //searchPoints.println(point.x + " " + point.y)
     write("plot " + point.x + "," + point.y + " with points")
   }
 
@@ -100,15 +96,19 @@ class SearchVisualizer(filename: String, obstacles: Seq[Polygon], worldsize: Int
   }
 
   def pause() {
-    plotLines()
-    write("pause " + delay)
-    flush();
+    saveType match {
+      case "" => {
+        plotLines()
+        write("pause " + delay)
+      }
+      case _ => flush();
+    }
   }
 
-	def clear() {
-		write("clear")
-		pause()
-	}
+  def clear() {
+    write("clear")
+    pause()
+  }
 
   def drawFinalPath(nodes: Seq[(Point, Point)]) {
     nodes.foreach {
@@ -125,18 +125,46 @@ class SearchVisualizer(filename: String, obstacles: Seq[Polygon], worldsize: Int
 
 }
 
-abstract class Visualizer(filename: String, obstacles: Seq[Polygon], worldsize: Int, name: String, title: String) {
+trait Visualizer {
+  val LOG = org.apache.log4j.Logger.getLogger("cs470.visualization.visualizer")
 
-  import cs470.visualization.Visualizer._
+  val obstacleList: Seq[Polygon]
 
-  LOG.info("Opening file for visualization for " + name + " to: " + filename)
-  private val file = new PrintWriter(new BufferedOutputStream(new FileOutputStream(filename)))
+  val worldsize: Int
 
-  setGnuPlotHeader()
-  drawObjects()
-  plot()
+  val name: String
 
-  LOG.info("Saving " + name + " visualization to file: " + filename)
+  val fileName: String
+
+  val plotTitle: String
+
+  val saveType = Properties("visualizer.saveType", "eps")
+
+  private lazy val filename = fileName + ".gpi"
+
+  private lazy val file = new PrintWriter(new BufferedOutputStream(new FileOutputStream(filename)))
+
+  def draw() {
+    LOG.info("Opening file for visualization for " + name + " to: " + filename)
+
+    saveInfo()
+    setGnuPlotHeader()
+    drawObjects()
+    plot()
+
+    LOG.info("Saving " + name + " visualization to file: " + filename)
+  }
+
+  def saveInfo() {
+    saveType match {
+      case "eps" => {
+        write("set term post eps")
+        write("set output \"" + fileName + "." + saveType + "\"")
+      }
+      case "" => ""
+      case ext => LOG.warn("Save type " + ext + " is unknown.")
+    }
+  }
 
   def drawLine(p1: Point, p2: Point, color: Color.Color) {
     write("set arrow from " + p1.x + ", " + p1.y + " to " + p2.x + ", " + p2.y + " nohead lt 1 lc rgb \"" + color + "\"")
@@ -144,7 +172,7 @@ abstract class Visualizer(filename: String, obstacles: Seq[Polygon], worldsize: 
 
   private def drawObjects() {
     write("unset arrow")
-    obstacles.foreach {
+    obstacleList.foreach {
       obstacle =>
         obstacle.edges.foreach {
           case (p1, p2) =>
@@ -159,7 +187,7 @@ abstract class Visualizer(filename: String, obstacles: Seq[Polygon], worldsize: 
     write("set yrange [%d:%d]".format(-size2, size2))
     write("unset key")
     write("set size square")
-    write("set title '" + title + "'")
+    write("set title '" + plotTitle + "'")
   }
 
   def write(s: String) {
@@ -176,8 +204,4 @@ abstract class Visualizer(filename: String, obstacles: Seq[Polygon], worldsize: 
     file.close()
     LOG.info("Visualization for " + name + " saved to: " + filename)
   }
-}
-
-object Visualizer {
-  val LOG = org.apache.log4j.Logger.getLogger("cs470.visualization.visualizer")
 }

@@ -5,11 +5,12 @@ import cs470.domain.Constants._
 import cs470.domain.Point
 import cs470.bzrc.{Tank, DataStore}
 import cs470.movement.{PotentialFieldGenerator, SearchPath, PotentialFieldsMover}
+import cs470.visualization.PFVisualizer
 
 import cs470.domain.Vector
 
 class DecoyAgent(tank: Tank, store: DataStore) extends MultiAgentBase(tank, store) {
-	val ready = new java.util.concurrent.Semaphore(0)
+  val ready = new java.util.concurrent.Semaphore(0)
   val prePositionPoint = new Point(80, 0)
   override val LOG = org.apache.log4j.Logger.getLogger(classOf[DecoyAgent])
 
@@ -24,7 +25,19 @@ class DecoyAgent(tank: Tank, store: DataStore) extends MultiAgentBase(tank, stor
     }
 
     if (LOG.isDebugEnabled)
-      new cs470.visualization.PFVisualizer(searcher, "go_" + dir + ".gpi", obstacles, constants("worldsize"), 25)
+      new PFVisualizer {
+        val samples = 25
+        val pathFinder = searcher
+        val plotTitle = "Decoy PF " + dir
+        val fileName = "decoy_go_" + dir
+        val name = "decoy_" + dir
+        val worldsize: Int = constants("worldsize")
+        val obstacleList = obstacles
+      }.draw()
+    //      new cs470.visualization.PFVisualizer(searcher, "go_" + dir, obstacles, constants("worldsize"), 25) {
+    //        override val saveType = "eps"
+    //        override val title = ""
+    //      }
 
     new PotentialFieldsMover(store) {
       val tank = mytank
@@ -48,7 +61,7 @@ class DecoyAgent(tank: Tank, store: DataStore) extends MultiAgentBase(tank, stor
     LOG.info("Starting decoy")
     super.apply()
 
-	ready.release()
+    ready.release()
 
     while (true) {
       north()
@@ -57,7 +70,7 @@ class DecoyAgent(tank: Tank, store: DataStore) extends MultiAgentBase(tank, stor
   }
 
   def waitUntilReady() {
-  	ready.acquire()
+    ready.acquire()
   }
 }
 

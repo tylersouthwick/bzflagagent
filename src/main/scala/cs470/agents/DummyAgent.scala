@@ -8,10 +8,10 @@ class DummyAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 
   import DummyAgent._
 
-	def run() {
-		LOG.info("Running dummy agents")
-		myTanks.foreach(moveDummyTank)
-	}
+  def run() {
+    LOG.info("Running dummy agents")
+    myTanks.foreach(moveDummyTank)
+  }
 
   def moveDummyTank(tank: Tank) {
     LOG.info("Starting tank #" + tank.id + " on dummy path")

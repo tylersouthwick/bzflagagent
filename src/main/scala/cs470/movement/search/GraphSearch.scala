@@ -4,10 +4,10 @@ import collection.mutable.HashSet
 
 trait GraphSearch {
 
-	val explored = new HashSet[(Int, Int)]
-	val start : (Int, Int)
+  val explored = new HashSet[(Int, Int)]
+  val start: (Int, Int)
 
-	def find() {
+  def find() {
 
-	}
+  }
 }

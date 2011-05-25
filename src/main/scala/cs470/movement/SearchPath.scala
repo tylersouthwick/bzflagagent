@@ -38,13 +38,13 @@ class SearchPath(store: DataStore, searchGoal: Point, tankIdd: Int, searchTitle:
     val goal = searchGoal
     val title = searchTitle
     val filename = searchName
-    //		if (LOG.isDebugEnabled) {
 
-    val newPoint = occgrid.convert(searchGoal)
-    if (occgrid.data(newPoint._1)(newPoint._2) != Occupant.NONE) LOG.error("GOAL IS IN AN OBJECT")
-    LOG.info("goal [" + searchGoal + "]: " + occgrid.convert(searchGoal) + " {size of occgrid: " + occgrid.width + "}")
-    LOG.debug("goal: " + occgrid.convert(searchGoal))
-    //		}
+    if (LOG.isDebugEnabled) {
+      val newPoint = occgrid.convert(searchGoal)
+      if (occgrid.data(newPoint._1)(newPoint._2) != Occupant.NONE) LOG.error("GOAL IS IN AN OBJECT")
+      LOG.info("goal [" + searchGoal + "]: " + occgrid.convert(searchGoal) + " {size of occgrid: " + occgrid.width + "}")
+      LOG.debug("goal: " + occgrid.convert(searchGoal))
+    }
   }
 
   lazy val result = searcher.search
@@ -65,7 +65,7 @@ class SearchPath(store: DataStore, searchGoal: Point, tankIdd: Int, searchTitle:
       val points = java.lang.Math.min(result.size - minPointIdx, futurePoints)
       if (points <= 0) {
         //			new Point(0, 0)
-        AttractivePF(point, result(result.size - 1), r, s, alpha)
+        AttractivePF(point, result(result.size - 1), 2, 20, 20)
       } else {
         val slice = result.slice(minPointIdx, minPointIdx + points)
         SearchPath.LOG.debug(slice)
@@ -77,24 +77,7 @@ class SearchPath(store: DataStore, searchGoal: Point, tankIdd: Int, searchTitle:
       }
     }
 
-    /*
-         val previous = {
-           val points = java.lang.Math.min(minPointIdx, previousPoints)
-           if (points == 0) {
-             new Point(0, 0)
-           } else {
-             val slice = result.slice(minPointIdx - points, minPointIdx)
-             // new Vector(slice.foldLeft(new Point(0, 0))(_ + _) - point * points)
-             slice.foldLeft(new Point(0, 0)) { (vector, p) =>
-               vector + ReflectivePF(point, p, r, s, alpha)
-             }
-           }
-         }
-         */
-
-    //val walls = getFieldForObstacles(point, 3, .2)
-
-    new Vector(forward /*+ previous + walls + randomVector*/)
+    new Vector(forward)
   }
 }
 
