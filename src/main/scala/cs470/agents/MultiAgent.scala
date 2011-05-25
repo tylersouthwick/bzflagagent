@@ -37,7 +37,8 @@ abstract class MultiAgentBase(tank: Tank, store: DataStore) {
 	val obstacles = store.obstacles
 	val bases = store.bases
 
-	val opponentFlag = bases.find(_.color == "green").get.points.center
+  val goalFlag = flags.find(_.color == "green").get
+	val opponentFlag = goalFlag.location
 	val mytank = tank
 
 	val shotrange: Int = constants("shotrange")
