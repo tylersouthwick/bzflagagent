@@ -5,126 +5,148 @@ import java.util.Date
 import cs470.utils.{Radian, Angle, Threading}
 
 class RefreshableTanks(queue: BzrcQueue) extends RefreshableData[MyTank, Tank](queue) {
-	private val LOG = org.apache.log4j.Logger.getLogger(classOf[RefreshableTanks])
+  private val LOG = org.apache.log4j.Logger.getLogger(classOf[RefreshableTanks])
 
 
-	protected def loadData(con: BzFlagConnection) = con.mytanks
-	protected def convert(f: MyTank) = buildTank(f.id)
+  protected def loadData(con: BzFlagConnection) = con.mytanks
 
-	private def buildTank(buildTankId: Int) = new Tank(queue, this) {
-		private def tank: MyTank = findItem(_.id == tankId)
+  protected def convert(f: MyTank) = buildTank(f.id)
 
-		val tankId = buildTankId
-		def angvel = tank.angvel
-		def xy = tank.xy
-		def vx = tank.vx
-		def angle = tank.angle
-		def location = tank.location
-		def flag = tank.flag
-		def timeToReload = tank.timeToReload
-		def shotsAvailable = tank.shotsAvailable
-		def status = tank.status
-		def callsign = tank.callsign
-	}
+  private def buildTank(buildTankId: Int) = new Tank(queue, this) {
+    private def tank: MyTank = findItem(_.id == tankId)
+
+    val tankId = buildTankId
+
+    def angvel = tank.angvel
+
+    def xy = tank.xy
+
+    def vx = tank.vx
+
+    def angle = tank.angle
+
+    def location = tank.location
+
+    def flag = tank.flag
+
+    def timeToReload = tank.timeToReload
+
+    def shotsAvailable = tank.shotsAvailable
+
+    def status = tank.status
+
+    def callsign = tank.callsign
+  }
 
 }
 
 object Tank {
-	val LOG = org.apache.log4j.Logger.getLogger(classOf[Tank])
+  val LOG = org.apache.log4j.Logger.getLogger(classOf[Tank])
 }
 
 import java.lang.Math._
 import cs470.utils.Angle._
 
-abstract class Tank(queue : BzrcQueue, tanks : RefreshableTanks) extends Threading {
+abstract class Tank(queue: BzrcQueue, tanks: RefreshableTanks) extends Threading {
 
-	val tankId: Int
+  val tankId: Int
 
-	def id = tankId
+  def id = tankId
 
-	def angvel: Double
-	def xy: Double
-	def vx: Double
-	def angle: Angle
-	def location: Point
-	def flag: Option[String]
-	def timeToReload: Double
-	def shotsAvailable: Int
-	def status: String
-	def callsign: String
-	def dead = "dead" == status
+  def angvel: Double
 
-	def speed(s: Double) {
-		queue.invoke {
-			_.speed(tankId, s)
-		}
-	}
+  def xy: Double
 
-	def setAngularVelocity(v: Double) {
-		queue.invoke{
-			_.angvel(tankId, v)
-		}
-	}
+  def vx: Double
 
-	def shoot() {
-		queue.invoke{
-			_.shoot(tankId)
-		}
-	}
+  def angle: Angle
 
-	import Tank.LOG
+  def location: Point
 
-	def moveAngle(theta: Angle) = {
-		if (dead) {
-			LOG.debug("Tried to rotate Tank #" + tankId + " but it is dead")
-			(degree(0), 0)
-		} else {
-			computeAngle(theta)
-		}
-	}
+  def flag: Option[String]
 
-	def moveToAngle(targetAngle : Angle) {
-		pdController(radian(0), targetAngle)
-	}
+  def timeToReload: Double
 
-	def getTime = (new Date).getTime
+  def shotsAvailable: Int
 
-	def computeAngle(theta: Radian) = {
-		val startingAngle = angle
-		val targetAngle = startingAngle + theta
+  def status: String
 
-		val startTime = getTime
-		pdController(radian(0), targetAngle)
-		((angle - startingAngle), (getTime - startTime).asInstanceOf[Int])
-	}
+  def callsign: String
 
-	val Kp = 1
-	val Kd = 4.5
-	val tol = degree(1).radian
-	val tolv = .1
-	val maxVel = .7854 //constants("tankangvel")
+  def dead = "dead" == status
 
-	def pdController(error0: Radian, targetAngle : Radian) {
-		val uncorrectedError = (targetAngle - angle).radian
+  def speed(s: Double) {
+    queue.invoke {
+      _.speed(tankId, s)
+    }
+  }
 
-		println("angle: " + angle.degree)
-		println("targetAngle: " + targetAngle.degree)
-		//Correct for right turns
-		val moddedError = uncorrectedError % (2 * PI)
-		val errorM = moddedError % PI
-		val error = new Radian(if (errorM == moddedError) errorM else -errorM)
-		println("error: " + error.degree)
+  def setAngularVelocity(v: Double) {
+    queue.invoke {
+      _.angvel(tankId, v)
+    }
+  }
 
-		val rv = (Kp * error + Kd * (error - error0) / 200);
-		val v = if(rv > maxVel) 1 else rv/maxVel
+  def shoot() {
+    queue.invoke {
+      _.shoot(tankId)
+    }
+  }
 
-		if (abs(error) < tol && abs(v) < tolv) {
-			setAngularVelocity(0f)
-		} else {
-			//Agents.LOG.debug("Setting velocity to " + v)
-			setAngularVelocity(v)
-			tanks.waitForNewData()
-			pdController(error, targetAngle)
-		}
-	}
+  import Tank.LOG
+
+  def moveAngle(theta: Angle) = {
+    if (dead) {
+      LOG.debug("Tried to rotate Tank #" + tankId + " but it is dead")
+      (degree(0), 0)
+    } else {
+      computeAngle(theta)
+    }
+  }
+
+  def moveToAngle(targetAngle: Angle) {
+    pdController(radian(0), targetAngle)
+  }
+
+  def getTime = (new Date).getTime
+
+  def computeAngle(theta: Radian) = {
+    val startingAngle = angle
+    val targetAngle = startingAngle + theta
+
+    val startTime = getTime
+    pdController(radian(0), targetAngle)
+    ((angle - startingAngle), (getTime - startTime).asInstanceOf[Int])
+  }
+
+  val Kp = 1
+  val Kd = 4.5
+  val tol = degree(1).radian
+  val tolv = .1
+  val maxVel = .7854
+  //constants("tankangvel")
+
+  def pdController(error0: Radian, targetAngle: Radian) {
+    val uncorrectedError = (targetAngle - angle).radian
+
+    LOG.debug("angle: " + angle.degree)
+    LOG.debug("targetAngle: " + targetAngle.degree)
+    //Correct for right turns
+    val moddedError = uncorrectedError % (2 * PI)
+    val errorM = moddedError % PI
+    val error = new Radian(if (errorM == moddedError) errorM else -errorM)
+    LOG.debug("error: " + error.degree)
+
+    val rv = (Kp * error + Kd * (error - error0) / 200);
+    val v = if (rv > maxVel) 1 else rv / maxVel
+
+    if (abs(error) < tol && abs(v) < tolv) {
+      setAngularVelocity(0f)
+    } else {
+      //Agents.LOG.debug("Setting velocity to " + v)
+      setAngularVelocity(v)
+      tanks.waitForNewData()
+      pdController(error, targetAngle)
+    }
+  }
 }

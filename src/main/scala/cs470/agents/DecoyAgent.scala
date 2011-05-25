@@ -9,7 +9,7 @@ import cs470.movement.{PotentialFieldGenerator, SearchPath, PotentialFieldsMover
 import cs470.domain.Vector
 
 class DecoyAgent(tank: Tank, store: DataStore) extends MultiAgentBase(tank, store) {
-  val prePositionPoint = opponentFlag - new Point(shotrange + 50, 0)
+  val prePositionPoint = new Point(100,-50)//opponentFlag - new Point(shotrange + 50, 0)
   override val LOG = org.apache.log4j.Logger.getLogger(classOf[DecoyAgent])
 
   def alternate(dir: String, direction: Int) {
@@ -22,7 +22,7 @@ class DecoyAgent(tank: Tank, store: DataStore) extends MultiAgentBase(tank, stor
 
     }
 
-	if (LOG.isDebugEnabled)
+    if (LOG.isDebugEnabled)
       new cs470.visualization.PFVisualizer(searcher, "go_" + dir + ".gpi", obstacles, constants("worldsize"), 25)
 
     new PotentialFieldsMover(store) {
@@ -30,6 +30,7 @@ class DecoyAgent(tank: Tank, store: DataStore) extends MultiAgentBase(tank, stor
       val goal = target
       override val moveWhileTurning = true
       override val howClose = 30
+
       def path = searcher.getPathVector(tank.location)
     }.moveAlongPotentialField()
   }

@@ -10,7 +10,7 @@ import cs470.movement.pfFindFlag
 class SniperAgent(tank : Tank, store : DataStore) extends MultiAgentBase(tank, store) with Threading {
 	val offset = 50
 	val prePositionPoint = opponentFlag - new Point(shotrange - offset, shotrange - offset)
-  override val LOG = org.apache.log4j.Logger.getLogger(classOf[DecoyAgent])
+  override val LOG = org.apache.log4j.Logger.getLogger(classOf[SniperAgent])
 
 	def enemies = store.enemies.filter(_.color == "green").filter(_.status == "alive")
 
@@ -32,8 +32,8 @@ class SniperAgent(tank : Tank, store : DataStore) extends MultiAgentBase(tank, s
 		while (enemy.status == "alive") {
 			//println("Trying to kill " + enemy.callsign + " - angle was " + angle.degree)
 			val angle = vector.angle
-			LOG.debug("shooting [" + enemy.callsign + "] moving angle: " + angle.degree)
 			tank.moveToAngle(angle)
+      LOG.info("shooting [" + enemy.callsign + "]")
 			tank.shoot()
 			RefreshableData.waitForNewData()
 		}
@@ -74,7 +74,7 @@ class SniperAgent(tank : Tank, store : DataStore) extends MultiAgentBase(tank, s
 					tank.setAngularVelocity(0f)
 					val speed = {
 						val m = vector.magnitude
-						LOG.debug("magnitude: " + m)
+						LOG.debug("Magnitude: " + m)
 						val result = m / 30.0
 						if (result > maxVelocity) {
 							maxVelocity
@@ -82,14 +82,14 @@ class SniperAgent(tank : Tank, store : DataStore) extends MultiAgentBase(tank, s
 							result
 						}
 					}
-					LOG.debug("setting speed: " + speed)
+					LOG.debug("Setting speed: " + speed)
 					tank.speed(speed)
 					RefreshableData.waitForNewData()
 				} else {
 					//Agents.LOG.debug("Setting velocity to " + v)
 					tank.setAngularVelocity(v)
 					//slow it down to turn
-					LOG.debug("setting speed: " + turningSpeed)
+					LOG.debug("Setting speed: " + turningSpeed)
 					tank.speed(turningSpeed)
 					RefreshableData.waitForNewData()
 					pdController(error, pdVector)
