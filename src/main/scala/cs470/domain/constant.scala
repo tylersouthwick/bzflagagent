@@ -21,9 +21,9 @@ class Constants(constants : Seq[Constant]) extends (String => String) {
 	val map = new ListMap[String, String]
 	import Constants._
 
-	LOG.info("Constants:")
+	LOG.debug("Constants:")
 	constants.foreach {constant =>
-		LOG.info("\t" + constant)
+		LOG.debug("\t" + constant)
 		map += constant.name -> constant.value
 	}
 

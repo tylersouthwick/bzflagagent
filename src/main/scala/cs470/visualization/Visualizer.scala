@@ -179,5 +179,5 @@ abstract class Visualizer(filename: String, obstacles: Seq[Polygon], worldsize: 
 }
 
 object Visualizer {
-  val LOG = org.apache.log4j.Logger.getLogger("cs470.visualizer")
+  val LOG = org.apache.log4j.Logger.getLogger("cs470.visualization.visualizer")
 }
