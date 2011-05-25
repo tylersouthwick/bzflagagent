@@ -77,9 +77,9 @@ class SniperAgent(tank: Tank, store: DataStore, decoy: DecoyAgent) extends Multi
     def vector = new Vector(enemy.location - tank.location)
     while (enemy.status == "alive") {
       val angle = vector.angle
-      println("Trying to kill " + enemy.callsign + " - angle was " + angle.degree)
+//      LOG.debug("Trying to kill " + enemy.callsign + " - angle was " + angle.degree)
       tank.moveToAngle(angle)
-      println("shooting [" + enemy.callsign + "]")
+//      LOG.debug("shooting [" + enemy.callsign + "]")
       tank.shoot()
       RefreshableData.waitForNewData()
     }

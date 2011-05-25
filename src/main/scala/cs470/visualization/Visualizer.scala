@@ -26,6 +26,12 @@ trait PFVisualizer extends Visualizer {
 
   private lazy val vec_len = 0.75 * worldsize.asInstanceOf[Double] / samples.asInstanceOf[Double]
 
+
+  override def draw() {
+    super.draw()
+    close()
+  }
+
   override def plot() {
     write("plot '-' with vectors head")
 
@@ -151,15 +157,17 @@ trait Visualizer {
     setGnuPlotHeader()
     drawObjects()
     plot()
-
-    LOG.info("Saving " + name + " visualization to file: " + filename)
   }
 
   def saveInfo() {
     saveType match {
       case "eps" => {
         write("set term post eps")
-        write("set output \"" + fileName + "." + saveType + "\"")
+        write("set output \"" + fileName + ".eps\"")
+      }
+      case "png" => {
+        write("set term png")
+        write("set output \"" + fileName + ".png\"")
       }
       case "" => ""
       case ext => LOG.warn("Save type " + ext + " is unknown.")
