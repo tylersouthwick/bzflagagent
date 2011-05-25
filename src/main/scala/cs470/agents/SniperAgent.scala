@@ -10,6 +10,7 @@ import cs470.movement.pfFindFlag
 class SniperAgent(tank : Tank, store : DataStore) extends MultiAgentBase(tank, store) with Threading {
 	val offset = 50
 	val prePositionPoint = opponentFlag - new Point(shotrange - offset, shotrange - offset)
+  override val LOG = org.apache.log4j.Logger.getLogger(classOf[DecoyAgent])
 
 	def enemies = store.enemies.filter(_.color == "green").filter(_.status == "alive")
 
@@ -31,7 +32,7 @@ class SniperAgent(tank : Tank, store : DataStore) extends MultiAgentBase(tank, s
 		while (enemy.status == "alive") {
 			//println("Trying to kill " + enemy.callsign + " - angle was " + angle.degree)
 			val angle = vector.angle
-			println("shooting [" + enemy.callsign + "] moving angle: " + angle.degree)
+			LOG.debug("shooting [" + enemy.callsign + "] moving angle: " + angle.degree)
 			tank.moveToAngle(angle)
 			tank.shoot()
 			RefreshableData.waitForNewData()
@@ -102,7 +103,7 @@ class SniperAgent(tank : Tank, store : DataStore) extends MultiAgentBase(tank, s
 			def path = finder.getPathVector(tank.location)
 		}}
 		def findFlag() {
-			println("findFlag: " + flagFinders)
+			LOG.info("findFlag: " + flagFinders)
 			flagFinders.foreach(finder => move(finder.path))
 		}
 		LOG.debug("flag: " + tank.flag)
