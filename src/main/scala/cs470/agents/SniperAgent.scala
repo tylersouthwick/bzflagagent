@@ -34,6 +34,7 @@ class SniperAgent(tank: Tank, store: DataStore, decoy : DecoyAgent) extends Mult
           LOG.info("Sniper [" + tank.callsign + "] has killed " + enemy.callsign)
       }
 
+
       gotoFlag()
 
       returnHome()
@@ -64,10 +65,10 @@ class SniperAgent(tank: Tank, store: DataStore, decoy : DecoyAgent) extends Mult
   def killEnemy(enemy: Enemy) {
     def vector = new Vector(enemy.location - tank.location)
     while (enemy.status == "alive") {
-      //println("Trying to kill " + enemy.callsign + " - angle was " + angle.degree)
       val angle = vector.angle
+      println("Trying to kill " + enemy.callsign + " - angle was " + angle.degree)
       tank.moveToAngle(angle)
-      LOG.debug("shooting [" + enemy.callsign + "]")
+      println("shooting [" + enemy.callsign + "]")
       tank.shoot()
       RefreshableData.waitForNewData()
     }
@@ -88,8 +89,11 @@ class SniperAgent(tank: Tank, store: DataStore, decoy : DecoyAgent) extends Mult
 
         val goal = opponentFlag
         val tank = mytank
-        override val moveWhileTurning = true
-        override val howClose = 30
+        //override val moveWhileTurning = true
+        override def inRange(vector : Vector) = {
+//println("flag: " + tank.flag + "->" + tank.flag.isEmpty)
+            tank.flag.isEmpty
+}
       }
     }
 

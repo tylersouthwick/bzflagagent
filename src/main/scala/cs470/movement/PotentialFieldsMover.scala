@@ -135,7 +135,7 @@ abstract class PotentialFieldsMover(store: DataStore) {
 
   private def distance = goal.distance(tank.location)
 
-  private def inRange(vector: Vector) = {
+  def inRange(vector: Vector) = {
     distance > howClose
   }
 
