@@ -35,7 +35,13 @@ trait Threading {
 	def actor(callback : => Unit) {
 		Threading.pool.submit(new Runnable {
 			def run() {
-				callback
+				try {
+					callback
+				} catch {
+					case t : Throwable => {
+						t.printStackTrace()
+					}
+				}
 			}
 		})
 	}
