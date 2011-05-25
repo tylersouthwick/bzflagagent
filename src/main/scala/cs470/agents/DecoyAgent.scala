@@ -10,16 +10,16 @@ import cs470.domain.Vector
 
 class DecoyAgent(tank: Tank, store: DataStore) extends MultiAgentBase(tank, store) {
 	val ready = new java.util.concurrent.Semaphore(0)
-  val prePositionPoint = new Point(100, 50)
+  val prePositionPoint = new Point(80, 0)
   override val LOG = org.apache.log4j.Logger.getLogger(classOf[DecoyAgent])
 
   def alternate(dir: String, direction: Int) {
-    val target = prePositionPoint + new Point(0, direction * 200)
+    val target = new Point(110, direction * 200)
 
     LOG.info("Moving decoy (" + tank.callsign + ") " + dir + " to " + target)
 
     val searcher = new PotentialFieldGenerator(store) {
-      def getPathVector(point: Point) = new Vector(AttractivePF(point, target, 5, 10, 1))
+      def getPathVector(point: Point) = new Vector(AttractivePF(point, target, 5, 10, 20))
 
     }
 

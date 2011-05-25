@@ -10,7 +10,7 @@ import cs470.movement.{SearchPath, PotentialFieldsMover, PotentialFieldGenerator
 
 class SniperAgent(tank: Tank, store: DataStore, decoy : DecoyAgent) extends MultiAgentBase(tank, store) with Threading {
   val offset = 50
-  val prePositionPoint = new Point(45, -315)//opponentFlag - new Point(shotrange + offset, 0)
+  val prePositionPoint = new Point(45, -250)//opponentFlag - new Point(shotrange + offset, 0)
   val sniperPosition = new Point(180, -230)
   override val LOG = org.apache.log4j.Logger.getLogger(classOf[SniperAgent])
 
@@ -61,8 +61,6 @@ class SniperAgent(tank: Tank, store: DataStore, decoy : DecoyAgent) extends Mult
     }.moveAlongPotentialField()
   }
 
-  import cs470.domain.Vector
-
   def killEnemy(enemy: Enemy) {
     def vector = new Vector(enemy.location - tank.location)
     while (enemy.status == "alive") {
@@ -75,22 +73,7 @@ class SniperAgent(tank: Tank, store: DataStore, decoy : DecoyAgent) extends Mult
     }
   }
 
-  val Kp = 1
-  val Kd = 4.5
-  val tol = degree(2).radian
-  val tolv = .1
-  val maxVel: Double = constants("tankangvel")
-  val worldsize: Int = constants("worldsize")
-  val offsetVector = new Vector(new Point(worldsize / 2, worldsize / 2))
-  val maxMagnitude = 100.0
-  val maxVelocity = 1
-  val team = constants("team")
-  val turningSpeed = 0.6
-
-  import java.lang.Math._
-
   private def doGotoFlag() {
-    LOG.info("Moving sniper [" + tank.callsign + "] to get " + goalFlag.color + " flag")
     val mover = {
 
       val toFlag = new PotentialFieldGenerator(store) {
@@ -114,6 +97,8 @@ class SniperAgent(tank: Tank, store: DataStore, decoy : DecoyAgent) extends Mult
   }
 
   def gotoFlag() {
+    LOG.info("Moving sniper [" + tank.callsign + "] to get " + goalFlag.color + " flag")
+	
     while (tank.flag.isEmpty) doGotoFlag()
 
     LOG.info("Sniper [" + tank.callsign + "] captured the " + goalFlag.color + " flag")
