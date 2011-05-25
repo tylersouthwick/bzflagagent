@@ -14,6 +14,8 @@ object BZRC {
 
 class BzFlagConnection(host : String, port : Int) {
 	private val socket = new Socket(host, port)
+    println("nodelay: " + socket.getTcpNoDelay)
+    socket.setTcpNoDelay(false)
 
 	if (!socket.isConnected) throw new UnableToConnectException
 
