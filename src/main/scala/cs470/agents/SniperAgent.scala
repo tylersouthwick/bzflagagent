@@ -89,7 +89,7 @@ class SniperAgent(tank: Tank, store: DataStore, decoy: DecoyAgent) extends Multi
     val mover = {
 
       val toFlag = new PotentialFieldGenerator(store) {
-        def getPathVector(point: Point) = new Vector(AttractivePF(point, opponentFlag, 5, 10, 1))
+        def getPathVector(point: Point) = new Vector(AttractivePF(point, opponentFlag, 5, 10, 30))
       }
 
       if (LOG.isDebugEnabled)
