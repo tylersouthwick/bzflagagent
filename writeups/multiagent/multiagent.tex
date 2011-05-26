@@ -18,6 +18,19 @@ Once the sniper made its way to the presposition, it waited for the decoy to ass
 
 At this point, the sniper goes for the flag, being attracted to it with a potential field.  Upon capturing the flag, a search path is found to the goal.  The same procedure as described above was used to guide the sniper back to the goal with the retrieved flag.
 
+\section{Potential Fields}
+We used potential fields for all movement.
+For their use with traversing the maze, see section \ref{movement_along}.
+Once the agents got to their pre-positions, new fields were created.
+
+For the DECOY agent, we picked a point towards the north and the south that had alternating attractive fields.
+Once it arrived at one of the fields, it would then go towards the other.
+This caused the north-south movement.
+
+For the SNIPER agent, we used a search path to move it to the SNIPE position.
+Once the enemy agents were sniped, an attractive field was put on the green flag.
+When the SNIPER got the green flag, a new search path was calculated to go back home (see section \ref{movement_along}).
+
 
 \section{Search Path}
 In order to search the world, we needed to discretize it.  This was done by building off of the occgrid concept, but creating it ourselves.  This occgrid could have an arbitrary resolution, and would populate the world with information about obstacles (enemies can be added if needed).  We found that adding the enemy was essentially of no use, since they would block the path to the points and therefore cause it to be impossible to find a route.  This occgrid is shown in Fig.~\ref{fig:occgrid}
@@ -31,7 +44,8 @@ We calculated the search path by using the A* algorithm.  The starting point was
 	\label{fig:searchpaths}
 \end{figure}
 
-\section{Movement along Search path (with Potential Fields)}
+\section{Movement Along Search Path}
+\label{movement_along}
 The path gave the optimal route to these points, but the tanks can only be moved by manipulating the angular and forward velocities.  In order to follow the search path, a series of potential fields were created.  We found that if we were to use potential fields for the entire search path, there would be much computation that would do nothing, and it would adversely affect the resultant vectors.  So, in order to alleviate this, we decided to use a subset of the points.  This subset was defined based off of the node closest to the current point of the tank.  The specified number of nodes were skipped (which, for the resolution our occgrid was at turned out to be 3), and then, for the occgrid we used, 7 points were used to create the potential fields.  
 \begin{figure}[h!tb]
 	\subfigure[Decoy]{\includegraphics[width=.30\textwidth]{graphics/red0_safePoint}}
