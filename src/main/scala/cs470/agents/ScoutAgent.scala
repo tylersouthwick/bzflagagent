@@ -2,7 +2,7 @@ package cs470.agents
 
 import cs470.utils.Threading
 import cs470.visualizer.BayesianVisualizer
-import cs470.domain.{Point, BayesianOccgrid, Vector}
+import cs470.domain._
 import cs470.movement.PotentialFieldGenerator._
 import cs470.domain.Constants._
 import cs470.movement.{SearchPath, PotentialFieldsMover, PotentialFieldGenerator}
@@ -13,7 +13,7 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 
 	def rand = scala.util.Random.nextGaussian()
 
-	val stepSize = 50
+	val stepSize = 150
 
 	def run() {
 		LOG.info("Starting scout agent")
@@ -76,9 +76,10 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 							if (count % 5 == 0)
 								occgrid.update(myTank)
 
+                                def random = scala.util.Random.nextGaussian
 							try {
-								searcher.getPathVector(tank.location)
-							} catch {case _ => new Vector(new Point(0.0,0.0))}
+								new Vector(searcher.getPathVector(tank.location).vector + new Point(random, random))
+							} catch {case _ => new Vector(new Point(random,random))}
 						}
 					}.moveAlongPotentialField()
 				}

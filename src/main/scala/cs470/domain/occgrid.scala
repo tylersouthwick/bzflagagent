@@ -56,7 +56,7 @@ trait Occgrid {
 	}
 }
 
-trait UpdateableOccgrid extends ((Int, Int) => Double) {
+trait UpdateableOccgrid extends ((Int, Int) => Double) with Occgrid {
 	def update() {}
 
 	def size: Int
@@ -72,12 +72,13 @@ trait BayesianOccgrid extends Occgrid with UpdateableOccgrid {
 	def getClosestUnexplored(point: Point, within: Double) : Point = {
 		import scala.math.{cos,sin}
 		val angles = Seq.range(0, 360, 10)
+        println("looking for closest unexplored point: " + (point, within))
 		angles.foreach {
 			angle =>
 				val a = Degree(angle).radian
 				val p = point + new Point(within * cos(a), within * sin(a))
 				val np = convert(p)
-				if(P_s(np._1,np._2) == DefaultProperties.prior){
+				if(P_s(np._1,np._2) == DefaultProperties.prior && data(np._1)(np._2) != Occupant.WALL){
 					return p
 				}
 		}

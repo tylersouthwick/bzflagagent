@@ -44,12 +44,12 @@ abstract class SearchPath(store: DataStore, tankIdd: Int, searchTitle: String, s
 		val title = searchTitle
 		val filename = searchName
 
-		if (LOG.isDebugEnabled) {
+//		if (LOG.isDebugEnabled) {
 			val newPoint = occgrid.convert(searchGoal)
 			if (occgrid.data(newPoint._1)(newPoint._2) != Occupant.NONE) LOG.error("GOAL IS IN AN OBJECT")
 			LOG.info("goal [" + searchGoal + "]: " + occgrid.convert(searchGoal) + " {size of occgrid: " + occgrid.width + "}")
 			LOG.debug("goal: " + occgrid.convert(searchGoal))
-		}
+//		}
 	}
 
 	lazy val result = searcher.search

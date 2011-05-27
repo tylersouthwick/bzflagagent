@@ -2,7 +2,7 @@ package cs470.visualizer
 
 import scala.swing._
 import scala.Array._
-import cs470.domain.UpdateableOccgrid
+import cs470.domain._
 import com.sun.org.apache.xerces.internal.parsers.CachingParserPool.SynchronizedGrammarPool
 import javax.swing.{Timer, JPanel}
 import java.awt.event.{ActionEvent, ActionListener}
@@ -11,9 +11,8 @@ import java.awt.event.{ActionEvent, ActionListener}
  * @author tylers3
  */
 
-//import cs470.domain.BayesianOccgrid.
 trait BayesianVisualizer extends UpdateableOccgrid {
-	private lazy val visualizer = new SwingOccgridRealVisualizer(this, size, lock);
+	private lazy val visualizer = new SwingOccgridRealVisualizer(this, size, lock, this);
 
 	override def update() {
 		super.update()
@@ -26,7 +25,7 @@ trait BayesianVisualizer extends UpdateableOccgrid {
 
 }
 
-class SwingOccgridRealVisualizer(data: (Int, Int) => Double, worldsize: Int, lock: Object) extends SimpleSwingApplication {
+class SwingOccgridRealVisualizer(data: (Int, Int) => Double, worldsize: Int, lock: Object, occgrid : UpdateableOccgrid) extends SimpleSwingApplication {
 	val LOG = org.apache.log4j.Logger.getLogger("cs470.visualizer.swing")
 
 	def top = new MainFrame {
@@ -38,12 +37,22 @@ class SwingOccgridRealVisualizer(data: (Int, Int) => Double, worldsize: Int, loc
 		*/
 		val update = new Button {
 			action = Action("Update") {
-				//updateData(x.value, y.value, percentage.value / 100.0)
+                updateImage()
+			}
+		}
+		val corners = new Button {
+			action = Action("Corners") {
+                val corners = occgrid.corners
+                if (corners.isEmpty) println("No corners found")
+                else {
+                    println("Corners:")
+                    corners.foreach(t => println("\t" + t)) 
+                }
 			}
 		}
 
 		def label(s: String) = new Label(s + " = ");
-		val updatePanel = new FlowPanel(/*label("x"), x.field, label("y"), y.field, label("percentage"), percentage.field, */ update)
+		val updatePanel = new FlowPanel(/*label("x"), x.field, label("y"), y.field, label("percentage"), percentage.field, */ update, corners)
 		contents = new BorderPanel {
 			add(updatePanel, BorderPanel.Position.North)
 			add(new ScrollPane(Component.wrap(image)), BorderPanel.Position.Center)
