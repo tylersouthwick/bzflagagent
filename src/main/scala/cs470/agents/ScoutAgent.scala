@@ -10,12 +10,21 @@ class ScoutAgent(host:String, port:Int) extends Agent(host,port) with Threading 
   def run() {
     LOG.info("Starting scout agent")
 
-    val tank = myTanks(0)
 	  val occgrid = new BayesianOccgrid with BayesianVisualizer {
 		  val constants = store.constants
 	  }
 	occgrid.startVisualizer()
-    occgrid.update(tank)
+
+	  myTanks.foreach {tank =>
+			  actor {
+		  tank.speed(.5)
+
+		  loop {
+			  occgrid.update(tank)
+			  sleep(500)
+		  }
+			  }
+	  }
 
     LOG.info("Scout agent done")
   }
