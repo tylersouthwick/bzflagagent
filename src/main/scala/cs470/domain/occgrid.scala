@@ -104,7 +104,7 @@ trait BayesianOccgrid extends Occgrid with UpdateableOccgrid {
 	private def doUpdate(grid: Occgrid) {
 		for (gx <- 0 until grid.width - 1) {
 			for (gy <- 0 until grid.height - 1) {
-				val (x,y) = convert(grid.getLocation(gx, gy))
+				val (x, y) = convert(grid.getLocation(gx, gy))
 				myData(x)(y) = grid.data(gx)(gy) match {
 					case Occupant.NONE => P_s_no(x, y)
 					case Occupant.WALL => P_s_o(x, y)
