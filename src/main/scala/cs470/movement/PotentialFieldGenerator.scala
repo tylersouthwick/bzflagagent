@@ -119,7 +119,6 @@ abstract class PotentialFieldGenerator(store: DataStore) extends FindAgentPath(s
     )
   }
 
-  @deprecated
   def RegectivePF(current: Point, goal: Point, r1: Double, s: Double, beta: Double) = {
     ReflectivePF(current, goal, r1, s, beta)
   }

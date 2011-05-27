@@ -15,20 +15,24 @@ import java.awt.event.{ActionEvent, ActionListener}
 trait BayesianVisualizer extends UpdateableOccgrid {
 	private lazy val visualizer = new SwingOccgridRealVisualizer(this, size, lock);
 
+	override def update() {
+		  visualizer.updateImage()
+	}
+
 	def startVisualizer() {
 		visualizer.main(Array(""))
 
-		new Timer(500, new ActionListener {
-			def actionPerformed(e: ActionEvent) {
-		visualizer.updateImage()
-			}
-		})
+//		new Timer(500, new ActionListener {
+//			def actionPerformed(e: ActionEvent) {
+//				visualizer.updateImage()
+//			}
+//		})
 	}
 
 }
 
-class SwingOccgridRealVisualizer(data : (Int, Int) => Double, worldsize : Int, lock : Object) extends SimpleSwingApplication {
-  val LOG = org.apache.log4j.Logger.getLogger("cs470.visualizer.swing")
+class SwingOccgridRealVisualizer(data: (Int, Int) => Double, worldsize: Int, lock: Object) extends SimpleSwingApplication {
+	val LOG = org.apache.log4j.Logger.getLogger("cs470.visualizer.swing")
 
 	def top = new MainFrame {
 		title = "Searching Visualizer"
@@ -42,8 +46,9 @@ class SwingOccgridRealVisualizer(data : (Int, Int) => Double, worldsize : Int, l
 				//updateData(x.value, y.value, percentage.value / 100.0)
 			}
 		}
-		def label(s : String) = new Label(s  +" = ");
-		val updatePanel = new FlowPanel(/*label("x"), x.field, label("y"), y.field, label("percentage"), percentage.field, */update)
+
+		def label(s: String) = new Label(s + " = ");
+		val updatePanel = new FlowPanel(/*label("x"), x.field, label("y"), y.field, label("percentage"), percentage.field, */ update)
 		contents = new BorderPanel {
 			add(updatePanel, BorderPanel.Position.North)
 			add(new ScrollPane(Component.wrap(image)), BorderPanel.Position.Center)
@@ -57,13 +62,16 @@ class SwingOccgridRealVisualizer(data : (Int, Int) => Double, worldsize : Int, l
 		import java.awt.image._
 		import scala.collection.JavaConversions._
 		val panel = new JPanel {
-			val grayscale : Seq[Color] = (0 to 100).foldLeft(new java.util.ArrayList[Color]()) { (seq, num) => {
-				val color = 255 - (num * 2.55).asInstanceOf[Int]
-				seq.add(new Color(color, color, color))
-				seq
-			}}
+			val grayscale: Seq[Color] = (0 to 100).foldLeft(new java.util.ArrayList[Color]()) {
+				(seq, num) => {
+					val color = 255 - (num * 2.55).asInstanceOf[Int]
+					seq.add(new Color(color, color, color))
+					seq
+				}
+			}
 
 			override def paint(g: Graphics) {
+				LOG.debug("Redrawing screen")
 				super.paint(g)
 
 				val start = time
