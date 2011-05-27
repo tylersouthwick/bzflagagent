@@ -26,7 +26,7 @@ trait AgentCreator {
 }
 
 object Agents {
-  val all = Seq(DummyAgent, PotentialFieldAgent, PotentialFieldsVisualizerAgent, SearchLabAgent, MultiAgent)
+  val all = Seq(DummyAgent, PotentialFieldAgent, PotentialFieldsVisualizerAgent, SearchLabAgent, MultiAgent, ScoutAgent)
   val LOG = org.apache.log4j.Logger.getLogger("cs470.agents.Agents")
 
   def start(agent: String, host: String, port: Int) {
