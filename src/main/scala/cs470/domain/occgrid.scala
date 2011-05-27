@@ -28,14 +28,15 @@ trait Occgrid {
 	def print: String
 
 	def corners = {
-		def filterSeq(seq : Seq[(Int, Int)]) = {
+		def isLine(seq : Seq[(Int, Int)]) = {
 			seq
 			.filter{case (x, y) => (x >= 0 && x < width) && (y >= 0 && y < height)}
 			.map{case (x, y) => data(x)(y)}
 			.filter(_ == Occupant.WALL)
+			.size == 2
 		}
-		def horizontal(x : Int, y : Int) = filterSeq(Seq((x - 1, y), (x + 1, y))).size == 2
-		def vertical(x : Int, y : Int) = filterSeq(Seq((x, y + 1), (x, y - 1))).size == 2
+		def horizontal(x : Int, y : Int) = isLine(Seq((x - 1, y), (x + 1, y)))
+		def vertical(x : Int, y : Int) = isLine(Seq((x, y + 1), (x, y - 1)))
 
 		val corners = new java.util.LinkedList[(Int, Int)]
 		for (x <- 0 until width) {
