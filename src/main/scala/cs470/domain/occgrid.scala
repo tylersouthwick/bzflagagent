@@ -31,13 +31,14 @@ trait Occgrid {
 trait UpdateableOccgrid extends ((Int, Int) => Double) {
 	def update() {}
 	def size : Int
+	def lock : Object
 }
 
 trait BayesianOccgrid extends Occgrid with UpdateableOccgrid {
   val LOG = org.apache.log4j.Logger.getLogger("cs470.domain.BayesianOccgrid")
   private val cutoff: Double = Properties("bayesianCutoff", 0.95)
 
-  def offset: (Int, Int) = (size / 2, size / 2)
+  def offset: (Int, Int) = (size / 2 - 1, size / 2 - 1)
 
   def height = size
 
@@ -88,13 +89,21 @@ trait BayesianOccgrid extends Occgrid with UpdateableOccgrid {
 		data
 	}
 
-  def update(tank : Tank) {
-    LOG.debug("Updating with occgrid from " + tank.callsign)
-    val grid = tank.occgrid
+	val lock = new Object
 
+  def update(tank : Tank) {
+	  val grid = tank.occgrid
+	  lock synchronized {
+		  LOG.debug("Updating with occgrid from " + tank.callsign)
+		  doUpdate(grid)
+	  }
+  }
+  private def doUpdate(grid : Occgrid) {
     for(x <- 0 until grid.width - 1){
       for(y <- 0 until grid.height -1 ){
 		val tmp = convert(grid.getLocation(x,y))
+		  //println("tmp: " + tmp)
+		  //println("(x, y): " + (x, y))
         myData(tmp._1)(tmp._2) = grid.data(x)(y) match {
           case Occupant.NONE => P_s_no(x,y)
           case Occupant.WALL => P_s_o(x,y)
@@ -109,7 +118,7 @@ trait BayesianOccgrid extends Occgrid with UpdateableOccgrid {
 
   def print : String = ""
 
-  def convert(location: Point) = (location.x.intValue + offset._1, location.y.intValue + offset._2)
+  def convert(location: Point) = (location.x.intValue + offset._1, -location.y.intValue + offset._2)
 
   def getLocation(x: Int, y: Int) = {
     new Point(x + offset._1, y + offset._2)

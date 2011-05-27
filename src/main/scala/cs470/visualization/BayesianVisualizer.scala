@@ -4,6 +4,7 @@ import scala.swing._
 import javax.swing.JPanel
 import scala.Array._
 import cs470.domain.UpdateableOccgrid
+import com.sun.org.apache.xerces.internal.parsers.CachingParserPool.SynchronizedGrammarPool
 
 /**
  * @author tylers3
@@ -11,7 +12,7 @@ import cs470.domain.UpdateableOccgrid
 
 //import cs470.domain.BayesianOccgrid.
 trait BayesianVisualizer extends UpdateableOccgrid {
-	private lazy val visualizer = new SwingOccgridRealVisualizer(this, this.size);
+	private lazy val visualizer = new SwingOccgridRealVisualizer(this, size, lock);
 
 	override def update() {
 		super.update()
@@ -24,7 +25,7 @@ trait BayesianVisualizer extends UpdateableOccgrid {
 
 }
 
-class SwingOccgridRealVisualizer(data : (Int, Int) => Double, worldsize : Int) extends SimpleSwingApplication {
+class SwingOccgridRealVisualizer(data : (Int, Int) => Double, worldsize : Int, lock : Object) extends SimpleSwingApplication {
 
 	def top = new MainFrame {
 		title = "Searching Visualizer"
@@ -71,7 +72,13 @@ class SwingOccgridRealVisualizer(data : (Int, Int) => Double, worldsize : Int) e
 					for (y <- 0 until worldsize - 1) {
 
 						//graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (data(x)(y)).asInstanceOf[Float]))
-						val percent = java.lang.Math.floor(data(x, y) * 100).asInstanceOf[Int]
+						def percent = {
+							var percent = 0
+							lock synchronized {
+								percent = java.lang.Math.floor(data(x, y) * 100).asInstanceOf[Int]
+							}
+							percent
+						}
 						//println("percent [" + percent + "] -> " + grayscale(percent))
 						graphics.setColor(grayscale(percent))
 						graphics.drawLine(x, y, x, y)
