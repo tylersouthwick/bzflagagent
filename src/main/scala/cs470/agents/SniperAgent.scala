@@ -27,7 +27,7 @@ class SniperAgent(tank: Tank, store: DataStore, decoy: DecoyAgent) extends Multi
 
       gotoSniperPosition()
 
-      tank.speed(0)
+      tank.setSpeed(0)
 
       enemies.foreach {
         enemy =>

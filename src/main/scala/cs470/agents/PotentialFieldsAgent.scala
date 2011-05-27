@@ -87,7 +87,7 @@ class PotentialFieldAgent(host: String, port: Int) extends Agent(host, port) wit
         tank.shoot();
 
         def move(pdVector: => Vector) {
-          //	tank.speed(vector.magnitude / maxMagnitude)
+          //	tank.setSpeed(vector.magnitude / maxMagnitude)
           //val (angle, time) = tank.moveAngle(vector.angle)
 
           def pdController(error0: Radian, vector: Vector) {
@@ -116,15 +116,15 @@ class PotentialFieldAgent(host: String, port: Int) extends Agent(host, port) wit
                   result
                 }
               }
-              LOG.debug("setting speed: " + speed)
-              tank.speed(speed)
+              LOG.debug("setting setSpeed: " + speed)
+              tank.setSpeed(speed)
               waitForNewData()
             } else {
               //Agents.LOG.debug("Setting velocity to " + v)
               tank.setAngularVelocity(v)
               //slow it down to turn
-              LOG.debug("setting speed: " + turningSpeed)
-              tank.speed(turningSpeed)
+              LOG.debug("setting setSpeed: " + turningSpeed)
+              tank.setSpeed(turningSpeed)
               waitForNewData()
               pdController(error, pdVector)
             }

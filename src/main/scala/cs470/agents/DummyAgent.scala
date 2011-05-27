@@ -20,12 +20,12 @@ class DummyAgent(host: String, port: Int) extends Agent(host, port) with Threadi
     actor {
       loop {
         LOG.debug("Tank #" + tank.id + " is moving")
-        tank.speed(1.0)
+        tank.setSpeed(1.0)
 
         sleep(7000)
 
         LOG.debug("Tank #" + tank.id + " is stopping")
-        tank.speed(0.0)
+        tank.setSpeed(0.0)
 
         LOG.debug("Tank #" + tank.id + " is rotating")
         val (angle, time) = tank.moveAngle(degree(60))

@@ -4,7 +4,7 @@ import collection.mutable.{HashMap, LinkedList}
 import cs470.domain._
 import Constants._
 import cs470.bzrc.{Tank, RefreshableEnemies, DataStore}
-import cs470.utils.{DefaultProperties, Properties}
+import cs470.utils.{Degree, DefaultProperties, Properties}
 
 /**
  * @author tylers2
@@ -40,13 +40,29 @@ trait BayesianOccgrid extends Occgrid with UpdateableOccgrid {
 	val LOG = org.apache.log4j.Logger.getLogger("cs470.domain.BayesianOccgrid")
 	private val cutoff: Double = Properties("bayesianCutoff", 0.95)
 
+
+	def getClosestUnexplored(point: Point, within: Double) : Point = {
+		import scala.math.{cos,sin}
+		val angles = Seq.range(0, 360, 10)
+		angles.foreach {
+			angle =>
+				val a = Degree(angle).radian
+				val p = point + new Point(within * cos(a), within * sin(a))
+				val np = convert(p)
+				if(P_s(np._1,np._2) == DefaultProperties.prior){
+					return p
+				}
+		}
+		return null
+	}
+
 	def offset: (Int, Int) = (size / 2, size / 2 - 1)
 
 	def height = size
 
 	def width = size
 
-	def P_s(x: Int, y: Int) = myData(x)(y)
+	def P_s(x: Int, y: Int) = try { myData(x)(y) } catch {case _ => 1.0 }
 
 	def P_ns(x: Int, y: Int) = 1 - P_s(x, y)
 
