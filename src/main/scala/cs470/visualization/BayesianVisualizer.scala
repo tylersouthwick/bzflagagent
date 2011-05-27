@@ -28,6 +28,7 @@ trait BayesianVisualizer extends UpdateableOccgrid {
 }
 
 class SwingOccgridRealVisualizer(data : (Int, Int) => Double, worldsize : Int, lock : Object) extends SimpleSwingApplication {
+  val LOG = org.apache.log4j.Logger.getLogger("cs470.visualizer.swing")
 
 	def top = new MainFrame {
 		title = "Searching Visualizer"
@@ -89,7 +90,7 @@ class SwingOccgridRealVisualizer(data : (Int, Int) => Double, worldsize : Int, l
 				g.drawImage(bufferedImage, 0, 0, this)
 				val end = time
 
-				println("redrew: " + (end - start) + "ms")
+				LOG.debug("Redrew in " + (end - start) + "ms")
 			}
 		}
 		panel.setPreferredSize(new java.awt.Dimension(worldsize, worldsize))
