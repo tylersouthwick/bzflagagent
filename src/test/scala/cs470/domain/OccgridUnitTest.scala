@@ -15,10 +15,11 @@ object OccgridUnitTest {
 		occgrid
 	}
 }
+
 class OccgridUnitTest {
 
 	@Test
-	def buildGrid() {
-		OccgridUnitTest.createOccgrid
+	def findObstacles() {
+		val occgrid = OccgridUnitTest.createOccgrid
 	}
 }
