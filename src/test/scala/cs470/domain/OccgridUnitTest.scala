@@ -4,8 +4,8 @@ import org.junit.Test
 import java.io.{InputStreamReader, BufferedReader}
 
 object OccgridUnitTest {
-	def createOccgrid = {
-		val reader = new BufferedReader(new InputStreamReader(classOf[OccgridUnitTest].getResourceAsStream("/occgrid.dat")))
+	def createOccgrid(s : String) = {
+		val reader = new BufferedReader(new InputStreamReader(classOf[OccgridUnitTest].getResourceAsStream("/" + s)))
 		val occgrid = new OccgridCommand
 		var line : String = reader.readLine
 		while (line != null) {
@@ -20,9 +20,20 @@ class OccgridUnitTest {
 
 	@Test
 	def findObstacles() {
-		val con = new cs470.bzrc.BzFlagConnection("localhost", 9000)
-		val occgrid = con.occgrid(0)
-		val corners = occgrid.corners
+		val occgrid = OccgridUnitTest.createOccgrid("4_l_worlds.occgrid")
+		val corners = occgrid.polygons
+        new cs470.visualization.Visualizer {
+          val samples = 25
+          val plotTitle = "obstacles"
+          val fileName = "obstacles"
+          val name = "obstacles"
+          val worldsize = 400
+          val obstacleList = corners
+
+            draw()
+plotLines()
+close()
+        }
 		println("(width,height): " + (occgrid.width, occgrid.height))
 		println("offset: " + occgrid.offset)
 		println("found " + corners.size + " corners")

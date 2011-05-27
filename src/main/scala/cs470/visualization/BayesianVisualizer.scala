@@ -42,7 +42,7 @@ class SwingOccgridRealVisualizer(data: (Int, Int) => Double, worldsize: Int, loc
 		}
 		val corners = new Button {
 			action = Action("Corners") {
-                val corners = occgrid.corners
+                val corners = occgrid.polygons
                 if (corners.isEmpty) println("No corners found")
                 else {
                     println("Corners:")

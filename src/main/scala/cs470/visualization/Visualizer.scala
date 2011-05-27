@@ -95,13 +95,6 @@ trait SearchVisualizer extends Visualizer {
     write("plot " + point.x + "," + point.y + " with points")
   }
 
-  def plotLines() {
-    write("plot '-' with lines")
-    write("0 0 0 0")
-    write("e")
-    flush();
-  }
-
   def pause() {
     saveType match {
       case "" => {
@@ -163,6 +156,13 @@ trait Visualizer {
     setGnuPlotHeader()
     drawObjects()
     plot()
+  }
+
+  def plotLines() {
+    write("plot '-' with lines")
+    write("0 0 0 0")
+    write("e")
+    flush();
   }
 
   def saveInfo() {

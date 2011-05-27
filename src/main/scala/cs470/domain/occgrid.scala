@@ -27,32 +27,68 @@ trait Occgrid {
 
 	def print: String
 
-	def corners /*: Seq[(Int, Int)] */= {
-		def isLineEnd(seq : Seq[(Int, Int)]) = {
-			seq
-			.filter{case (x, y) => (x >= 0 && x < width) && (y >= 0 && y < height)}
-			.map{case (x, y) => data(x)(y)}
-			.filter(_ == Occupant.WALL)
-			.size == 1
-		}
-		def horizontal(x : Int, y : Int) = isLineEnd(Seq((x - 1, y), (x + 1, y)))
-		def vertical(x : Int, y : Int) = isLineEnd(Seq((x, y + 1), (x, y - 1)))
-
-		val corners = new java.util.LinkedList[(Int, Int)]
+	def polygons : Seq[Polygon] = {
+		val polygons = new java.util.LinkedList[Polygon]
+        val tmp = Array.ofDim[Occupant.Occupant](width, height)
 		for (x <- 0 until width) {
 			for (y <- 0 until height) {
-				data(x)(y) match {
-					case Occupant.WALL => {
-						//is this the end of a horizontal and vertical line?
-						if (horizontal(x, y) && vertical(x, y))
-							corners.add((x, y))
-					}
-					case _ =>
-				}
+				tmp(x)(y) = data(x)(y)
 			}
 		}
+
+        def findFirstCorner(tmp : Array[Array[Occupant.Occupant]]) : Option[(Int, Int)] = {
+		    for (x <- 0 until width) {
+			    for (y <- 0 until height) {
+				    tmp(x)(y) match {
+					    case Occupant.WALL => {
+                            return Some((x, y))
+					    }
+					    case _ =>
+				    }
+			    }
+		    }
+            None
+        }
+
+        def findBoxWidth(tmp : Array[Array[Occupant.Occupant]], corner : (Int, Int)) = {
+            var w = 0
+            val x = corner._1
+            while(tmp(x + w)(corner._2) == Occupant.WALL && x + w < width) {
+                w = w + 1
+            }
+            w
+        }
+        def findBoxHeight(tmp : Array[Array[Occupant.Occupant]], corner : (Int, Int)) = {
+            var h = 0
+            val y = corner._2
+            while(tmp(corner._1)(y + h) == Occupant.WALL && y + h < height) {
+                h = h + 1
+            }
+            h
+        }
+        def findBox(tmp : Array[Array[Occupant.Occupant]]) = {
+            findFirstCorner(tmp) match {
+                case Some(corner) => {
+                    println("found box @" + corner)
+                    val (height, width) = (findBoxHeight(tmp, corner), findBoxWidth(tmp, corner))
+                    val corners = Seq(corner, (corner._1 + width, corner._2), (corner._1 + width, corner._2 + height), (corner._1, corner._2 + height))
+                    polygons.add(new Polygon(corners.map(t => getLocation(t._1, t._2))))
+                    for (x <- corner._1 until corner._1 + width) {
+                        for (y <- corner._2 until corner._2 + height) {
+                            tmp(x)(y) = Occupant.NONE
+                        }
+                    }
+                    true
+                }
+                case None => false
+            }
+        }
+
+        while (findBox(tmp)) {
+        }
+
 		import scala.collection.JavaConversions._
-		corners.map(t=>getLocation(t._1, t._2))
+		polygons
 	}
 }
 
@@ -355,6 +391,7 @@ class OccgridCommand extends Occgrid with Traversable[Array[Occupant.Occupant]] 
 		width = Integer.parseInt(dim(0))
 		height = Integer.parseInt(dim(1))
 
+        println("(width, height) = " + (width, height))
 		myData = Array.ofDim(width, height)
 	}
 

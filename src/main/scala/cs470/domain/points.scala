@@ -133,6 +133,9 @@ class Polygon(points: Seq[Point]) {
   val maxDistance = {
     points(0).distance(center)
   }
+
+    override def toString() = points.foldLeft(new StringBuilder) { (sb, point) => sb.append(point)}.toString()
+
 }
 
 // vim: set ts=4 sw=4 et:
