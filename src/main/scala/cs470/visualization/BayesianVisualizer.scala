@@ -16,17 +16,12 @@ trait BayesianVisualizer extends UpdateableOccgrid {
 	private lazy val visualizer = new SwingOccgridRealVisualizer(this, size, lock);
 
 	override def update() {
-		  visualizer.updateImage()
+		super.update()
+		visualizer.updateImage()
 	}
 
 	def startVisualizer() {
 		visualizer.main(Array(""))
-
-//		new Timer(500, new ActionListener {
-//			def actionPerformed(e: ActionEvent) {
-//				visualizer.updateImage()
-//			}
-//		})
 	}
 
 }
