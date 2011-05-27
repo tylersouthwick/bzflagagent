@@ -1,6 +1,6 @@
 package cs470
 
-import agents.{MultiAgent, SearchLabAgent, Agents}
+import agents.{ScoutAgent, MultiAgent, SearchLabAgent, Agents}
 import org.apache.commons.cli._
 import org.apache.log4j.Logger
 import utils.Properties
@@ -9,7 +9,7 @@ object Main {
   val LOG = Logger.getLogger("cs470.Main")
   val DEFAULT_HOST = "localhost"
   val DEFAULT_PORT = "9000";
-  val DEFAULT_AGENT = MultiAgent.name
+  val DEFAULT_AGENT = ScoutAgent.name
 
   implicit def findAttribute(cmd: CommandLine) = new {
     def findAttribute(name: String, error: => String, default: String): String = {

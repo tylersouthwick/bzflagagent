@@ -59,6 +59,7 @@ class BzFlagConnection(host : String, port : Int) {
 	private def receiveItems[T](command : String, callback : (String) => T) : Seq[T] = {
         send(command)
 		val begin = readLine
+		if ("fail".equals(begin)) return new java.util.LinkedList[T]
 		if (!"begin".equals(begin)) throw new InvalidBlockException(begin)
 
 		var line = readLine

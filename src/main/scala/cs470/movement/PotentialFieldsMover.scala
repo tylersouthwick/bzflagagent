@@ -83,7 +83,7 @@ abstract class PotentialFieldsMover(store: DataStore) {
     if (abs(error) < tol && abs(v) < tolv) {
       LOG.debug("Done Turning");
       tank.setAngularVelocity(0f)
-      val speed = {
+      val speed = {1/*
         val m = vector.magnitude
         LOG.debug("magnitude: " + m)
         val result = m / 30.0
@@ -91,7 +91,7 @@ abstract class PotentialFieldsMover(store: DataStore) {
           maxVelocity
         } else {
           result
-        }
+        }*/
       }
       LOG.debug("setting speed: " + speed)
       tank.speed(speed * Kgoal)
@@ -102,6 +102,7 @@ abstract class PotentialFieldsMover(store: DataStore) {
 
       //slow it down to turn
       val turningSpeed = {
+		  /*
         if (moveWhileTurning) {
           if (abs(error) > angularTolerance) {
             0.0
@@ -114,7 +115,8 @@ abstract class PotentialFieldsMover(store: DataStore) {
           }
         } else {
           0.0
-        }
+        }*/
+        .5
       }
 
       LOG.debug("setting speed: " + turningSpeed)

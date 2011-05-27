@@ -42,3 +42,7 @@ object Properties {
 		value
 	}
 }
+
+object DefaultProperties {
+  val prior = Properties("prior", .33)
+}
