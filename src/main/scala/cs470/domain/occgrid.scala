@@ -3,7 +3,8 @@ package cs470.domain
 import collection.mutable.{HashMap, LinkedList}
 import cs470.domain._
 import Constants._
-import cs470.bzrc.{RefreshableEnemies, DataStore}
+import cs470.bzrc.{Tank, RefreshableEnemies, DataStore}
+import cs470.utils.{DefaultProperties, Properties}
 
 /**
  * @author tylers2
@@ -22,9 +23,71 @@ trait Occgrid {
 
   def convert(location: Point): (Int, Int)
 
-  def getLocation(x: Int, y: Int) : Point
+  def getLocation(x: Int, y: Int): Point
 }
 
+object BayesianOccgrid extends Occgrid {
+  private var size: Int = 600
+  private var TP: Double = 1
+  private var TN: Double = 1
+  private val cutoff: Double = Properties("bayesianCutoff", 0.95)
+
+  def offset: (Int, Int) = (size / 2, size / 2)
+
+  def height = size
+
+  def width = size
+
+  def P_s(x: Int, y: Int) = myData(x)(y)
+
+  def P_ns(x: Int, y: Int) = 1 - P_s(x, y)
+
+  def P_o_s = TP
+
+  def P_no_s = 1 - P_o_s
+
+  def P_no_ns = TN
+
+  def P_o_ns = 1 - P_no_ns
+
+  def P_o(x: Int, y: Int) = P_o_s * P_s(x, y) + P_o_ns * (1 - P_s(x, y))
+
+  def P_no(x: Int, y: Int) = 1 - P_o(x, y)
+
+  def P_s_o(x: Int, y: Int) = (P_o_s * P_s(x, y)) / P_o(x, y)
+
+  def P_s_no(x: Int, y: Int) = (P_no_s * P_s(x, y)) / P_no(x, y)
+
+  def init(constants: Constants) {
+    size = constants("worldsize")
+    TP = constants("truepositive")
+    TN = constants("truenegative")
+
+    myData = Array.ofDim(size, size)
+
+    for(x <- 0 until myData.length){
+      for(y <- 0 until myData.length) {
+        myData(x)(y) = DefaultProperties.prior
+      }
+    }
+  }
+
+  private var myData: Array[Array[Double]] = null
+
+  def convert(location: Point) = (location.x.intValue - offset._1, location.y.intValue - offset._2)
+
+  def getLocation(x: Int, y: Int) = {
+    new Point(x + offset._1, y + offset._2)
+  }
+
+  def data(x: Int)(y: Int) = {
+    if (myData(y)(x) > cutoff) {
+      Occupant.WALL
+    } else {
+      Occupant.NONE
+    }
+  }
+}
 
 class UsableOccgrid(resolution: Int, obstacles: Seq[Polygon], tankRadius: Double, val worldSize: Int, enemies: RefreshableEnemies) extends Occgrid with Traversable[Array[Occupant.Occupant]] {
   val alpha = math.floor(worldSize / resolution)
@@ -89,14 +152,14 @@ class UsableOccgrid(resolution: Int, obstacles: Seq[Polygon], tankRadius: Double
     myData.foreach(f)
   }
 
-    def convert(location: Point) = {
-    val t:(Int,Int) = (location.x.intValue / alpha + offset._1, offset._2 + location.y.intValue / alpha)
-//    Console.out.println(t)
+  def convert(location: Point) = {
+    val t: (Int, Int) = (location.x.intValue / alpha + offset._1, offset._2 + location.y.intValue / alpha)
+    //    Console.out.println(t)
     t
   }
 
   override def getLocation(x: Int, y: Int) = {
-    new Point((x- offset._1) * alpha, (y- offset._2) * alpha)
+    new Point((x - offset._1) * alpha, (y - offset._2) * alpha)
   }
 
   def fillArray = {
@@ -106,10 +169,11 @@ class UsableOccgrid(resolution: Int, obstacles: Seq[Polygon], tankRadius: Double
         (0 to height - 1).foreach {
           y =>
             val tmp = getLocation(x, y)
-            if (checkEnemy(tmp.x, tmp.y)) {
-              //myData(y)(x) = Occupant.ENEMY
-				myData(y)(x) = Occupant.NONE
-            } else if (checkObstacle(tmp.x, tmp.y)) {
+            //            if (checkEnemy(tmp.x, tmp.y)) {
+            //myData(y)(x) = Occupant.ENEMY
+            //              myData(y)(x) = Occupant.NONE
+            //            } else
+            if (checkObstacle(tmp.x, tmp.y)) {
               myData(y)(x) = Occupant.WALL
             } else {
               myData(y)(x) = Occupant.NONE
