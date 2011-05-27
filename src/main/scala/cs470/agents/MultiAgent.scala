@@ -51,7 +51,9 @@ abstract class MultiAgentBase(tank: Tank, store: DataStore) {
   def gotoPrePosition() {
     LOG.info("Moving " + tank.callsign + " to preposition")
     val mover = {
-      val toSafePoint = new SearchPath(store, prePositionPoint, tank.id, "prePositionPath_" + tank.tankId, "prePosition_" + tank.tankId)
+      val toSafePoint = new SearchPath(store, tank.id, "prePositionPath_" + tank.tankId, "prePosition_" + tank.tankId) {
+	      val searchGoal = prePositionPoint
+      }
 
       if (LOG.isDebugEnabled)
         new PFVisualizer {
@@ -87,7 +89,9 @@ abstract class MultiAgentBase(tank: Tank, store: DataStore) {
     LOG.info("Sending " + tank.callsign + " home")
     val goalFlag = bases.find(_.color == constants("team")).get.points.center
     val mover = {
-      val toHomeBase = new SearchPath(store, goalFlag, tank.id, "returnHome_" + tank.tankId, "returnHome_" + tank.tankId)
+      val toHomeBase = new SearchPath(store, tank.id, "returnHome_" + tank.tankId, "returnHome_" + tank.tankId){
+	      val searchGoal = goalFlag
+      }
       if (LOG.isDebugEnabled)
         new PFVisualizer {
           val samples = 25

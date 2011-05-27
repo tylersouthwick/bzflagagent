@@ -4,8 +4,8 @@ import cs470.utils.Threading
 import cs470.visualizer.BayesianVisualizer
 import cs470.domain.{Point, BayesianOccgrid, Vector}
 import cs470.movement.PotentialFieldGenerator._
-import cs470.movement.{PotentialFieldsMover, PotentialFieldGenerator}
 import cs470.domain.Constants._
+import cs470.movement.{SearchPath, PotentialFieldsMover, PotentialFieldGenerator}
 
 class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threading {
 
@@ -42,22 +42,20 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 					}
 
 
-					val calculateFrequency = 10
+					val calculateFrequency = 20
 					var count = 0
 					var pseudoTarget: Point = target
 
-					val searcher = new PotentialFieldGenerator(store) {
-						def getPathVector(point: Point) = {
-							if (count > calculateFrequency) {
-								occgrid.update(myTank)
-								count = 0
-								pseudoTarget = target
-								LOG.debug("sending " + myTank.callsign + " to " + pseudoTarget + " from " + myTank.location)
-							}
-							count = count + 1
-							new Vector(AttractivePF(point, pseudoTarget, 5, 10, 20))
+					def pathSearcher = new SearchPath(store, myTank.id, myTank.callsign + "_toUnexplored", myTank.callsign + "_toUnexplored") {
+						def searchGoal = {
+							LOG.debug("Updating path " + myTank.callsign + " to " + pseudoTarget)
+							pseudoTarget
 						}
+
+						override def buildOccgrid() = occgrid
 					}
+
+					var searcher = pathSearcher
 
 					new PotentialFieldsMover(store) {
 						val tank = myTank
@@ -66,7 +64,22 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 
 						override val constantSpeed = .8
 
-						def path = searcher.getPathVector(tank.location)
+						def path = {
+							if (count > calculateFrequency) {
+								count = 0
+								pseudoTarget = target
+								searcher = pathSearcher
+								LOG.debug("Sending " + myTank.callsign + " to " + pseudoTarget + " from " + myTank.location)
+							}
+							count = count + 1
+
+							if (count % 5 == 0)
+								occgrid.update(myTank)
+
+							try {
+							searcher.getPathVector(tank.location)
+							} catch {case _ => new Vector(new Point(0.0,0.0))}
+						}
 					}.moveAlongPotentialField()
 				}
 		}

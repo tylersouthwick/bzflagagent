@@ -38,7 +38,7 @@ object Properties {
 	}
 
 	private def use[T](s : String, value : T) = {
-		LOG.warn("Using default value [" + value + "] for property [" + s + "]")
+		LOG.debug("Using default value [" + value + "] for property [" + s + "]")
 		value
 	}
 }

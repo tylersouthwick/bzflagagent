@@ -12,7 +12,9 @@ object SearchPath {
 	val LOG = org.apache.log4j.Logger.getLogger(classOf[SearchPath])
 }
 
-class SearchPath(store: DataStore, searchGoal: Point, tankIdd: Int, searchTitle: String, searchName: String) extends PotentialFieldGenerator(store) {
+abstract class SearchPath(store: DataStore, tankIdd: Int, searchTitle: String, searchName: String) extends PotentialFieldGenerator(store) {
+
+	def searchGoal : Point
 
 	import SearchPath.LOG
 
@@ -60,7 +62,7 @@ class SearchPath(store: DataStore, searchGoal: Point, tankIdd: Int, searchTitle:
 	def getPathVector(point: Point) = {
 		val minPointIdx = result.map {
 			p => (p, p.distance(point))
-		}.zipWithIndex.min._2 + 3
+		}.zipWithIndex.min._2 + 5
 
 		LOG.debug("Minpoint: " + minPointIdx)
 
