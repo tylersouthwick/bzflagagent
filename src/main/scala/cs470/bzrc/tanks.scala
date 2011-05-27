@@ -75,7 +75,7 @@ abstract class Tank(queue: BzrcQueue, tanks: RefreshableTanks) extends Threading
 
   def dead = "dead" == status
 
-  def speed(s: Double) {
+  def setSpeed(s: Double) {
     queue.invoke {
       _.speed(tankId, s)
     }
