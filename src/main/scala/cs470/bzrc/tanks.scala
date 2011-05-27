@@ -93,6 +93,7 @@ abstract class Tank(queue: BzrcQueue, tanks: RefreshableTanks) extends Threading
     }
   }
 
+  def occgrid = queue.invokeAndWait(_.occgrid(tankId))
   import Tank.LOG
 
   def moveAngle(theta: Angle) = {

@@ -24,13 +24,17 @@ trait Occgrid {
   def convert(location: Point): (Int, Int)
 
   def getLocation(x: Int, y: Int): Point
+
+  def print : String
 }
 
 object BayesianOccgrid extends Occgrid {
+  val LOG = org.apache.log4j.Logger.getLogger("cs470.domain.BayesianOccgrid")
   private var size: Int = 600
   private var TP: Double = 1
   private var TN: Double = 1
   private val cutoff: Double = Properties("bayesianCutoff", 0.95)
+  private var myData: Array[Array[Double]] = null
 
   def offset: (Int, Int) = (size / 2, size / 2)
 
@@ -63,6 +67,9 @@ object BayesianOccgrid extends Occgrid {
     TP = constants("truepositive")
     TN = constants("truenegative")
 
+    LOG.debug("True Positive Rate = " + TP)
+    LOG.debug("True Negative Rate = " + TN)
+
     myData = Array.ofDim(size, size)
 
     for(x <- 0 until myData.length){
@@ -72,7 +79,24 @@ object BayesianOccgrid extends Occgrid {
     }
   }
 
-  private var myData: Array[Array[Double]] = null
+  def update(tank : Tank) {
+    LOG.debug("Updating with occgrid from " + tank.callsign)
+    val grid = tank.occgrid
+
+    for(x <- 0 until grid.width - 1){
+      for(y <- 0 until grid.height -1 ){
+        myData(x)(y) = grid.data(x)(y) match {
+          case Occupant.NONE => P_s_no(x,y)
+          case Occupant.WALL => P_s_o(x,y)
+        }
+      }
+    }
+
+    LOG.debug("Done updating")
+
+  }
+
+  def print : String = ""
 
   def convert(location: Point) = (location.x.intValue - offset._1, location.y.intValue - offset._2)
 
@@ -300,6 +324,25 @@ class OccgridCommand extends Occgrid with Traversable[Array[Occupant.Occupant]] 
     sb.append("]")
     sb.toString()
   }
+
+
+  def print: String = {
+    val sb = new StringBuilder
+
+    myData.foreach {
+      rows =>
+        rows.foreach {
+          case Occupant.ENEMY => sb.append("\tE")
+          case Occupant.WALL => sb.append("\tW")
+          case Occupant.NONE => sb.append("\t ")
+          case _ => sb.append("\t!")
+        }
+        sb.append("\n")
+    }
+
+    sb.toString()
+  }
+
 }
 
 object Occupant extends Enumeration {
