@@ -20,8 +20,11 @@ class OccgridUnitTest {
 
 	@Test
 	def findObstacles() {
-		val occgrid = OccgridUnitTest.createOccgrid
+		val con = new cs470.bzrc.BzFlagConnection("localhost", 9000)
+		val occgrid = con.occgrid(0)
 		val corners = occgrid.corners
+		println("(width,height): " + (occgrid.width, occgrid.height))
+		println("offset: " + occgrid.offset)
 		println("found " + corners.size + " corners")
 		corners.foreach(x=>println(x))
 	}

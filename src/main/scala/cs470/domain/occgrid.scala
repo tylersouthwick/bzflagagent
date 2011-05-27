@@ -27,7 +27,7 @@ trait Occgrid {
 
 	def print: String
 
-	def corners = {
+	def corners /*: Seq[(Int, Int)] */= {
 		def isLineEnd(seq : Seq[(Int, Int)]) = {
 			seq
 			.filter{case (x, y) => (x >= 0 && x < width) && (y >= 0 && y < height)}
@@ -43,7 +43,7 @@ trait Occgrid {
 			for (y <- 0 until height) {
 				data(x)(y) match {
 					case Occupant.WALL => {
-						//is this an interrior wall?
+						//is this the end of a horizontal and vertical line?
 						if (horizontal(x, y) && vertical(x, y))
 							corners.add((x, y))
 					}
