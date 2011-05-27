@@ -5,6 +5,7 @@ apply plugin: 'application'
 version = '1.0-SNAPSHOT'
 
 mainClassName = 'cs470.Main'
+scalaVersion = '2.9.0'
 
 repositories {
 	mavenLocal()
@@ -12,10 +13,10 @@ repositories {
 }
 
 dependencies {
-	scalaTools 'org.scala-lang:scala-compiler:2.8.1'
-	scalaTools 'org.scala-lang:scala-library:2.8.1'
-	compile 'org.scala-lang:scala-swing:2.8.1'
-	compile 'org.scala-lang:scala-library:2.8.1'
+	scalaTools "org.scala-lang:scala-compiler:$scalaVersion"
+	scalaTools "org.scala-lang:scala-library:$scalaVersion"
+	compile "org.scala-lang:scala-swing:$scalaVersion"
+	compile "org.scala-lang:scala-library:$scalaVersion"
 	compile 'commons-cli:commons-cli:1.2'
 	compile 'log4j:log4j:1.2.16'
 
