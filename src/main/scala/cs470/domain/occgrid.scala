@@ -118,10 +118,10 @@ trait BayesianOccgrid extends Occgrid with UpdateableOccgrid {
 
 	def print: String = ""
 
-	def convert(location: Point) = (location.x.intValue + offset._1, -location.y.intValue + offset._2)
+	def convert(location: Point) = (location.x.intValue + offset._1, offset._2 - location.y.intValue)
 
 	def getLocation(x: Int, y: Int) = {
-		new Point(x + offset._1, y + offset._2)
+		new Point(x - offset._1, offset._2 - y)
 	}
 
 	def data(x: Int)(y: Int) = {

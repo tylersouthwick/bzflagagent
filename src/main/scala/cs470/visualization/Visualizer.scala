@@ -4,6 +4,7 @@ import cs470.domain.{Polygon, Point}
 import cs470.movement.{FindAgentPath}
 import java.io.{BufferedOutputStream, FileOutputStream, PrintWriter}
 import cs470.utils.Properties
+import java.util.concurrent.atomic.AtomicInteger
 
 object Color extends Enumeration {
   type Color = Value
@@ -131,6 +132,11 @@ trait SearchVisualizer extends Visualizer {
 
 }
 
+object Visualizer {
+	private val ai = new AtomicInteger
+	def count = ai.incrementAndGet()
+}
+
 trait Visualizer {
   val LOG = org.apache.log4j.Logger.getLogger("cs470.visualization.visualizer")
 
@@ -144,9 +150,9 @@ trait Visualizer {
 
   val plotTitle: String
 
-  val saveType = Properties("visualizer.saveType", "eps")
+  val saveType = Properties("visualizer.saveType", "")
 
-  private lazy val filename = fileName + ".gpi"
+  private lazy val filename = fileName + "_" + Visualizer.count + ".gpi"
 
   private lazy val file = new PrintWriter(new BufferedOutputStream(new FileOutputStream(filename)))
 

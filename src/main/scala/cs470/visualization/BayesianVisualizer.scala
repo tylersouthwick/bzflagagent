@@ -1,10 +1,11 @@
 package cs470.visualizer
 
 import scala.swing._
-import javax.swing.JPanel
 import scala.Array._
 import cs470.domain.UpdateableOccgrid
 import com.sun.org.apache.xerces.internal.parsers.CachingParserPool.SynchronizedGrammarPool
+import javax.swing.{Timer, JPanel}
+import java.awt.event.{ActionEvent, ActionListener}
 
 /**
  * @author tylers3
@@ -14,13 +15,14 @@ import com.sun.org.apache.xerces.internal.parsers.CachingParserPool.Synchronized
 trait BayesianVisualizer extends UpdateableOccgrid {
 	private lazy val visualizer = new SwingOccgridRealVisualizer(this, size, lock);
 
-	override def update() {
-		super.update()
-		visualizer.updateImage()
-	}
-
 	def startVisualizer() {
 		visualizer.main(Array(""))
+
+		new Timer(500, new ActionListener {
+			def actionPerformed(e: ActionEvent) {
+		visualizer.updateImage()
+			}
+		})
 	}
 
 }
