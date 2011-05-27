@@ -25,46 +25,51 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 
 		occgrid.startVisualizer()
 
-		val myTank = myTanks(0)
+		myTanks foreach {
+			myTank =>
 
-		def target: Point = {
-			def findTarget(w: Double): Point = {
-				val t = occgrid.getClosestUnexplored(myTank.location, w)
-				if (t == null) {
-					findTarget(w + stepSize)
-				} else {
-					t
+				actor {
+					def target: Point = {
+						def findTarget(w: Double): Point = {
+							val t = occgrid.getClosestUnexplored(myTank.location, w)
+							if (t == null) {
+								findTarget(w + stepSize)
+							} else {
+								t
+							}
+						}
+						findTarget(stepSize)
+					}
+
+
+					val calculateFrequency = 10
+					var count = 0
+					var pseudoTarget: Point = target
+
+					val searcher = new PotentialFieldGenerator(store) {
+						def getPathVector(point: Point) = {
+							if (count > calculateFrequency) {
+								occgrid.update(myTank)
+								count = 0
+								pseudoTarget = target
+								LOG.debug("sending " + myTank.callsign + " to " + pseudoTarget + " from " + myTank.location)
+							}
+							count = count + 1
+							new Vector(AttractivePF(point, pseudoTarget, 5, 10, 20))
+						}
+					}
+
+					new PotentialFieldsMover(store) {
+						val tank = myTank
+
+						def goal = pseudoTarget
+
+						override val constantSpeed = .8
+
+						def path = searcher.getPathVector(tank.location)
+					}.moveAlongPotentialField()
 				}
-			}
-			findTarget(stepSize)
 		}
-
-
-		val calculateFrequency = 10
-		var count = 0
-		var pseudoTarget: Point = target
-
-		val searcher = new PotentialFieldGenerator(store) {
-			def getPathVector(point: Point) = {
-				if (count > calculateFrequency) {
-				occgrid.update(myTank)
-					count = 0
-					pseudoTarget = target
-					LOG.debug("sending " + myTank.callsign + " to " + pseudoTarget + " from " + myTank.location)
-				}
-				count = count + 1
-				new Vector(AttractivePF(point, pseudoTarget, 5, 10, 20))
-			}
-		}
-
-		new PotentialFieldsMover(store) {
-			val tank = myTank
-			def goal = pseudoTarget
-			override val constantSpeed = .8
-
-			def path = searcher.getPathVector(tank.location)
-		}.moveAlongPotentialField()
-
 		LOG.info("Scout agent done")
 	}
 
