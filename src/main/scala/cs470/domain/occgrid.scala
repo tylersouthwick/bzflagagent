@@ -28,13 +28,14 @@ trait Occgrid {
   def print : String
 }
 
-object BayesianOccgrid extends Occgrid {
+trait UpdateableOccgrid extends ((Int, Int) => Double) {
+	def update() {}
+	def size : Int
+}
+
+trait BayesianOccgrid extends Occgrid with UpdateableOccgrid {
   val LOG = org.apache.log4j.Logger.getLogger("cs470.domain.BayesianOccgrid")
-  private var size: Int = 600
-  private var TP: Double = 1
-  private var TN: Double = 1
   private val cutoff: Double = Properties("bayesianCutoff", 0.95)
-  private var myData: Array[Array[Double]] = null
 
   def offset: (Int, Int) = (size / 2, size / 2)
 
@@ -62,22 +63,30 @@ object BayesianOccgrid extends Occgrid {
 
   def P_s_no(x: Int, y: Int) = (P_no_s * P_s(x, y)) / P_no(x, y)
 
-  def init(constants: Constants) {
-    size = constants("worldsize")
-    TP = constants("truepositive")
-    TN = constants("truenegative")
+	def apply(x : Int, y: Int) = myData(x)(y)
 
-    LOG.debug("True Positive Rate = " + TP)
-    LOG.debug("True Negative Rate = " + TN)
+	val constants : Constants
+    lazy val size : Int = constants("worldsize")
+    private lazy val TP = {
+		val t : Double = constants("truepositive")
+		LOG.debug("True Positive Rate = " + t)
+		t
+	}
+    private lazy val TN = {
+		val t : Double = constants("truenegative")
+		LOG.debug("True Negative Rate = " + t)
+		t
+	}
 
-    myData = Array.ofDim(size, size)
-
-    for(x <- 0 until myData.length){
-      for(y <- 0 until myData.length) {
-        myData(x)(y) = DefaultProperties.prior
-      }
-    }
-  }
+    private lazy val myData : Array[Array[Double]] = {
+		val data = Array.ofDim[Double](size, size)
+    	for(x <- 0 until data.length){
+      		for(y <- 0 until data.length) {
+        		data(x)(y) = DefaultProperties.prior
+      		}
+    	}
+		data
+	}
 
   def update(tank : Tank) {
     LOG.debug("Updating with occgrid from " + tank.callsign)
@@ -85,20 +94,22 @@ object BayesianOccgrid extends Occgrid {
 
     for(x <- 0 until grid.width - 1){
       for(y <- 0 until grid.height -1 ){
-        myData(x)(y) = grid.data(x)(y) match {
+		val tmp = convert(grid.getLocation(x,y))
+        myData(tmp._1)(tmp._2) = grid.data(x)(y) match {
           case Occupant.NONE => P_s_no(x,y)
           case Occupant.WALL => P_s_o(x,y)
         }
       }
     }
 
+	  update()
     LOG.debug("Done updating")
 
   }
 
   def print : String = ""
 
-  def convert(location: Point) = (location.x.intValue - offset._1, location.y.intValue - offset._2)
+  def convert(location: Point) = (location.x.intValue + offset._1, location.y.intValue + offset._2)
 
   def getLocation(x: Int, y: Int) = {
     new Point(x + offset._1, y + offset._2)

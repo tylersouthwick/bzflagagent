@@ -2,6 +2,7 @@ package cs470.agents
 
 import cs470.utils.Threading
 import cs470.domain.BayesianOccgrid
+import cs470.visualizer.BayesianVisualizer
 
 class ScoutAgent(host:String, port:Int) extends Agent(host,port) with Threading {
   import ScoutAgent._
@@ -10,11 +11,13 @@ class ScoutAgent(host:String, port:Int) extends Agent(host,port) with Threading 
     LOG.info("Starting scout agent")
 
     val tank = myTanks(0)
-    BayesianOccgrid.init(constants)
-    BayesianOccgrid.update(tank)
+	  val occgrid = new BayesianOccgrid with BayesianVisualizer {
+		  val constants = store.constants
+	  }
+	occgrid.startVisualizer()
+    occgrid.update(tank)
 
     LOG.info("Scout agent done")
-    System.exit(0)
   }
 }
 

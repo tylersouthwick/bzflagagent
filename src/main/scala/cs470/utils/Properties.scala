@@ -44,5 +44,5 @@ object Properties {
 }
 
 object DefaultProperties {
-  val prior = Properties("prior",1/3)
+  val prior = Properties("prior", .33)
 }
