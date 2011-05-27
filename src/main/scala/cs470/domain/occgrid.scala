@@ -26,6 +26,33 @@ trait Occgrid {
 	def getLocation(x: Int, y: Int): Point
 
 	def print: String
+
+	def corners = {
+		def filterSeq(seq : Seq[(Int, Int)]) = {
+			seq
+			.filter{case (x, y) => (x >= 0 && x < width) && (y >= 0 && y < height)}
+			.map{case (x, y) => data(x)(y)}
+			.filter(_ == Occupant.WALL)
+		}
+		def horizontal(x : Int, y : Int) = filterSeq(Seq((x - 1, y), (x + 1, y))).size == 2
+		def vertical(x : Int, y : Int) = filterSeq(Seq((x, y + 1), (x, y - 1))).size == 2
+
+		val corners = new java.util.LinkedList[(Int, Int)]
+		for (x <- 0 until width) {
+			for (y <- 0 until height) {
+				data(x)(y) match {
+					case Occupant.WALL => {
+						//is this an interrior wall?
+						if (!horizontal(x, y) && !vertical(x, y))
+							corners.add((x, y))
+					}
+					case _ =>
+				}
+			}
+		}
+		import scala.collection.JavaConversions._
+		corners.map(t=>getLocation(t._1, t._2))
+	}
 }
 
 trait UpdateableOccgrid extends ((Int, Int) => Double) {

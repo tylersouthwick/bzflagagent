@@ -21,5 +21,8 @@ class OccgridUnitTest {
 	@Test
 	def findObstacles() {
 		val occgrid = OccgridUnitTest.createOccgrid
+		val corners = occgrid.corners
+		println("found " + corners.size + " corners")
+		corners.foreach(x=>println(x))
 	}
 }
