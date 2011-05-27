@@ -28,15 +28,15 @@ trait Occgrid {
 	def print: String
 
 	def corners = {
-		def isLine(seq : Seq[(Int, Int)]) = {
+		def isLineEnd(seq : Seq[(Int, Int)]) = {
 			seq
 			.filter{case (x, y) => (x >= 0 && x < width) && (y >= 0 && y < height)}
 			.map{case (x, y) => data(x)(y)}
 			.filter(_ == Occupant.WALL)
-			.size == 2
+			.size == 1
 		}
-		def horizontal(x : Int, y : Int) = isLine(Seq((x - 1, y), (x + 1, y)))
-		def vertical(x : Int, y : Int) = isLine(Seq((x, y + 1), (x, y - 1)))
+		def horizontal(x : Int, y : Int) = isLineEnd(Seq((x - 1, y), (x + 1, y)))
+		def vertical(x : Int, y : Int) = isLineEnd(Seq((x, y + 1), (x, y - 1)))
 
 		val corners = new java.util.LinkedList[(Int, Int)]
 		for (x <- 0 until width) {
@@ -44,7 +44,7 @@ trait Occgrid {
 				data(x)(y) match {
 					case Occupant.WALL => {
 						//is this an interrior wall?
-						if (!horizontal(x, y) && !vertical(x, y))
+						if (horizontal(x, y) && vertical(x, y))
 							corners.add((x, y))
 					}
 					case _ =>

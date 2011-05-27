@@ -77,7 +77,7 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 								occgrid.update(myTank)
 
 							try {
-							searcher.getPathVector(tank.location)
+								searcher.getPathVector(tank.location)
 							} catch {case _ => new Vector(new Point(0.0,0.0))}
 						}
 					}.moveAlongPotentialField()
