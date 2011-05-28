@@ -34,6 +34,8 @@ class OccgridUnitTest {
 plotLines()
 close()
         }
+
+	Runtime.getRuntime().exec(Array("gnuplot", "-persist", "obstacles_1.gpi")).waitFor()
 		println("(width,height): " + (occgrid.width, occgrid.height))
 		println("offset: " + occgrid.offset)
 		println("found " + corners.size + " corners")
