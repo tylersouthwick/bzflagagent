@@ -11,7 +11,7 @@ import java.awt.event.{ActionEvent, ActionListener}
  * @author tylers3
  */
 
-trait BayesianVisualizer extends UpdateableOccgrid {
+trait BayesianVisualizer extends UpdateableOccgrid with PolygonFinder {
 	private lazy val visualizer = new SwingOccgridRealVisualizer(this, size, lock, this);
 
 	override def update() {
@@ -25,7 +25,7 @@ trait BayesianVisualizer extends UpdateableOccgrid {
 
 }
 
-class SwingOccgridRealVisualizer(data: (Int, Int) => Double, worldsize: Int, lock: Object, occgrid : UpdateableOccgrid) extends SimpleSwingApplication {
+class SwingOccgridRealVisualizer(data: (Int, Int) => Double, worldsize: Int, lock: Object, occgrid : UpdateableOccgrid with PolygonFinder) extends SimpleSwingApplication {
 	val LOG = org.apache.log4j.Logger.getLogger("cs470.visualizer.swing")
 
 	def top = new MainFrame {
@@ -37,17 +37,31 @@ class SwingOccgridRealVisualizer(data: (Int, Int) => Double, worldsize: Int, loc
 		*/
 		val update = new Button {
 			action = Action("Update") {
-                updateImage()
+				updateImage()
 			}
 		}
 		val corners = new Button {
 			action = Action("Corners") {
-                val corners = occgrid.polygons
-                if (corners.isEmpty) println("No corners found")
-                else {
-                    println("Corners:")
-                    corners.foreach(t => println("\t" + t)) 
-                }
+				val corners = occgrid.polygons
+				if (corners.isEmpty) println("No corners found")
+				else {
+					println("Corners:")
+					corners.foreach(t => println("\t" + t)) 
+					val filename = "polygon_view"
+					val myworldsize = worldsize
+					new cs470.visualization.Visualizer {
+						val samples = 25
+						val plotTitle = filename
+						val fileName = filename
+						val name = filename
+						val worldsize = myworldsize
+						val obstacleList = corners
+						draw()
+						plotLines()
+						close()
+					}
+					Runtime.getRuntime().exec(Array("gnuplot", "-persist", filename + "_1.gpi")).waitFor()
+				}
 			}
 		}
 

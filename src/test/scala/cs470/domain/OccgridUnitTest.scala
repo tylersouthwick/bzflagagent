@@ -6,7 +6,7 @@ import java.io.{InputStreamReader, BufferedReader}
 object OccgridUnitTest {
 	def createOccgrid(s : String) = {
 		val reader = new BufferedReader(new InputStreamReader(classOf[OccgridUnitTest].getResourceAsStream("/" + s)))
-		val occgrid = new OccgridCommand
+		val occgrid = new OccgridCommand with PolygonFinder
 		var line : String = reader.readLine
 		while (line != null) {
 			occgrid.read(line)
@@ -22,21 +22,22 @@ class OccgridUnitTest {
 	def findObstacles() {
 		val occgrid = OccgridUnitTest.createOccgrid("4_l_worlds.occgrid")
 		val corners = occgrid.polygons
-        new cs470.visualization.Visualizer {
-          val samples = 25
-          val plotTitle = "obstacles"
-          val fileName = "obstacles"
-          val name = "obstacles"
-          val worldsize = 400
-          val obstacleList = corners
+		new cs470.visualization.Visualizer {
+			val samples = 25
+			val plotTitle = "obstacles"
+			val fileName = "obstacles"
+			val name = "obstacles"
+			val worldsize = 400
+			val obstacleList = corners
+			draw()
+			plotLines()
+			close()
+		}
 
-            draw()
-plotLines()
-close()
-        }
-//		println("(width,height): " + (occgrid.width, occgrid.height))
-//		println("offset: " + occgrid.offset)
-//		println("found " + corners.size + " corners")
+//	Runtime.getRuntime().exec(Array("gnuplot", "-persist", "obstacles_1.gpi")).waitFor()
+		println("(width,height): " + (occgrid.width, occgrid.height))
+		println("offset: " + occgrid.offset)
+		println("found " + corners.size + " corners")
 		corners.foreach(x=>println(x))
 	}
 }
