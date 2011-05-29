@@ -63,6 +63,7 @@ abstract class PotentialFieldsMover(store: DataStore) {
 
 		def Kgoal = 1 //if (distance > 10) 1 else .1
 
+
 		//    if (minimizeTurning && abs(PI - abs(error)) < .01) {
 		//      LOG.debug("Reversing");
 		//      tank.setAngularVelocity(0f)
@@ -119,10 +120,12 @@ abstract class PotentialFieldsMover(store: DataStore) {
 		tank.setAngularVelocity(finalAngVel)
 
 		waitForNewData()
-		//		LOG.debug("Speed is: " + tank.speed)
-		if (!inRange(vector))
+
+		if (!inRange(vector)){
 			pdController(error, pdVector)
-		stop
+		} else {
+			stop
+		}
 	}
 
 	def stop {
@@ -140,14 +143,17 @@ abstract class PotentialFieldsMover(store: DataStore) {
 
 	private def doPdController(vector: Vector) = {
 		if (inRange(vector)) {
+//			println("Starting PD Controller")
 			pdController(radian(0), vector)
-			true
+//			println("Ending PD Controller")
+			false
 		} else false
 	}
 
 	def moveAlongPotentialField() {
 		LOG.info("Moving " + tank.callsign)
-		while (doPdController(pdVector)) {
+		if (!inRange(pdVector)){
+			pdController(radian(0),pdVector)
 		}
 		LOG.info("Ending move for " + tank.callsign)
 	}
