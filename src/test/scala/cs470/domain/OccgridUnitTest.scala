@@ -6,7 +6,7 @@ import java.io.{InputStreamReader, BufferedReader}
 object OccgridUnitTest {
 	def createOccgrid(s : String) = {
 		val reader = new BufferedReader(new InputStreamReader(classOf[OccgridUnitTest].getResourceAsStream("/" + s)))
-		val occgrid = new OccgridCommand
+		val occgrid = new OccgridCommand with PolygonFinder
 		var line : String = reader.readLine
 		while (line != null) {
 			occgrid.read(line)
@@ -35,7 +35,7 @@ plotLines()
 close()
         }
 
-	Runtime.getRuntime().exec(Array("gnuplot", "-persist", "obstacles_1.gpi")).waitFor()
+//	Runtime.getRuntime().exec(Array("gnuplot", "-persist", "obstacles_1.gpi")).waitFor()
 		println("(width,height): " + (occgrid.width, occgrid.height))
 		println("offset: " + occgrid.offset)
 		println("found " + corners.size + " corners")

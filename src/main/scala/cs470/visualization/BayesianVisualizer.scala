@@ -11,7 +11,7 @@ import java.awt.event.{ActionEvent, ActionListener}
  * @author tylers3
  */
 
-trait BayesianVisualizer extends UpdateableOccgrid {
+trait BayesianVisualizer extends UpdateableOccgrid with PolygonFinder {
 	private lazy val visualizer = new SwingOccgridRealVisualizer(this, size, lock, this);
 
 	override def update() {
@@ -25,7 +25,7 @@ trait BayesianVisualizer extends UpdateableOccgrid {
 
 }
 
-class SwingOccgridRealVisualizer(data: (Int, Int) => Double, worldsize: Int, lock: Object, occgrid : UpdateableOccgrid) extends SimpleSwingApplication {
+class SwingOccgridRealVisualizer(data: (Int, Int) => Double, worldsize: Int, lock: Object, occgrid : UpdateableOccgrid with PolygonFinder) extends SimpleSwingApplication {
 	val LOG = org.apache.log4j.Logger.getLogger("cs470.visualizer.swing")
 
 	def top = new MainFrame {
