@@ -3,7 +3,7 @@ package cs470.movement.search
 import cs470.utils.Properties
 
 object PenalizedUniformCostSearch {
-  val penalizedMode = Properties("penalized", false)
+  val penalizedMode = Properties("penalized", true)
   val nextToNextTo = Properties("penalized.nextToNextTo", 2.5)
   val nextToAway = Properties("penalized.nextToAway", 1.1)
   val awayNextTo = Properties("penalized.awayNextTo", 2.3)

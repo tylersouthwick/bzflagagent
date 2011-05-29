@@ -44,8 +44,6 @@ trait Searcher extends SearchVisualizer {
 
   final def search = {
     LOG.info("Starting: " + title)
-    //println("start: " + start)
-    //println("goal: " + goal)
     val begin = time
     val result = doSearch(Node(occgrid, realStart._1, realStart._2))
     LOG.debug("Cost of " + title + ": " + result.cost + " (depth=" + result.depth + ")")

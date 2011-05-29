@@ -12,9 +12,13 @@ object SearchPath {
 	val LOG = org.apache.log4j.Logger.getLogger(classOf[SearchPath])
 }
 
-abstract class SearchPath(store: DataStore, tankIdd: Int, searchTitle: String, searchName: String) extends PotentialFieldGenerator(store) {
+abstract class SearchPath(store: DataStore) extends PotentialFieldGenerator(store) {
 
-	def searchGoal : Point
+	val searchTitle = ""
+	val searchName = ""
+
+	val searchGoal : Point
+	val tankIdd : Int
 
 	import SearchPath.LOG
 
@@ -38,18 +42,18 @@ abstract class SearchPath(store: DataStore, tankIdd: Int, searchTitle: String, s
 	}
 
 	val searcher = new AgentSearcher {
-		val name = searchName
-		val tankId = 0
-		val goal = searchGoal
-		val title = searchTitle
-		val filename = searchName
+		lazy val name = searchName
+		lazy val tankId = tankIdd
+		lazy val goal = searchGoal
+		lazy val title = searchTitle
+		lazy val filename = searchName
 
-//		if (LOG.isDebugEnabled) {
+		if (LOG.isDebugEnabled) {
 			val newPoint = occgrid.convert(searchGoal)
 			if (occgrid.data(newPoint._1)(newPoint._2) != Occupant.NONE) LOG.error("GOAL IS IN AN OBJECT")
 			LOG.info("goal [" + searchGoal + "]: " + occgrid.convert(searchGoal) + " {size of occgrid: " + occgrid.width + "}")
 			LOG.debug("goal: " + occgrid.convert(searchGoal))
-//		}
+		}
 	}
 
 	lazy val result = searcher.search
@@ -57,12 +61,12 @@ abstract class SearchPath(store: DataStore, tankIdd: Int, searchTitle: String, s
 	val s = Properties("searcher.s", 30)
 	val alpha = Properties("searcher.alpha", 5.8)
 	val futurePoints = Properties("searcher.futurePoints", 2)
-	val previousPoints = Properties("searcher.previousPoints", 2)
+	val previousPoints = Properties("searcher.previousPoints", 3)
 
 	def getPathVector(point: Point) = {
 		val minPointIdx = result.map {
 			p => (p, p.distance(point))
-		}.zipWithIndex.min._2 + 5
+		}.zipWithIndex.min._2 + 2
 
 		LOG.debug("Minpoint: " + minPointIdx)
 

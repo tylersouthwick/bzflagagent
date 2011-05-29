@@ -27,65 +27,65 @@ trait Occgrid {
 
 	def print: String
 
-	def polygons : Seq[Polygon] = {
+	def polygons: Seq[Polygon] = {
 		val polygons = new java.util.LinkedList[Polygon]
-        val tmp = Array.ofDim[Occupant.Occupant](width, height)
+		val tmp = Array.ofDim[Occupant.Occupant](width, height)
 		for (x <- 0 until width) {
 			for (y <- 0 until height) {
 				tmp(x)(y) = data(x)(y)
 			}
 		}
 
-        def findFirstCorner(tmp : Array[Array[Occupant.Occupant]]) : Option[(Int, Int)] = {
-		    for (x <- 0 until width) {
-			    for (y <- 0 until height) {
-				    tmp(x)(y) match {
-					    case Occupant.WALL => {
-                            return Some((x, y))
-					    }
-					    case _ =>
-				    }
-			    }
-		    }
-            None
-        }
+		def findFirstCorner(tmp: Array[Array[Occupant.Occupant]]): Option[(Int, Int)] = {
+			for (x <- 0 until width) {
+				for (y <- 0 until height) {
+					tmp(x)(y) match {
+						case Occupant.WALL => {
+							return Some((x, y))
+						}
+						case _ =>
+					}
+				}
+			}
+			None
+		}
 
-        def findBoxWidth(tmp : Array[Array[Occupant.Occupant]], corner : (Int, Int)) = {
-            var w = 0
-            val x = corner._1
-            while(tmp(x + w)(corner._2) == Occupant.WALL && x + w < width) {
-                w = w + 1
-            }
-            w
-        }
-        def findBoxHeight(tmp : Array[Array[Occupant.Occupant]], corner : (Int, Int)) = {
-            var h = 0
-            val y = corner._2
-            while(tmp(corner._1)(y + h) == Occupant.WALL && y + h < height) {
-                h = h + 1
-            }
-            h
-        }
-        def findBox(tmp : Array[Array[Occupant.Occupant]]) = {
-            findFirstCorner(tmp) match {
-                case Some(corner) => {
-                    println("found box @" + corner)
-                    val (height, width) = (findBoxHeight(tmp, corner), findBoxWidth(tmp, corner))
-                    val corners = Seq(corner, (corner._1 + width, corner._2), (corner._1 + width, corner._2 + height), (corner._1, corner._2 + height))
-                    polygons.add(new Polygon(corners.map(t => getLocation(t._1, t._2))))
-                    for (x <- corner._1 until corner._1 + width) {
-                        for (y <- corner._2 until corner._2 + height) {
-                            tmp(x)(y) = Occupant.NONE
-                        }
-                    }
-                    true
-                }
-                case None => false
-            }
-        }
+		def findBoxWidth(tmp: Array[Array[Occupant.Occupant]], corner: (Int, Int)) = {
+			var w = 0
+			val x = corner._1
+			while (tmp(x + w)(corner._2) == Occupant.WALL && x + w < width) {
+				w = w + 1
+			}
+			w
+		}
+		def findBoxHeight(tmp: Array[Array[Occupant.Occupant]], corner: (Int, Int)) = {
+			var h = 0
+			val y = corner._2
+			while (tmp(corner._1)(y + h) == Occupant.WALL && y + h < height) {
+				h = h + 1
+			}
+			h
+		}
+		def findBox(tmp: Array[Array[Occupant.Occupant]]) = {
+			findFirstCorner(tmp) match {
+				case Some(corner) => {
+					println("found box @" + corner)
+					val (height, width) = (findBoxHeight(tmp, corner), findBoxWidth(tmp, corner))
+					val corners = Seq(corner, (corner._1 + width, corner._2), (corner._1 + width, corner._2 + height), (corner._1, corner._2 + height))
+					polygons.add(new Polygon(corners.map(t => getLocation(t._1, t._2))))
+					for (x <- corner._1 until corner._1 + width) {
+						for (y <- corner._2 until corner._2 + height) {
+							tmp(x)(y) = Occupant.NONE
+						}
+					}
+					true
+				}
+				case None => false
+			}
+		}
 
-        while (findBox(tmp)) {
-        }
+		while (findBox(tmp)) {
+		}
 
 		import scala.collection.JavaConversions._
 		polygons
@@ -105,16 +105,16 @@ trait BayesianOccgrid extends Occgrid with UpdateableOccgrid {
 	private val cutoff: Double = Properties("bayesianCutoff", 0.95)
 
 
-	def getClosestUnexplored(point: Point, within: Double) : Point = {
-		import scala.math.{cos,sin}
+	def getClosestUnexplored(point: Point, within: Double): Point = {
+		import scala.math.{cos, sin}
 		val angles = Seq.range(0, 360, 10)
-        println("looking for closest unexplored point: " + (point, within))
+		println("looking for closest unexplored point: " + (point, within))
 		angles.foreach {
 			angle =>
 				val a = Degree(angle).radian
 				val p = point + new Point(within * cos(a), within * sin(a))
 				val np = convert(p)
-				if(P_s(np._1,np._2) == DefaultProperties.prior && data(np._1)(np._2) != Occupant.WALL){
+				if (P_s(np._1, np._2) == DefaultProperties.prior && data(np._1)(np._2) != Occupant.WALL) {
 					return p
 				}
 		}
@@ -127,7 +127,11 @@ trait BayesianOccgrid extends Occgrid with UpdateableOccgrid {
 
 	def width = size
 
-	def P_s(x: Int, y: Int) = try { myData(x)(y) } catch {case _ => 1.0 }
+	def P_s(x: Int, y: Int) = try {
+		myData(x)(y)
+	} catch {
+		case _ => 1.0
+	}
 
 	def P_ns(x: Int, y: Int) = 1 - P_s(x, y)
 
@@ -206,10 +210,14 @@ trait BayesianOccgrid extends Occgrid with UpdateableOccgrid {
 	}
 
 	def data(x: Int)(y: Int) = {
-		if (myData(x)(y) > cutoff) {
-			Occupant.WALL
-		} else {
-			Occupant.NONE
+		try {
+			if (myData(x)(y) > cutoff) {
+				Occupant.WALL
+			} else {
+				Occupant.NONE
+			}
+		} catch {
+			case _ => Occupant.WALL
 		}
 	}
 }
@@ -391,7 +399,7 @@ class OccgridCommand extends Occgrid with Traversable[Array[Occupant.Occupant]] 
 		width = Integer.parseInt(dim(0))
 		height = Integer.parseInt(dim(1))
 
-//        println("(width, height) = " + (width, height))
+		//        println("(width, height) = " + (width, height))
 		myData = Array.ofDim(width, height)
 	}
 
