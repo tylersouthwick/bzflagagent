@@ -1,11 +1,12 @@
 package cs470.agents
 
-import cs470.utils.Threading
 import cs470.visualizer.BayesianVisualizer
 import cs470.domain._
 import cs470.movement.PotentialFieldGenerator._
 import cs470.domain.Constants._
 import cs470.movement.{SearchPath, PotentialFieldsMover, PotentialFieldGenerator}
+import collection.mutable.Queue
+import cs470.utils.{DefaultProperties, Threading}
 
 class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threading {
 
@@ -27,61 +28,51 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 
 		myTanks foreach {
 			myTank =>
+				LOG.info("Filling queue for " + myTank.callsign)
 
-				actor {
-					def target: Point = {
-						def findTarget(w: Double): Point = {
-							val t = occgrid.getClosestUnexplored(myTank.location, w)
-							if (t == null) {
-								findTarget(w + stepSize)
-							} else {
-								t
-							}
-						}
-						findTarget(stepSize)
+				val pointsToVisit = new collection.mutable.Queue[(Int,Int)]()
+
+				//Fill Points
+				(0 to worldsize - 1).foreach{x=>
+					(0 to worldsize - 1).foreach{y =>
+						pointsToVisit.enqueue((x,y))
 					}
+				}
 
+				while(pointsToVisit.size > 0) {
+					val (x,y) = pointsToVisit.dequeue()
 
-					val calculateFrequency = 20
-					var count = 0
-					var pseudoTarget: Point = target
+					val point = occgrid.getLocation(x,y)
+					LOG.info((x,y) + " = " + occgrid.data(x)(y) + " [" + DefaultProperties.prior + "]")
+					if(occgrid.P_s(x,y) == DefaultProperties.prior){
+							LOG.info("Trying point " + point + " [" + pointsToVisit.size + "]")
 
-					def pathSearcher = new SearchPath(store, myTank.id, myTank.callsign + "_toUnexplored", myTank.callsign + "_toUnexplored") {
-						def searchGoal = {
-							LOG.debug("Updating path " + myTank.callsign + " to " + pseudoTarget)
-							pseudoTarget
-						}
+						  val toPoint = new PotentialFieldGenerator(store){
+							  def getPathVector(p: Point) = new Vector(AttractivePF(p,point,3,50,20))
+						  }
 
-						override def buildOccgrid() = occgrid
-					}
+							var count = 0
 
-					var searcher = pathSearcher
+							val mover = new PotentialFieldsMover(store){
+								def path = {
+									if(count > 15){
+										count = 0
+										occgrid.update(myTank)
+									}
+									count = count + 1
+									toPoint.getPathVector(myTank.location)
+								}
 
-					new PotentialFieldsMover(store) {
-						val tank = myTank
+								val goal = point
+								val tank = myTank
 
-						def goal = pseudoTarget
-
-						override val constantSpeed = .8
-
-						def path = {
-							if (count > calculateFrequency) {
-								count = 0
-								pseudoTarget = target
-								searcher = pathSearcher
-								LOG.debug("Sending " + myTank.callsign + " to " + pseudoTarget + " from " + myTank.location)
+								override def inRange(vector: Vector) = {
+									myTank.location.distance(goal) > 30
+								}
 							}
-							count = count + 1
 
-							if (count % 5 == 0)
-								occgrid.update(myTank)
-
-                                def random = scala.util.Random.nextGaussian
-							try {
-								new Vector(searcher.getPathVector(tank.location).vector + new Point(random, random))
-							} catch {case _ => new Vector(new Point(random,random))}
-						}
-					}.moveAlongPotentialField()
+							mover.moveAlongPotentialField()
+					}
 				}
 		}
 		LOG.info("Scout agent done")
