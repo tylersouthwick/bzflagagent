@@ -391,7 +391,7 @@ class OccgridCommand extends Occgrid with Traversable[Array[Occupant.Occupant]] 
 		width = Integer.parseInt(dim(0))
 		height = Integer.parseInt(dim(1))
 
-        println("(width, height) = " + (width, height))
+//        println("(width, height) = " + (width, height))
 		myData = Array.ofDim(width, height)
 	}
 

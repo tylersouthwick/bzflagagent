@@ -34,9 +34,9 @@ class OccgridUnitTest {
 plotLines()
 close()
         }
-		println("(width,height): " + (occgrid.width, occgrid.height))
-		println("offset: " + occgrid.offset)
-		println("found " + corners.size + " corners")
+//		println("(width,height): " + (occgrid.width, occgrid.height))
+//		println("offset: " + occgrid.offset)
+//		println("found " + corners.size + " corners")
 		corners.foreach(x=>println(x))
 	}
 }
