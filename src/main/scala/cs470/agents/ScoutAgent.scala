@@ -81,11 +81,14 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 								import scala.math._
 								val angle: Double = myTank.angle.radian
 
-								val angles = Seq(Degree(1), Degree(0), Degree(-1))
+								val angles = Seq.range(-20,25,5)
 
 								val hitWall = angles.foldLeft(false) {
 									(t, d) =>
-										val (x, y) = occgrid.convert(myTank.location + new Point(2 * cos(angle + d.radian), 2 * sin(angle + d.radian)))
+										val dangle : Double = Degree(d).radian
+										val tmp = new Point(10 * cos(angle + dangle), 10 * sin(angle + dangle))
+
+										val (x, y) = occgrid.convert(myTank.location + tmp)
 										if (occgrid.data(x)(y) == Occupant.WALL) {
 											true
 										} else {
@@ -94,7 +97,7 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 								}
 
 								if (hitWall) {
-									LOG.info("Hit a wall")
+									LOG.info(myTank.callsign + " hit a wall")
 									tank.setSpeed(-1)
 									tank.setAngularVelocity(1)
 									sleep(1000)

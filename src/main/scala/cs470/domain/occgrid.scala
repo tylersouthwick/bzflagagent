@@ -206,7 +206,7 @@ trait BayesianOccgrid extends Occgrid with UpdateableOccgrid {
 	}
 
 	def data(x: Int)(y: Int) = {
-		if (myData(y)(x) > cutoff) {
+		if (myData(x)(y) > cutoff) {
 			Occupant.WALL
 		} else {
 			Occupant.NONE
