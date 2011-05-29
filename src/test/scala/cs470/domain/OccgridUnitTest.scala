@@ -22,18 +22,17 @@ class OccgridUnitTest {
 	def findObstacles() {
 		val occgrid = OccgridUnitTest.createOccgrid("4_l_worlds.occgrid")
 		val corners = occgrid.polygons
-        new cs470.visualization.Visualizer {
-          val samples = 25
-          val plotTitle = "obstacles"
-          val fileName = "obstacles"
-          val name = "obstacles"
-          val worldsize = 400
-          val obstacleList = corners
-
-            draw()
-plotLines()
-close()
-        }
+		new cs470.visualization.Visualizer {
+			val samples = 25
+			val plotTitle = "obstacles"
+			val fileName = "obstacles"
+			val name = "obstacles"
+			val worldsize = 400
+			val obstacleList = corners
+			draw()
+			plotLines()
+			close()
+		}
 
 //	Runtime.getRuntime().exec(Array("gnuplot", "-persist", "obstacles_1.gpi")).waitFor()
 		println("(width,height): " + (occgrid.width, occgrid.height))
