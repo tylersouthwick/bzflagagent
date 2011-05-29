@@ -41,16 +41,16 @@ trait BayesianOccgrid extends Occgrid with UpdateableOccgrid {
 	private val cutoff: Double = Properties("bayesianCutoff", 0.95)
 
 
-	def getClosestUnexplored(point: Point, within: Double) : Point = {
-		import scala.math.{cos,sin}
+	def getClosestUnexplored(point: Point, within: Double): Point = {
+		import scala.math.{cos, sin}
 		val angles = Seq.range(0, 360, 10)
-        println("looking for closest unexplored point: " + (point, within))
+		println("looking for closest unexplored point: " + (point, within))
 		angles.foreach {
 			angle =>
 				val a = Degree(angle).radian
 				val p = point + new Point(within * cos(a), within * sin(a))
 				val np = convert(p)
-				if(P_s(np._1,np._2) == DefaultProperties.prior && data(np._1)(np._2) != Occupant.WALL){
+				if (P_s(np._1, np._2) == DefaultProperties.prior && data(np._1)(np._2) != Occupant.WALL) {
 					return p
 				}
 		}
@@ -63,7 +63,11 @@ trait BayesianOccgrid extends Occgrid with UpdateableOccgrid {
 
 	def width = size
 
-	def P_s(x: Int, y: Int) = try { myData(x)(y) } catch {case _ => 1.0 }
+	def P_s(x: Int, y: Int) = try {
+		myData(x)(y)
+	} catch {
+		case _ => 1.0
+	}
 
 	def P_ns(x: Int, y: Int) = 1 - P_s(x, y)
 
@@ -142,12 +146,17 @@ trait BayesianOccgrid extends Occgrid with UpdateableOccgrid {
 	}
 
 	def data(x: Int)(y: Int) = {
-		if (myData(y)(x) > cutoff) {
-			Occupant.WALL
-		} else {
-			Occupant.NONE
+		try {
+			if (myData(x)(y) > cutoff) {
+				Occupant.WALL
+			} else {
+				Occupant.NONE
+			}
+		} catch {
+			case _ => Occupant.WALL
 		}
 	}
+
 }
 
 class UsableOccgrid(resolution: Int, obstacles: Seq[Polygon], tankRadius: Double, val worldSize: Int, enemies: RefreshableEnemies) extends Occgrid with Traversable[Array[Occupant.Occupant]] {
@@ -327,7 +336,7 @@ class OccgridCommand extends Occgrid with Traversable[Array[Occupant.Occupant]] 
 		width = Integer.parseInt(dim(0))
 		height = Integer.parseInt(dim(1))
 
-        println("(width, height) = " + (width, height))
+		//        println("(width, height) = " + (width, height))
 		myData = Array.ofDim(width, height)
 	}
 
