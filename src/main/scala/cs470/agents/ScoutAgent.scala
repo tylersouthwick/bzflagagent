@@ -39,17 +39,17 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 				LOG.info("Filling queue for " + myTank.callsign)
 				val pointsToVisit = new collection.mutable.Queue[(Int, Int)]()
 
-//				val padding = 15
-				//Fill Points
-//				(padding to worldsize - padding).foreach {
-//					x =>
-//						(padding to worldsize - padding).foreach {
-//							y =>
-//								pointsToVisit.enqueue((x, y))
-//						}
-//				}
-					pointsToVisit.enqueue((15,15))
-				   pointsToVisit.enqueue(occgrid.convert(new Point(0,0)))
+				//				val padding = 15
+				//				Fill Points
+				//				(padding to worldsize - padding).foreach {
+				//					x =>
+				//						(padding to worldsize - padding).foreach {
+				//							y =>
+				//								pointsToVisit.enqueue((x, y))
+				//						}
+				//				}
+				pointsToVisit.enqueue((15, 15))
+				pointsToVisit.enqueue(occgrid.convert(new Point(0, 0)))
 
 				while (pointsToVisit.size > 0) {
 					val (x, y) = pointsToVisit.dequeue()
@@ -60,10 +60,11 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 						LOG.info("Trying point " + point + " [" + pointsToVisit.size + "]")
 						occgrid.update(myTank)
 
-							var searchType = "PF"
+						var searchType = "PF"
 
 						def pfToPoint = new PotentialFieldGenerator(store) {
 							searchType = "PF"
+
 							def getPathVector(p: Point) = new Vector(AttractivePF(p, point, 3, 50, 100))
 						}
 
@@ -80,12 +81,10 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 
 						val mover = new PotentialFieldsMover(store) {
 
-							override def getTurningSpeed(angle: Double) : Double = {
-								if(searchType == "A*"){
-									if(angle > Degree(60).radian){
-										0.0
-//									} else if(angle > Degree(20).radian){
-//										0.3
+							override def getTurningSpeed(angle: Double): Double = {
+								if (searchType == "A*") {
+									if (angle > Degree(60).radian) {
+										0.1
 									} else {
 										1.0
 									}
@@ -106,15 +105,16 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 								import scala.math._
 								val angle: Double = myTank.angle.radian
 
-								val angles = Seq.range(-15, 15, 2)
+								val angles = Seq.range(-30, 30, 2)
 
-								val hitWall = if (searchType == "A*") {
-									false
-								} else {
+								val hitWall = {
+									//									if (searchType == "A*") {
+									//									false
+									//								} else {
 									angles.foldLeft(false) {
 										(t, d) =>
 											val dangle: Double = Degree(d).radian
-											val tmp = new Point(6 * cos(angle + dangle), 6 * sin(angle + dangle))
+											val tmp = new Point(8 * cos(angle + dangle), 8 * sin(angle + dangle))
 
 											val (x, y) = occgrid.convert(myTank.location + tmp)
 											if (occgrid.data(x)(y) == Occupant.WALL) {
@@ -128,7 +128,7 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 								if (hitWall) {
 									LOG.info("Updating path for " + myTank.callsign + " with A* to " + point + " type=" + searchType)
 									stop
-									actor{
+									actor {
 										LOG.info("Setting backward")
 										tank.setSpeed(-1)
 										sleep(3000)
