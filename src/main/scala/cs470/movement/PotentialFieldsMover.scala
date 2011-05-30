@@ -37,6 +37,18 @@ abstract class PotentialFieldsMover(store: DataStore) {
 
 	def goal: Point
 
+	def getTurningSpeed(angle : Double) : Double = {
+		if (angle > angularTolerance) {
+			0.0
+		} else if (angle > angularTolerance / 2) {
+			0.2
+		} else if (angle > angularTolerance / 4) {
+			0.4
+		} else {
+			1.0
+		}
+	}
+
 	import RefreshableData.waitForNewData
 
 	private def pdVector = path
@@ -61,30 +73,8 @@ abstract class PotentialFieldsMover(store: DataStore) {
 		val v = rv / maxVel
 		LOG.debug("v: " + v)
 
-		def Kgoal = 1 //if (distance > 10) 1 else .1
-
-
-		//    if (minimizeTurning && abs(PI - abs(error)) < .01) {
-		//      LOG.debug("Reversing");
-		//      tank.setAngularVelocity(0f)
-		//      val setSpeed = {
-		//        val m = vector.magnitude
-		//        LOG.debug("magnitude: " + m)
-		//        val result = m / 30.0
-		//        if (result > maxVelocity) {
-		//          maxVelocity
-		//        } else {
-		//          result
-		//        }
-		//      }
-		//      LOG.debug("setting setSpeed: " + -setSpeed)
-		//      tank.setSpeed(-setSpeed * Kgoal)
-		//      waitForNewData()
-
-		//    } else if (abs(error) < tol && abs(v) < tolv) {
 		val (finalSpeed: Double, finalAngVel: Double) = if (abs(error) < tol && abs(v) < tolv) {
 			val speed = {
-				1.0 /*
         val m = vector.magnitude
         LOG.debug("magnitude: " + m)
         val result = m / 30.0
@@ -92,29 +82,16 @@ abstract class PotentialFieldsMover(store: DataStore) {
           maxVelocity
         } else {
           result
-        }*/
+        }
 			}
 			waitForNewData()
 			(speed, 0.0)
 		} else {
-			val turningSpeed = {
-				if (moveWhileTurning) {
-					//slow it down to turn
-					if (abs(error) > angularTolerance) {
-						0.0
-					} else if (abs(error) > angularTolerance / 2) {
-						0.2
-					} else if (abs(error) > angularTolerance / 4) {
-						0.4
-					} else {
-						1.0
-					}
-				} else {
-					constantSpeed
-				}
-			}
+			val turningSpeed = getTurningSpeed(abs(error))
+
 			(turningSpeed, v)
 		}
+
 		LOG.debug("Setting " + tank.callsign + " to speed: " + finalSpeed + " and angvel: " + finalAngVel)
 		tank.setSpeed(finalSpeed)
 		tank.setAngularVelocity(finalAngVel)

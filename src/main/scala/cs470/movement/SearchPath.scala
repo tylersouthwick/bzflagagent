@@ -14,11 +14,12 @@ object SearchPath {
 
 abstract class SearchPath(store: DataStore) extends PotentialFieldGenerator(store) {
 
+
 	val searchTitle = ""
 	val searchName = ""
 
-	val searchGoal : Point
-	val tankIdd : Int
+	val searchGoal: Point
+	val tankIdd: Int
 
 	import SearchPath.LOG
 
@@ -28,7 +29,7 @@ abstract class SearchPath(store: DataStore) extends PotentialFieldGenerator(stor
 		}
 	}
 
-	def buildOccgrid() : Occgrid = {
+	def buildOccgrid(): Occgrid = {
 		val worldSize: Int = store.constants("worldsize")
 		val tankRadius: Double = store.constants("tankradius")
 		new UsableOccgrid(Properties("discreteSize", 100), obstacles, tankRadius, worldSize, enemies)
@@ -47,13 +48,6 @@ abstract class SearchPath(store: DataStore) extends PotentialFieldGenerator(stor
 		lazy val goal = searchGoal
 		lazy val title = searchTitle
 		lazy val filename = searchName
-
-		if (LOG.isDebugEnabled) {
-			val newPoint = occgrid.convert(searchGoal)
-			if (occgrid.data(newPoint._1)(newPoint._2) != Occupant.NONE) LOG.error("GOAL IS IN AN OBJECT")
-			LOG.info("goal [" + searchGoal + "]: " + occgrid.convert(searchGoal) + " {size of occgrid: " + occgrid.width + "}")
-			LOG.debug("goal: " + occgrid.convert(searchGoal))
-		}
 	}
 
 	lazy val result = searcher.search
@@ -62,31 +56,61 @@ abstract class SearchPath(store: DataStore) extends PotentialFieldGenerator(stor
 	val alpha = Properties("searcher.alpha", 5.8)
 	val futurePoints = Properties("searcher.futurePoints", 2)
 	val previousPoints = Properties("searcher.previousPoints", 3)
+	lazy val myTank = store.tanks.find(_.tankId == tankIdd).get
 
 	def getPathVector(point: Point) = {
 		val minPointIdx = result.map {
 			p => (p, p.distance(point))
-		}.zipWithIndex.min._2 + 2
+		}.zipWithIndex.min._2
 
+		val minPoint: Point = result(minPointIdx)
 		LOG.debug("Minpoint: " + minPointIdx)
 
-		val forward = {
-			val points = java.lang.Math.min(result.size - minPointIdx, futurePoints)
-			if (points <= 0) {
-				//			new Point(0, 0)
-				AttractivePF(point, result(result.size - 1), 2, 20, 20)
-			} else {
-				val slice = result.slice(minPointIdx, minPointIdx + points)
-				SearchPath.LOG.debug(slice)
-				// new Vector(slice.foldLeft(new Point(0, 0))(_ + _) - point * points)
-				slice.zipWithIndex.foldLeft(new Point(0, 0)) {
-					case (vector, (p, idx)) =>
-						vector + AttractivePF(point, p, r, s, alpha /*/ java.lang.Math.pow((idx + 1), 2)*/)
-				}
-			}
-		}
+		//		val forward = {
+		//			val points = java.lang.Math.min(result.size - minPointIdx, futurePoints)
+		//			if (points <= 0) {
+		//				//			new Point(0, 0)
+		//				AttractivePF(point, result(result.size - 1), 2, 20, 20)
+		//			} else {
+		//				val slice = result.slice(minPointIdx, minPointIdx + points)
+		//				SearchPath.LOG.debug(slice)
+		//				// new Vector(slice.foldLeft(new Point(0, 0))(_ + _) - point * points)
+		//				slice.zipWithIndex.foldLeft(new Point(0, 0)) {
+		//					case (vector, (p, idx)) =>
+		//						vector + AttractivePF(point, p, r, s, alpha /*/ java.lang.Math.pow((idx + 1), 2)*/)
+		//				}
+		//			}
+		//		}
 
-		new Vector(forward)
+		val slice = result.slice(minPointIdx, result.size - 1)
+		val deg60: Double = Degree(60).radian.value
+		val startingLocation = myTank.location
+		val startingAngle = myTank.angle.radian.value
+
+		val x1 = minPoint
+		var x2 = minPoint
+
+		val goalPoint = try {
+			slice.find {
+				x4 =>
+					val x3 = x2
+					val num = (x2 - x1) * (x4 - x3)
+					val den = (x2 - x1).magnitude * (x4 - x3).magnitude
+					val theta = acos(num / den)
+					x2 = x4
+					val xs = Seq(x1, x2, x3, x4)
+					//					println("xs = " + xs + "; theta = " + theta)
+					//				val t = abs(minPoint.getAngle(p)-startingLocation.getAngle(p))
+					//				println("\tminPoint = " + minPoint + ";p = " + x1 + "; t = " + t + "; deg60 = " + deg60)
+					theta > deg60
+			}.get
+		}
+		catch {case _ =>
+			result(result.size - 1)
+		}
+		val t = new Vector(AttractivePF(point, goalPoint, 4, point.distance(goalPoint), 100))
+		//		println("@" + point + " to " + goalPoint + " w/ " + t)
+		t
 	}
 }
 

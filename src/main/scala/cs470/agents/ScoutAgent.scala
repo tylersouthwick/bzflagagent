@@ -6,7 +6,7 @@ import cs470.movement.PotentialFieldGenerator._
 import cs470.domain.Constants._
 import cs470.movement.{SearchPath, PotentialFieldsMover, PotentialFieldGenerator}
 import collection.mutable.Queue
-import cs470.utils.{Degree, DefaultProperties, Threading}
+import cs470.utils._
 
 class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threading {
 
@@ -79,6 +79,21 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 						var searchPath = pfToPoint
 
 						val mover = new PotentialFieldsMover(store) {
+
+							override def getTurningSpeed(angle: Double) : Double = {
+								if(searchType == "A*"){
+									if(angle > Degree(60).radian){
+										0.0
+//									} else if(angle > Degree(20).radian){
+//										0.3
+									} else {
+										1.0
+									}
+								} else {
+									super.getTurningSpeed(angle)
+								}
+							}
+
 							def path = {
 								searchPath.getPathVector(myTank.location)
 							}
@@ -112,6 +127,13 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 
 								if (hitWall) {
 									LOG.info("Updating path for " + myTank.callsign + " with A* to " + point + " type=" + searchType)
+									stop
+									actor{
+										LOG.info("Setting backward")
+										tank.setSpeed(-1)
+										sleep(3000)
+										stop
+									}
 									searchPath = aStarToPoint
 								}
 
