@@ -108,11 +108,11 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 
 							override def getTurningSpeed(angle: Double): Double = {
 								if (searchType == "A*") {
-									//if (angle > Degree(30).radian) {
+									if (angle > Degree(30).radian) {
 										0.0
-									//} else {
-									//	1.0
-									//}
+									} else {
+										1.0
+									}
 								} else {
 									super.getTurningSpeed(angle)
 								}
