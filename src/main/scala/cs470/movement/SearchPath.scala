@@ -64,6 +64,7 @@ abstract class SearchPath(store: DataStore) extends PotentialFieldGenerator(stor
 		}.zipWithIndex.min._2+2
 
 		val minPoint: Point = result(minPointIdx)
+/*
 		LOG.debug("Minpoint: " + minPointIdx)
 
 				val forward = {
@@ -82,9 +83,10 @@ abstract class SearchPath(store: DataStore) extends PotentialFieldGenerator(stor
 					}
 				}
         new Vector(forward)
-/*
+*/
+
 		val slice = result.slice(minPointIdx, result.size - 1)
-		val deg60: Double = Degree(30).radian.value
+		val deg60: Double = Degree(40).radian.value
 		val startingLocation = myTank.location
 		val startingAngle = myTank.angle.radian.value
 
@@ -112,7 +114,7 @@ abstract class SearchPath(store: DataStore) extends PotentialFieldGenerator(stor
 		val t = new Vector(AttractivePF(point, goalPoint, 1, point.distance(goalPoint), 50))
 				println("@" + point + " to " + goalPoint + " w/ " + t)
 		t
-*/
+
 	}
 }
 
