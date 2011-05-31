@@ -20,7 +20,7 @@ class OccgridUnitTest {
 
 	@Test
 	def findObstacles() {
-		val occgrid = OccgridUnitTest.createOccgrid("4_l_worlds.occgrid")
+		val occgrid = OccgridUnitTest.createOccgrid("small_maze1.occgrid")
 		val corners = occgrid.polygons
 		new cs470.visualization.Visualizer {
 			val samples = 25
@@ -34,7 +34,7 @@ class OccgridUnitTest {
 			close()
 		}
 
-//	Runtime.getRuntime().exec(Array("gnuplot", "-persist", "obstacles_1.gpi")).waitFor()
+	Runtime.getRuntime().exec(Array("gnuplot", "-persist", "obstacles_1.gpi")).waitFor()
 		println("(width,height): " + (occgrid.width, occgrid.height))
 		println("offset: " + occgrid.offset)
 		println("found " + corners.size + " corners")
