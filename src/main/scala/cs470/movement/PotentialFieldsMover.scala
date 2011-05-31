@@ -17,7 +17,7 @@ abstract class PotentialFieldsMover(store: DataStore) {
 
 	val constants = store.constants
 	val Kp = 1
-	val Kd = .5
+	val Kd = 4.5
 	val tol = degree(5).radian
 	val tolv = .1
 	val maxVel: Double = constants("tankangvel")

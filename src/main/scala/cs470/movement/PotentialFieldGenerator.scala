@@ -158,5 +158,6 @@ abstract class PotentialFieldGenerator(store: DataStore) extends FindAgentPath(s
 object PotentialFieldGenerator {
   val LOG = org.apache.log4j.Logger.getLogger("cs470.movement.pf")
 	private val s2 = .1
-	def randomVector = new Point(s2 + scala.util.Random.nextGaussian, s2 + scala.util.Random.nextGaussian)
+val scale = 5
+	def randomVector = new Point(s2 + scale * scala.util.Random.nextGaussian, s2 + scale * scala.util.Random.nextGaussian)
 }

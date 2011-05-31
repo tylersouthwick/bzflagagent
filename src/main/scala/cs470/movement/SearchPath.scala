@@ -61,29 +61,30 @@ abstract class SearchPath(store: DataStore) extends PotentialFieldGenerator(stor
 	def getPathVector(point: Point) = {
 		val minPointIdx = result.map {
 			p => (p, p.distance(point))
-		}.zipWithIndex.min._2
+		}.zipWithIndex.min._2+2
 
 		val minPoint: Point = result(minPointIdx)
 		LOG.debug("Minpoint: " + minPointIdx)
 
-		//		val forward = {
-		//			val points = java.lang.Math.min(result.size - minPointIdx, futurePoints)
-		//			if (points <= 0) {
-		//				//			new Point(0, 0)
-		//				AttractivePF(point, result(result.size - 1), 2, 20, 20)
-		//			} else {
-		//				val slice = result.slice(minPointIdx, minPointIdx + points)
-		//				SearchPath.LOG.debug(slice)
-		//				// new Vector(slice.foldLeft(new Point(0, 0))(_ + _) - point * points)
-		//				slice.zipWithIndex.foldLeft(new Point(0, 0)) {
-		//					case (vector, (p, idx)) =>
-		//						vector + AttractivePF(point, p, r, s, alpha /*/ java.lang.Math.pow((idx + 1), 2)*/)
-		//				}
-		//			}
-		//		}
-
+				val forward = {
+					val points = java.lang.Math.min(result.size - minPointIdx, futurePoints)
+					if (points <= 0) {
+						//			new Point(0, 0)
+						AttractivePF(point, result(result.size - 1), 2, 20, 20)
+					} else {
+						val slice = result.slice(minPointIdx, minPointIdx + points)
+						SearchPath.LOG.debug(slice)
+						// new Vector(slice.foldLeft(new Point(0, 0))(_ + _) - point * points)
+						slice.zipWithIndex.foldLeft(new Point(0, 0)) {
+							case (vector, (p, idx)) =>
+								vector + AttractivePF(point, p, r, s, alpha /*/ java.lang.Math.pow((idx + 1), 2)*/)
+						}
+					}
+				}
+        new Vector(forward)
+/*
 		val slice = result.slice(minPointIdx, result.size - 1)
-		val deg60: Double = Degree(60).radian.value
+		val deg60: Double = Degree(30).radian.value
 		val startingLocation = myTank.location
 		val startingAngle = myTank.angle.radian.value
 
@@ -108,9 +109,10 @@ abstract class SearchPath(store: DataStore) extends PotentialFieldGenerator(stor
 		catch {case _ =>
 			result(result.size - 1)
 		}
-		val t = new Vector(AttractivePF(point, goalPoint, 4, point.distance(goalPoint), 100))
-		//		println("@" + point + " to " + goalPoint + " w/ " + t)
+		val t = new Vector(AttractivePF(point, goalPoint, 1, point.distance(goalPoint), 50))
+				println("@" + point + " to " + goalPoint + " w/ " + t)
 		t
+*/
 	}
 }
 
