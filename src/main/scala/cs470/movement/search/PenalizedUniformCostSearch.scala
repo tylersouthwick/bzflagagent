@@ -9,9 +9,9 @@ object PenalizedUniformCostSearch {
 //  val awayNextTo = Properties("penalized.awayNextTo", 2.3)
 //  val awayAway = Properties("penalized.awayAway", 1.0)
   val penalizedMode = Properties("penalized", true)
-  val nextToAway = Properties("penalized.nextToAway", 4.1)
-  val nextToNextTo = Properties("penalized.nextToNextTo", 4.0)
-  val awayNextTo = Properties("penalized.awayNextTo", 4.0)
+  val nextToAway = Properties("penalized.nextToAway", 5.0)
+  val nextToNextTo = Properties("penalized.nextToNextTo", 8.0)
+  val awayNextTo = Properties("penalized.awayNextTo", 6.0)
   val awayAway = Properties("penalized.awayAway", 4.0)
 }
 

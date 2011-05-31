@@ -33,7 +33,7 @@ object RefreshableData {
 					}
 				}
 			}
-		}, 0, 50, TimeUnit.MILLISECONDS)
+		}, 0, 100, TimeUnit.MILLISECONDS)
 	}
 
 	def data = {

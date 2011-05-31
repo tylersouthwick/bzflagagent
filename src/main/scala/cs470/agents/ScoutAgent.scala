@@ -8,8 +8,9 @@ import cs470.movement.{SearchPath, PotentialFieldsMover, PotentialFieldGenerator
 import cs470.utils._
 import java.util.Date
 import cs470.visualization.PFVisualizer
-import collection.mutable.{LinkedList, Queue}
-import cs470.bzrc.Tank
+import collection.mutable.{PriorityQueue, LinkedList, Queue}
+import java.awt.event.ItemEvent
+import cs470.bzrc.{RefreshableData, Tank}
 
 class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threading {
 
@@ -25,7 +26,7 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 			val constants = store.constants
 		}
 
-		val pointsToVisit = {
+		val pointsToVisit : Seq[PriorityQueue[(String, Int, Int)]] = {
 			/*
 			val worldsize: Int = constants("worldsize")
 			val padding = 25
@@ -38,7 +39,6 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 			queue
 			*/
 			val worldsize: Int = constants("worldsize")
-			val queue = new collection.mutable.PriorityQueue[(String, Int, Int)]
 			val padding = 25
 			//	Fill Points
 			val list = new java.util.LinkedList[(String, Int, Int)]
@@ -51,40 +51,27 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 				def compare(x: (String, Int, Int), y: (String, Int, Int)) : Int = x._1.compareTo(y._1)
 			}
 			import scala.collection.JavaConversions._
-			list.foreach(t => queue.enqueue(t))
-			LOG.info("points: " + queue.size)
-			new {
-				def dequeue() = {
-					var t : (String, Int, Int) = null
-					queue.synchronized {
-						t = queue.dequeue()
-					}
-					(t._2, t._3)
-				}
-				def size = {
-					var size = 0
-					queue.synchronized {
-						size = queue.size
-					}
-					size
-				}
+			//make sure it divides
+			val tankCount = myTanks.size
+			val map = list.zipWithIndex.groupBy{ case (item, idx) => idx % tankCount }.map{ case (count, data) =>
+				val queue = new collection.mutable.PriorityQueue[(String, Int, Int)]
+				data.foreach(t => queue.enqueue(t._1))
+				queue
 			}
+			val list2 = new java.util.LinkedList[PriorityQueue[(String, Int, Int)]]
+			map.foreach(p => list2.add(p))
+			list2
 		}
 
 		occgrid.startVisualizer()
 
 		val angles = Seq.range(-20, 20, 2).map(Degree(_).radian.value)
 
-		def moveTank(myTank : Tank) {
-				actor {
-					loop {
-						occgrid.update(myTank)
-						sleep(300)
-					}
-				}
-
+		def moveTank(myTank : Tank, pointsToVisit : PriorityQueue[(String, Int, Int)]) {
+			var usePF = true
 				while (pointsToVisit.size > 0) {
-					val (x, y) = pointsToVisit.dequeue()
+					val (id, x, y) = pointsToVisit.dequeue()
+					//println("dequeued: " + (x, y))
 
 					val point = occgrid.getLocation(x, y)
 					/*
@@ -100,12 +87,6 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 
 						var searchType = "PF"
 
-						def pfToPoint = new PotentialFieldGenerator(store) {
-							searchType = "PF"
-
-							def getPathVector(p: Point) = new Vector(AttractivePF(p, point, 3, 50, 100))
-						}
-
 						def aStarToPoint = new SearchPath(store) {
 							searchType = "A*"
 							LOG.debug("Creating A* to " + point)
@@ -113,6 +94,17 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 							val searchGoal = point
 
 							override def buildOccgrid() = occgrid
+						}
+
+						def pfToPoint = {
+							if (usePF) {
+								usePF = false
+								new PotentialFieldGenerator(store) {
+									searchType = "PF"
+
+									def getPathVector(p: Point) = new Vector(AttractivePF(p, point, 3, 50, 100))
+								}
+							} else aStarToPoint
 						}
 
 						var searchPath = pfToPoint
@@ -131,7 +123,21 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 								}
 							}
 
-							def path = new Vector(searchPath.getPathVector(myTank.location).vector + PotentialFieldGenerator.randomVector)
+							var count = 0
+							def path = {
+								if (count > 100) {
+									count = 0
+									tank.setSpeed(-1)
+									sleep(2000)
+									tank.setSpeed(0)
+									sleep(200)
+									RefreshableData.waitForNewData()
+									searchPath = aStarToPoint
+								} else {
+									count = count + 1
+								}
+								new Vector(searchPath.getPathVector(myTank.location).vector + PotentialFieldGenerator.randomVector)
+							}
 
 							val goal = point
 							val (gx, gy) = occgrid.convert(goal)
@@ -158,9 +164,10 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 
 								if (hitWall) {
 									LOG.debug("Updating path for " + myTank.callsign + " with A* to " + point + " type=" + searchType)
-									tank.setSpeed(-.5)
+									tank.setSpeed(-1)
 									sleep(1000)
-									stop
+									tank.setSpeed(0)
+									RefreshableData.waitForNewData()
 
 									searchPath = aStarToPoint
 									/*
@@ -175,11 +182,13 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 									}.draw()
 									*/
 								}
-								def isInWall = {
+								def isInWall = false/*{
 									!occgrid.polygons.filter(_.contains(goal)).isEmpty
-								}
+								}*/
 								def isGoalInWall = occgrid.data(gx)(gy) == Occupant.WALL || isInWall
 								val isClose = myTank.location.distance(goal) < 30
+								//println("isGoalInWall: " + isGoalInWall)
+								//println("isClose: " + isClose)
 
 								isClose || isGoalInWall
 							}
@@ -189,12 +198,18 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 					}
 				}
 		}
+		val ids = myTanks.map(_.tankId)
+
+		schedule(300) {
+			occgrid.update(queue.invokeAndWait(_.occgrids(ids)))
+		}
+
 		myTanks foreach {myTank =>
 			actor {
-				moveTank(myTank)
+				moveTank(myTank, pointsToVisit(myTank.tankId))
+				LOG.info("Scout agent [" + myTank.callsign + "] is done")
 			}
 		}
-		LOG.info("Scout agent done")
 	}
 
 }

@@ -29,8 +29,6 @@ trait Occgrid {
 }
 
 trait UpdateableOccgrid extends ((Int, Int) => Double) with Occgrid {
-	def update() {}
-
 	def size: Int
 
 	def lock: Object
@@ -118,11 +116,9 @@ trait BayesianOccgrid extends Occgrid with UpdateableOccgrid {
 
 	val lock = new Object
 
-	def update(tank: Tank) {
-		val grid = tank.occgrid
+	def update(occgrids : Traversable[OccgridCommand]) {
 		lock synchronized {
-			LOG.debug("Updating with occgrid from " + tank.callsign)
-			doUpdate(grid)
+			occgrids.foreach(doUpdate)
 		}
 	}
 
@@ -137,7 +133,6 @@ trait BayesianOccgrid extends Occgrid with UpdateableOccgrid {
 			}
 		}
 
-		update()
 		LOG.debug("Done updating")
 	}
 

@@ -1,9 +1,10 @@
 package cs470.utils
 
-import java.util.concurrent.Executors
+import java.util.concurrent.{TimeUnit, Executors}
 
 object Threading {
 	val pool = Executors.newCachedThreadPool
+	val sPool = Executors.newScheduledThreadPool(8)
 }
 
 trait Threading {
@@ -44,6 +45,20 @@ trait Threading {
 				}
 			}
 		})
+	}
+
+	def schedule(delay : Long)(callback : => Unit) {
+		Threading.sPool.scheduleWithFixedDelay(new Runnable {
+			def run() {
+				try {
+					callback
+				} catch {
+					case t : Throwable => {
+						t.printStackTrace()
+					}
+				}
+			}
+		}, 0, delay, TimeUnit.MILLISECONDS)
 	}
 
 	def loop(callback : => Unit) {

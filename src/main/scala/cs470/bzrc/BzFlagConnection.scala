@@ -120,8 +120,22 @@ class BzFlagConnection(host : String, port : Int) {
 
     def constants = new Constants(sendAndReceiveItems("constants", new Constant(_)))
 
+	def occgrids(agents : Traversable[Int]) = {
+		agents.foreach{id =>
+			send("occgrid " + id)
+		}
+		agents.map{id =>
+			ack
+			readOccgrid
+		}
+	}
+
 	def occgrid(agent : Int) = {
 		sendWithAck("occgrid " + agent)
+		readOccgrid
+	}
+
+	def readOccgrid = {
 		val occgrid = new OccgridCommand
 		receive (occgrid.read)
 		occgrid
