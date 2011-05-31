@@ -65,7 +65,7 @@ trait PolygonFinder extends Occgrid {
 			corner match {
 				case Some(corner) => {
 					val width = findBoxWidth(corner)
-					val height = java.lang.Math.min(findBoxHeight(corner, 0), findBoxHeight(corner, width - 1))
+                    val height = (0 to width - 1).map(findBoxHeight(corner, _)).min
 
 					val corners = Seq(corner, (corner._1 + width, corner._2), (corner._1 + width, corner._2 + height), (corner._1, corner._2 + height))
 					polygons.add(new Polygon(corners.map(t => getLocation(t._1, t._2))))
