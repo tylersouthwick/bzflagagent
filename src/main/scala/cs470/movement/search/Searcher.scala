@@ -43,7 +43,7 @@ trait Searcher extends SearchVisualizer {
   lazy val end = occgrid.convert(goal)
 
   final def search = {
-    LOG.info("Starting: " + title)
+    LOG.debug("Starting: " + title)
     val begin = time
     val result = doSearch(Node(occgrid, realStart._1, realStart._2))
     LOG.debug("Cost of " + title + ": " + result.cost + " (depth=" + result.depth + ")")

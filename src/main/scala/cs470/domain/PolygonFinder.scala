@@ -38,8 +38,12 @@ trait PolygonFinder extends Occgrid {
 		def findBoxWidth(corner : (Int, Int)) = {
 			val (x, y) = corner
 			var w = 0
-			while(tmp(x + w)(y) == Occupant.WALL && x + w < width) {
-				w = w + 1
+			try {
+				while(tmp(x + w)(y) == Occupant.WALL && x + w < width) {
+					w = w + 1
+				}
+			} catch {
+				case _ =>
 			}
 			w
 		}
@@ -47,8 +51,12 @@ trait PolygonFinder extends Occgrid {
 		def findBoxHeight(corner : (Int, Int), width : Int) = {
 			var h = 0
 			val (x, y) = corner
-			while(tmp(x + width)(y + h) == Occupant.WALL && y + h < height) {
-				h = h + 1
+			try {
+				while(tmp(x + width)(y + h) == Occupant.WALL && y + h < height) {
+					h = h + 1
+				}
+			} catch {
+				case _ =>
 			}
 			h
 		}

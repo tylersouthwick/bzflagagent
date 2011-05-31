@@ -26,6 +26,17 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 		}
 
 		val pointsToVisit = {
+			/*
+			val worldsize: Int = constants("worldsize")
+			val padding = 25
+			val queue = new collection.mutable.Queue[(Int, Int)]
+			(padding to worldsize - padding).foreach { x =>
+				(padding to worldsize - padding).foreach { y =>
+					queue.enqueue((x, y))
+				}
+			}
+			queue
+			*/
 			val worldsize: Int = constants("worldsize")
 			val queue = new collection.mutable.PriorityQueue[(String, Int, Int)]
 			val padding = 25
@@ -41,7 +52,7 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 			}
 			import scala.collection.JavaConversions._
 			list.foreach(t => queue.enqueue(t))
-			println("points: " + queue.size)
+			LOG.info("points: " + queue.size)
 			new {
 				def dequeue() = {
 					var t : (String, Int, Int) = null
@@ -62,11 +73,13 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 
 		occgrid.startVisualizer()
 
+		val angles = Seq.range(-20, 20, 2).map(Degree(_).radian.value)
+
 		def moveTank(myTank : Tank) {
 				actor {
 					loop {
 						occgrid.update(myTank)
-						sleep(100)
+						sleep(300)
 					}
 				}
 
@@ -81,9 +94,9 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 					}
 					*/
 
-					if (occgrid.P_s(x, y) == DefaultProperties.prior) {
-						LOG.info("Trying point " + point + " [" + pointsToVisit.size + "]")
-						occgrid.update(myTank)
+					val ps = occgrid.P_s(x, y)
+					if (ps < .95 && ps > .05) {
+						println("Trying point " + point + " [" + pointsToVisit.size + "]")
 
 						var searchType = "PF"
 
@@ -95,7 +108,7 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 
 						def aStarToPoint = new SearchPath(store) {
 							searchType = "A*"
-							LOG.info("Creating A* to " + point)
+							LOG.debug("Creating A* to " + point)
 							val tankIdd = myTank.tankId
 							val searchGoal = point
 
@@ -118,25 +131,20 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 								}
 							}
 
-							def path = searchPath.getPathVector(myTank.location)
+							def path = new Vector(searchPath.getPathVector(myTank.location).vector + PotentialFieldGenerator.randomVector)
 
 							val goal = point
 							val (gx, gy) = occgrid.convert(goal)
 							val tank = myTank
+							var lastPoint = tank.location
 
 							override def inRange(vector: Vector) = {
 								import scala.math._
 								val angle: Double = myTank.angle.radian
 
-								val angles = Seq.range(-20, 20, 2)
-
 								val hitWall = {
-									//									if (searchType == "A*") {
-									//									false
-									//								} else {
 									angles.foldLeft(false) {
-										(t, d) =>
-											val dangle: Double = Degree(d).radian
+										(t, dangle) =>
 											val tmp = new Point(8 * cos(angle + dangle), 8 * sin(angle + dangle))
 
 											val (x, y) = occgrid.convert(myTank.location + tmp)
@@ -149,22 +157,13 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 								}
 
 								if (hitWall) {
-									LOG.info("Updating path for " + myTank.callsign + " with A* to " + point + " type=" + searchType)
-									def time = new Date().getTime
-									val start = time
-									//stop
-									//actor {
-										LOG.info("Setting backward")
-										tank.setSpeed(-1)
-										sleep(2000)
-									//	stop
-									//}
+									LOG.debug("Updating path for " + myTank.callsign + " with A* to " + point + " type=" + searchType)
+									tank.setSpeed(-.5)
+									sleep(1000)
+									stop
+
 									searchPath = aStarToPoint
-									val end = time
-									val diff = 2000 - (end - start)
-									if (diff > 0) {
-										sleep(diff)
-									}
+									/*
 									new PFVisualizer {
 										val samples = 15
 										val pathFinder = searchPath
@@ -174,11 +173,15 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 										val worldsize : Int = constants("worldsize")
 										val obstacleList = Seq[Polygon]()
 									}.draw()
+									*/
 								}
-								val isGoalInWall = occgrid.data(gx)(gy) == Occupant.WALL || !occgrid.polygons.filter(_.contains(goal)).isEmpty
+								def isInWall = {
+									!occgrid.polygons.filter(_.contains(goal)).isEmpty
+								}
+								def isGoalInWall = occgrid.data(gx)(gy) == Occupant.WALL || isInWall
 								val isClose = myTank.location.distance(goal) < 30
 
-								isGoalInWall || isClose
+								isClose || isGoalInWall
 							}
 						}
 

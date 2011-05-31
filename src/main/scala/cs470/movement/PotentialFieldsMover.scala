@@ -128,11 +128,11 @@ abstract class PotentialFieldsMover(store: DataStore) {
 	}
 
 	def moveAlongPotentialField() {
-		LOG.info("Moving " + tank.callsign)
+		LOG.debug("Moving " + tank.callsign)
 		if (!inRange(pdVector)){
 			pdController(radian(0),pdVector)
 		}
-		LOG.info("Ending move for " + tank.callsign)
+		LOG.debug("Ending move for " + tank.callsign)
 	}
 
 }

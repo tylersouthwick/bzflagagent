@@ -58,10 +58,7 @@ class pfFindFlag(store: DataStore, flagColor: String) extends PotentialFieldGene
 }
 
 abstract class PotentialFieldGenerator(store: DataStore) extends FindAgentPath(store) {
-  private val random = new Random(new java.util.Date().getTime)
-  private val s2 = .1
-
-  def randomVector = new Point(s2 + scala.util.Random.nextGaussian, s2 + scala.util.Random.nextGaussian)
+  def randomVector = PotentialFieldGenerator.randomVector
 
   def AttractivePF2(current: Point, goal: Point, r1: Double, s: Double, alpha: Double) = {
     val r2 = r1 + s
@@ -160,4 +157,6 @@ abstract class PotentialFieldGenerator(store: DataStore) extends FindAgentPath(s
 
 object PotentialFieldGenerator {
   val LOG = org.apache.log4j.Logger.getLogger("cs470.movement.pf")
+	private val s2 = .1
+	def randomVector = new Point(s2 + scala.util.Random.nextGaussian, s2 + scala.util.Random.nextGaussian)
 }
