@@ -7,8 +7,7 @@ import cs470.utils.{Radian, Angle, Threading}
 class RefreshableTanks(queue: BzrcQueue) extends RefreshableData[MyTank, Tank](queue) {
   private val LOG = org.apache.log4j.Logger.getLogger(classOf[RefreshableTanks])
 
-
-  protected def loadData(con: BzFlagConnection) = con.mytanks
+	def findData(data: BzData) = data.mytanks
 
   protected def convert(f: MyTank) = buildTank(f.id)
 

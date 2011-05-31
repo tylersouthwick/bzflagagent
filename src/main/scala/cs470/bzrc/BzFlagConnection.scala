@@ -38,6 +38,10 @@ class BzFlagConnection(host : String, port : Int) {
 		LOG.debug("sending " + s)
 		out.println(s)
 		LOG.debug("sent")
+	}
+
+	private def sendWithAck(s : String) {
+		send(s)
 		ack
 	}
 	private def readLine = in.readLine
@@ -56,8 +60,13 @@ class BzFlagConnection(host : String, port : Int) {
 		}
 	}
 
+	private def sendAndReceiveItems[T](command : String, callback : (String) => T) : Seq[T] = {
+		send(command)
+		receiveItems(command, callback)
+	}
+
 	private def receiveItems[T](command : String, callback : (String) => T) : Seq[T] = {
-        send(command)
+		ack
 		val begin = readLine
 		if ("fail".equals(begin)) return new java.util.LinkedList[T]
 		if (!"begin".equals(begin)) throw new InvalidBlockException(begin)
@@ -72,7 +81,7 @@ class BzFlagConnection(host : String, port : Int) {
 	}
 
 	def shoot(agent : Int) {
-		send("shoot " + agent)
+		sendWithAck("shoot " + agent)
 		status
 	}
 
@@ -80,7 +89,7 @@ class BzFlagConnection(host : String, port : Int) {
 		if (speed == Double.NaN) {
 			LOG.warn("Trying to set " + action + " to NaN")
 		} else {
-			send(action + " " + agent + " " + speed)
+			sendWithAck(action + " " + agent + " " + speed)
 			status
 		}
 	}
@@ -90,18 +99,29 @@ class BzFlagConnection(host : String, port : Int) {
 	def accelx(agent : Int, speed : Double) = movement("accelx", agent, speed)
 	def accely(agent : Int, speed : Double) = movement("accely", agent, speed)
 
-	def teams = receiveItems("teams", new Team(_))
-	def obstacles = receiveItems("obstacles", new Obstacle(_))
-	def bases = receiveItems("bases", new Base(_))
-	def flags = receiveItems("flags", new Flag(_))
-	def shots = receiveItems("shots", new Shot(_))
-	def mytanks = receiveItems("mytanks", new MyTank(_))
-	def othertanks = receiveItems("othertanks", new OtherTank(_))
+	def data = {
+		send("teams")
+		send("flags")
+		send("shots")
+		send("mytanks")
+		send("othertanks")
 
-    def constants = new Constants(receiveItems("constants", new Constant(_)))
+		new BzData {
+			val teams = receiveItems("teams", new Team(_))
+			val flags = receiveItems("flags", new Flag(_))
+			val shots = receiveItems("shots", new Shot(_))
+			val mytanks = receiveItems("mytanks", new MyTank(_))
+			val othertanks = receiveItems("othertanks", new OtherTank(_))
+		}
+	}
+
+	def obstacles = sendAndReceiveItems("obstacles", new Obstacle(_))
+	def bases = sendAndReceiveItems("bases", new Base(_))
+
+    def constants = new Constants(sendAndReceiveItems("constants", new Constant(_)))
 
 	def occgrid(agent : Int) = {
-		send("occgrid " + agent)
+		sendWithAck("occgrid " + agent)
 		val occgrid = new OccgridCommand
 		receive (occgrid.read)
 		occgrid
@@ -114,4 +134,11 @@ class InvalidHandshakeException extends BZRCException("Invalid Handshake")
 class InvalidBZRCVersionException extends BZRCException("Invalid BZRC Version")
 class InvalidBlockException(line : String) extends BZRCException("expected 'begin' found '" + line +"'")
 
+trait BzData {
+	val teams : Seq[Team]
+	val flags : Seq[Flag]
+	val shots : Seq[Shot]
+	val mytanks : Seq[MyTank]
+	val othertanks : Seq[OtherTank]
+}
 // vim: set ts=4 sw=4 et:

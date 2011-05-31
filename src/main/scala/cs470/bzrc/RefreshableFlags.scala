@@ -4,6 +4,9 @@ import cs470.domain.{Point, Flag}
 
 class RefreshableFlags(queue : BzrcQueue) extends RefreshableData[Flag, RefreshableFlag](queue) {
 
+
+	def findData(data: BzData) = data.flags
+
 	protected def convert(f: Flag) = new RefreshableFlag {
 		def flag = findItem(_.color == color)
 
@@ -14,7 +17,6 @@ class RefreshableFlags(queue : BzrcQueue) extends RefreshableData[Flag, Refresha
 		val color = f.color
 	}
 
-	protected def loadData(con: BzFlagConnection) = con.flags
 }
 
 abstract class RefreshableFlag() {

@@ -9,6 +9,8 @@ class BzrcQueue(host: String, port: Int) {
 	private val con = new BzFlagConnection(host, port)
 	private val queue = Executors.newSingleThreadExecutor
 
+	RefreshableData.start(this)
+
 	def invoke(callback: BzFlagConnection => Unit) {
 		queue.execute(new Runnable () {
 			def run() {

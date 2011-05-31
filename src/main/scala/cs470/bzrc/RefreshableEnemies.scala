@@ -4,6 +4,9 @@ import cs470.domain.{Point, OtherTank}
 import cs470.utils.Angle
 
 class RefreshableEnemies(queue : BzrcQueue) extends RefreshableData[OtherTank, Enemy](queue) {
+
+	def findData(data: BzData) = data.othertanks
+
 	protected def convert(f: OtherTank) = new Enemy {
 		def tank = findItem(_.callsign == callsign)
 
@@ -15,8 +18,6 @@ class RefreshableEnemies(queue : BzrcQueue) extends RefreshableData[OtherTank, E
 
 		val callsign = f.callsign
 	}
-
-	protected def loadData(con: BzFlagConnection) = con.othertanks
 }
 
 trait Enemy {
