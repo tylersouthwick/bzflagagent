@@ -12,21 +12,21 @@ trait SearchVisualizer {
 
   lazy val visualizer = {
 
-//    val tmp = new Visualizer {
-//      val fileName = filename
-//      val name = "Search Visualizer"
-//      val worldsize: Int = datastore.constants("worldsize")
-//      val obstacleList = datastore.obstacles
-//      val plotTitle = title
-//    }
-//    tmp.draw()
-//    tmp
-	  new {
+    val tmp = new Visualizer {
+      val fileName = filename
+      val name = "Search Visualizer"
+      val worldsize: Int = datastore.constants("worldsize")
+      val obstacleList = datastore.obstacles
+      val plotTitle = title
+    }
+    tmp.draw()
+    tmp
+/*	  new {
 		  def close() {}
 		  def clear() {}
 		  def drawSearchNodes(s : Traversable[(Point, Point)]) {}
 		  def drawFinalPath(s : Traversable[(Point, Point)]) {}
-	  }
+	  }*/
   }
 
 

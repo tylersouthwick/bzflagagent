@@ -61,7 +61,7 @@ abstract class SearchPath(store: DataStore) extends PotentialFieldGenerator(stor
 	def getPathVector(point: Point) = {
 		val minPointIdx = result.map {
 			p => (p, p.distance(point))
-		}.zipWithIndex.min._2+2
+		}.zipWithIndex.min._2+4
 
 		val minPoint: Point = result(minPointIdx)
 /*
@@ -111,7 +111,8 @@ abstract class SearchPath(store: DataStore) extends PotentialFieldGenerator(stor
 		catch {case _ =>
 			result(result.size - 1)
 		}
-		val t = new Vector(AttractivePF(point, goalPoint, 1, point.distance(goalPoint), 50))
+        val diff = new Point(4,0)
+		val t = new Vector(AttractivePF(point, goalPoint+diff, 1, point.distance(goalPoint), 50))
 				println("@" + point + " to " + goalPoint + " w/ " + t)
 		t
 

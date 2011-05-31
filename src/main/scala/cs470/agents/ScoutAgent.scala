@@ -89,7 +89,7 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 
 						def aStarToPoint = new SearchPath(store) {
 							searchType = "A*"
-							LOG.debug("Creating A* to " + point)
+							LOG.debug("Creating A* for " + myTank.callsign + " to " + point)
 							val tankIdd = myTank.tankId
 							val searchGoal = point
 
@@ -123,23 +123,32 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 								}
 							}
 
+                            var previousDistance = new Point(1000.0,1000)
+
 							var count = 0
 							def path = {
-								if (count > 200) {
-                                    println("count exceeded")
-									count = 0
-                                    stop
-                                    myTank.setSpeed(0)
-                                    sleep(1000)
+								if (count > 15) {
+                                    val dis = tank.location.distance(previousDistance)
+                                    if(dis < 1){
+                                    println("Tank " + tank.callsign + " appears stuck")
+									tank.setSpeed(0)
+									tank.setAngularVelocity(0)
+									sleep(1000)
+									tank.setSpeed(-1)
+                            println("test")
+									sleep(2000)
+                            println("test1")
+									tank.setSpeed(0)
+									sleep(1000)
+									RefreshableData.waitForNewData()
 
-                                    //sleep(100)
-									//tank.setSpeed(-1)
-									//sleep(2000)
-                                   // stop
-									//sleep(2000)
+                                    println("Moving")
 									RefreshableData.waitForNewData()
                                     println("recalculating")
 									searchPath = aStarToPoint
+                                }
+                                    previousDistance = tank.location
+									count = 0
 								} else {
 									count = count + 1
 								}
@@ -156,7 +165,8 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 								import scala.math._
 								val angle: Double = myTank.angle.radian
 
-								val hitWall = {
+								val hitWall = false
+/*{
                                     val ad = 7
 									val t = angles.foldLeft(0) {
 										(t, dangle) =>
@@ -171,7 +181,7 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 									}
                                     t > angles.size / 2
 								}
-
+*/
 								if (hitWall) {
 									LOG.debug("Updating path for " + myTank.callsign + " with A* to " + point + " type=" + searchType)
                                     println("Setting " + tank.callsign + " backward")

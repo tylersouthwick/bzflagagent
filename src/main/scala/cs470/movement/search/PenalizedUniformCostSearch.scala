@@ -4,10 +4,10 @@ import cs470.utils.Properties
 
 object PenalizedUniformCostSearch {
   val penalizedMode = Properties("penalized", true)
-  val nextToNextTo = Properties("penalized.nextToNextTo", 2.5)
-  val nextToAway = Properties("penalized.nextToAway", 1.1)
-  val awayNextTo = Properties("penalized.awayNextTo", 2.3)
-  val awayAway = Properties("penalized.awayAway", 1.0)
+  val nextToNextTo = Properties("penalized.nextToNextTo", 20.5)
+  val nextToAway = Properties("penalized.nextToAway", .9)
+  val awayNextTo = Properties("penalized.awayNextTo", 20.3)
+  val awayAway = Properties("penalized.awayAway", .5)
 /*
   val penalizedMode = Properties("penalized", true)
   val nextToAway = Properties("penalized.nextToAway", 10.0)
