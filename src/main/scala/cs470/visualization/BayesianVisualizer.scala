@@ -3,7 +3,6 @@ package cs470.visualizer
 import scala.swing._
 import scala.Array._
 import cs470.domain._
-import com.sun.org.apache.xerces.internal.parsers.CachingParserPool.SynchronizedGrammarPool
 import javax.swing.{Timer, JPanel}
 import java.awt.event.{ActionEvent, ActionListener}
 
@@ -16,11 +15,18 @@ trait BayesianVisualizer extends UpdateableOccgrid with PolygonFinder {
 
 	override def update() {
 		super.update()
-		visualizer.updateImage()
+		//visualizer.updateImage()
 	}
 
 	def startVisualizer() {
 		visualizer.main(Array(""))
+		val timer = new Timer(500, new ActionListener {
+			def actionPerformed(e: ActionEvent) {
+				visualizer.updateImage()
+			}
+		})
+		timer.setInitialDelay(0)
+		timer.start()
 	}
 
 }
