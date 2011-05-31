@@ -130,6 +130,12 @@ class Polygon(points: Seq[Point]) {
     }
   }
 
+	def contains(p : Point) : Boolean = contains(p.x, p.y)
+
+	def contains(x: Double, y: Double) : Boolean = {
+		x > topLeft.x && x < bottomRight.x && y < topLeft.y && y > bottomRight.y
+	}
+
   val maxDistance = {
     points(0).distance(center)
   }

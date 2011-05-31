@@ -146,6 +146,7 @@ trait Visualizer {
   val saveType = Properties("visualizer.saveType", "")
 
   private lazy val filename = fileName + "_" + Visualizer.count + ".gpi"
+	def outputName = filename
 
   private lazy val file = new PrintWriter(new BufferedOutputStream(new FileOutputStream(filename)))
 

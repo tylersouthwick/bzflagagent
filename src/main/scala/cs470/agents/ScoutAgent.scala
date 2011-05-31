@@ -5,8 +5,11 @@ import cs470.domain._
 import cs470.movement.PotentialFieldGenerator._
 import cs470.domain.Constants._
 import cs470.movement.{SearchPath, PotentialFieldsMover, PotentialFieldGenerator}
-import collection.mutable.Queue
 import cs470.utils._
+import java.util.Date
+import cs470.visualization.PFVisualizer
+import collection.mutable.{LinkedList, Queue}
+import cs470.bzrc.Tank
 
 class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threading {
 
@@ -18,17 +21,48 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 
 	def run() {
 		LOG.info("Starting scout agent")
-		val worldsize: Int = constants("worldsize")
-
 		val occgrid = new BayesianOccgrid with BayesianVisualizer {
 			val constants = store.constants
 		}
 
+		val pointsToVisit = {
+			val worldsize: Int = constants("worldsize")
+			val queue = new collection.mutable.PriorityQueue[(String, Int, Int)]
+			val padding = 25
+			//	Fill Points
+			val list = new java.util.LinkedList[(String, Int, Int)]
+			(padding to worldsize - padding).foreach { x =>
+				(padding to worldsize - padding).foreach { y =>
+					list.add((java.util.UUID.randomUUID().toString, x, y))
+				}
+			}
+			implicit object foo extends Ordering[(String, Int, Int)] {
+				def compare(x: (String, Int, Int), y: (String, Int, Int)) : Int = x._1.compareTo(y._1)
+			}
+			import scala.collection.JavaConversions._
+			list.foreach(t => queue.enqueue(t))
+			println("points: " + queue.size)
+			new {
+				def dequeue() = {
+					var t : (String, Int, Int) = null
+					queue.synchronized {
+						t = queue.dequeue()
+					}
+					(t._2, t._3)
+				}
+				def size = {
+					var size = 0
+					queue.synchronized {
+						size = queue.size
+					}
+					size
+				}
+			}
+		}
+
 		occgrid.startVisualizer()
 
-		myTanks foreach {
-			myTank =>
-
+		def moveTank(myTank : Tank) {
 				actor {
 					loop {
 						occgrid.update(myTank)
@@ -36,25 +70,16 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 					}
 				}
 
-				LOG.info("Filling queue for " + myTank.callsign)
-				val pointsToVisit = new collection.mutable.Queue[(Int, Int)]()
-
-				//				val padding = 15
-				//				Fill Points
-				//				(padding to worldsize - padding).foreach {
-				//					x =>
-				//						(padding to worldsize - padding).foreach {
-				//							y =>
-				//								pointsToVisit.enqueue((x, y))
-				//						}
-				//				}
-				pointsToVisit.enqueue((15, 15))
-				pointsToVisit.enqueue(occgrid.convert(new Point(0, 0)))
-
 				while (pointsToVisit.size > 0) {
 					val (x, y) = pointsToVisit.dequeue()
 
 					val point = occgrid.getLocation(x, y)
+					/*
+					if (!occgrid.polygons.filter(_.contains(x, y)).isEmpty) {
+						println("(" + x + ", " + y + ") is in a wall")
+						occgrid.P_s(x, y, 1.0)
+					}
+					*/
 
 					if (occgrid.P_s(x, y) == DefaultProperties.prior) {
 						LOG.info("Trying point " + point + " [" + pointsToVisit.size + "]")
@@ -83,19 +108,17 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 
 							override def getTurningSpeed(angle: Double): Double = {
 								if (searchType == "A*") {
-									if (angle > Degree(60).radian) {
-										0.1
-									} else {
-										1.0
-									}
+									//if (angle > Degree(30).radian) {
+										0.0
+									//} else {
+									//	1.0
+									//}
 								} else {
 									super.getTurningSpeed(angle)
 								}
 							}
 
-							def path = {
-								searchPath.getPathVector(myTank.location)
-							}
+							def path = searchPath.getPathVector(myTank.location)
 
 							val goal = point
 							val (gx, gy) = occgrid.convert(goal)
@@ -105,7 +128,7 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 								import scala.math._
 								val angle: Double = myTank.angle.radian
 
-								val angles = Seq.range(-30, 30, 2)
+								val angles = Seq.range(-20, 20, 2)
 
 								val hitWall = {
 									//									if (searchType == "A*") {
@@ -127,17 +150,32 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 
 								if (hitWall) {
 									LOG.info("Updating path for " + myTank.callsign + " with A* to " + point + " type=" + searchType)
-									stop
-									actor {
+									def time = new Date().getTime
+									val start = time
+									//stop
+									//actor {
 										LOG.info("Setting backward")
 										tank.setSpeed(-1)
-										sleep(3000)
-										stop
-									}
+										sleep(2000)
+									//	stop
+									//}
 									searchPath = aStarToPoint
+									val end = time
+									val diff = 2000 - (end - start)
+									if (diff > 0) {
+										sleep(diff)
+									}
+									new PFVisualizer {
+										val samples = 15
+										val pathFinder = searchPath
+										val plotTitle = "searchPath"
+										val fileName = "searchPath"
+										val name = "searchPath"
+										val worldsize : Int = constants("worldsize")
+										val obstacleList = Seq[Polygon]()
+									}.draw()
 								}
-
-								val isGoalInWall = occgrid.data(gx)(gy) == Occupant.WALL
+								val isGoalInWall = occgrid.data(gx)(gy) == Occupant.WALL || !occgrid.polygons.filter(_.contains(goal)).isEmpty
 								val isClose = myTank.location.distance(goal) < 30
 
 								isGoalInWall || isClose
@@ -147,6 +185,11 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 						mover.moveAlongPotentialField()
 					}
 				}
+		}
+		myTanks foreach {myTank =>
+			actor {
+				moveTank(myTank)
+			}
 		}
 		LOG.info("Scout agent done")
 	}

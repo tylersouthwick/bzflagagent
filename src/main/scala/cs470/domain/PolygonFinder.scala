@@ -78,14 +78,6 @@ trait PolygonFinder extends Occgrid {
 		import scala.collection.JavaConversions._
 		polygons
 	}
-
-import java.io._
-    val out = new FileOutputStream(new File("out.txt"))
-    def println(s : String) {
-        out.write(s.getBytes())
-        out.write("\n".getBytes())
-        out.flush()
-}
 }
 
 // vim: set ts=4 sw=4 et:

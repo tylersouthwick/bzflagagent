@@ -49,7 +49,7 @@ class SwingOccgridRealVisualizer(data: (Int, Int) => Double, worldsize: Int, loc
 					corners.foreach(t => println("\t" + t)) 
 					val filename = "polygon_view"
 					val myworldsize = worldsize
-					new cs470.visualization.Visualizer {
+					val outputName = new cs470.visualization.Visualizer {
 						val samples = 25
 						val plotTitle = filename
 						val fileName = filename
@@ -59,8 +59,8 @@ class SwingOccgridRealVisualizer(data: (Int, Int) => Double, worldsize: Int, loc
 						draw()
 						plotLines()
 						close()
-					}
-					Runtime.getRuntime().exec(Array("gnuplot", "-persist", filename + "_1.gpi")).waitFor()
+					}.outputName
+					Runtime.getRuntime.exec(Array("gnuplot", "-persist", outputName)).waitFor()
 				}
 			}
 		}

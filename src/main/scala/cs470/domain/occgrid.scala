@@ -54,7 +54,7 @@ trait BayesianOccgrid extends Occgrid with UpdateableOccgrid {
 					return p
 				}
 		}
-		return null
+		null
 	}
 
 	def offset: (Int, Int) = (size / 2, size / 2 - 1)
@@ -62,6 +62,10 @@ trait BayesianOccgrid extends Occgrid with UpdateableOccgrid {
 	def height = size
 
 	def width = size
+
+	def P_s(x: Int, y: Int, d : Double) {
+		myData(x)(y) = d
+	}
 
 	def P_s(x: Int, y: Int) = try {
 		myData(x)(y)
