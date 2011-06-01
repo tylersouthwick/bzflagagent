@@ -24,7 +24,7 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 
 		val pointsToVisit : Queue[(Int, Int)] = {
 			val worldsize: Int = constants("worldsize")
-			val padding = 25
+			val padding = 10
 			val queue = new collection.mutable.Queue[(Int, Int)]
 			(padding to worldsize - padding).foreach { x =>
 				(padding to worldsize - padding).foreach { y =>
