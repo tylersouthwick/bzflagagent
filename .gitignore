@@ -7,3 +7,4 @@ out
 *.iws
 *.swo
 writeups/multiagent/graphics/*.pdf
+*.gpi
