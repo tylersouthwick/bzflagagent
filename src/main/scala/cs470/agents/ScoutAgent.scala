@@ -126,7 +126,7 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 										//set all adjacent to 1
 										def updateNeighbors(allNeighbors : Seq[(Int, Int)]) {
 											//println("all neighbors: " + allNeighbors.map{t => (t, occgrid.data(t._1)(t._2))})
-											val neighbors = allNeighbors.filter{t => occgrid.P_s(t._1, t._2) > .5}
+											val neighbors = allNeighbors.filter{t => occgrid.data(t._1)(t._2) != Occupant.WALL && occgrid.P_s(t._1, t._2) >= DefaultProperties.prior}
 											//println("updating neighbors: " + neighbors)
 											neighbors.foreach{t => occgrid.P_s(t._1, t._2, 1.0)}
 											neighbors.foreach{t => updateNeighbors(occgrid.neighbors(t._1, t._2))}
