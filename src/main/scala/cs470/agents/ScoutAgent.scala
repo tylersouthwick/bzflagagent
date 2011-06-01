@@ -92,11 +92,11 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
                                     val dis = tank.location.distance(previousDistance)
                                     if(dis < 1){
                                     	println("Tank " + tank.callsign + " appears stuck")
-										tank.setSpeed(.5)
+										tank.setSpeed(0)
 										tank.setAngularVelocity(.8)
-										sleep(200)
+										sleep(500)
 										tank.setAngularVelocity(0)
-										sleep(800)
+										sleep(500)
 										tank.setSpeed(-1)
 										sleep(2000)
 										tank.setSpeed(0)
@@ -115,13 +115,23 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 								}
 
 								val tankLocation = myTank.location
-								val walls = occgrid.neighbors(occgrid.convert(tankLocation)).filter{case (x, y) => occgrid.data(x)(y) == Occupant.WALL}.map{case (x, y) => occgrid.getLocation(x, y)}
+								val walls = occgrid.neighbors(occgrid.convert(tankLocation)).filter{t => occgrid.data(t._1)(t._1) == Occupant.WALL}.map{t => occgrid.getLocation(t._1, t._2)}
 								val wallField = walls.map(PotentialFieldGenerator.ReflectivePF(tankLocation, _, 5, 25, 500)).foldLeft(Point.ORIGIN) { _ + _ }
 								try {
 									new Vector(searchPath.getPathVector(tankLocation).vector + PotentialFieldGenerator.randomVector + wallField)
 								} catch {
 									case t:IllegalArgumentException => {
+										println("Trying to find path in wall.  Updating all neighbor points")
 										occgrid.P_s(x, y, 1.0)
+										//set all adjacent to 1
+										def updateNeighbors(allNeighbors : Seq[(Int, Int)]) {
+											println("all neighbors: " + allNeighbors.map{t => (t, occgrid.data(t._1)(t._2))})
+											val neighbors = allNeighbors.filter{t => occgrid.data(t._1)(t._2) != Occupant.WALL}
+											println("updating neighbors: " + neighbors)
+											neighbors.foreach{t => occgrid.P_s(t._1, t._2, 1.0)}
+											neighbors.foreach{t => updateNeighbors(occgrid.neighbors(t._1, t._2))}
+										}
+										updateNeighbors(occgrid.neighbors(x, y))
 										new Vector(new Point(0, 0))
 									}
 								}
