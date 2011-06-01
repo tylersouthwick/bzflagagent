@@ -62,7 +62,11 @@ trait BayesianOccgrid extends Occgrid with UpdateableOccgrid {
 	def width = size
 
 	def P_s(x: Int, y: Int, d : Double) {
-		myData(x)(y) = d
+		try {
+			myData(x)(y) = d
+		} catch {
+			case _ =>
+		}
 	}
 
 	def P_s(x: Int, y: Int) = try {
