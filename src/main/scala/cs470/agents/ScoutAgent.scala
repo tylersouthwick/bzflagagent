@@ -1,17 +1,12 @@
 package cs470.agents
 
-import cs470.visualizer.BayesianVisualizer
 import cs470.domain._
-import cs470.movement.PotentialFieldGenerator._
 import cs470.domain.Constants._
 import cs470.movement.{SearchPath, PotentialFieldsMover, PotentialFieldGenerator}
 import cs470.utils._
-import java.util.Date
-import cs470.visualization.PFVisualizer
-import collection.mutable.{PriorityQueue, LinkedList, Queue}
-import java.awt.event.ItemEvent
+import collection.mutable.Queue
 import cs470.bzrc.{RefreshableData, Tank}
-import javax.management.remote.rmi._RMIConnection_Stub
+import cs470.visualization.BayesianVisualizer
 
 class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threading {
 
@@ -37,50 +32,15 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 				}
 			}
 			queue
-/*
-			val worldsize: Int = constants("worldsize")
-			val padding = 25
-			//	Fill Points
-			val list = new java.util.LinkedList[(String, Int, Int)]
-			(padding to worldsize - padding).foreach { x =>
-				(padding to worldsize - padding).foreach { y =>
-					list.add((java.util.UUID.randomUUID().toString, x, y))
-				}
-			}
-			implicit object foo extends Ordering[(String, Int, Int)] {
-				def compare(x: (String, Int, Int), y: (String, Int, Int)) : Int = x._1.compareTo(y._1)
-			}
-			import scala.collection.JavaConversions._
-			//make sure it divides
-			val tankCount = myTanks.size
-			val map = list.zipWithIndex.groupBy{ case (item, idx) => idx % tankCount }.map{ case (count, data) =>
-				val queue = new collection.mutable.PriorityQueue[(String, Int, Int)]
-				data.foreach(t => queue.enqueue(t._1))
-				queue
-			}
-			val list2 = new java.util.LinkedList[PriorityQueue[(String, Int, Int)]]
-			map.foreach(p => list2.add(p))
-			list2
-*/
 		}
 
 		occgrid.startVisualizer()
-
-		val angles = Seq.range(-40, 40, 1).map(t => Degree(t / 2).radian.value)
 
 		def moveTank(myTank : Tank) {
 			var usePF = true
 				while (pointsToVisit.size > 0) {
 					val (x, y) = pointsToVisit.dequeue()
-					//println("dequeued: " + (x, y))
-
 					val point = occgrid.getLocation(x, y)
-/*
-					if (!occgrid.polygons.filter(_.contains(x, y)).isEmpty) {
-						println("(" + x + ", " + y + ") is in a wall")
-						occgrid.P_s(x, y, 1.0)
-					}
-*/
 
 					val ps = occgrid.P_s(x, y)
 					if (ps < .95 && ps > .05) {
@@ -136,9 +96,7 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 									tank.setAngularVelocity(0)
 									sleep(1000)
 									tank.setSpeed(-1)
-                            println("test")
 									sleep(2000)
-                            println("test1")
 									tank.setSpeed(0)
 									sleep(1000)
 									RefreshableData.waitForNewData()
@@ -173,64 +131,12 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 							var lastPoint = tank.location
 
 							override def inRange(vector: Vector) = {
-								import scala.math._
-								val angle: Double = myTank.angle.radian
-
-								val hitWall = false
-/*{
-                                    val ad = 7
-									val t = angles.foldLeft(0) {
-										(t, dangle) =>
-											val tmp = new Point(ad * cos(angle + dangle), ad * sin(angle + dangle))
-
-											val (x, y) = occgrid.convert(myTank.location + tmp)
-											if (occgrid.data(x)(y) == Occupant.WALL) {
-												t+1
-											} else {
-                                                t
-											}
-									}
-                                    t > angles.size / 2
-								}
-*/
-								if (hitWall) {
-									LOG.debug("Updating path for " + myTank.callsign + " with A* to " + point + " type=" + searchType)
-                                    println("Setting " + tank.callsign + " backward")
-                            
-									tank.setSpeed(0)
-									tank.setAngularVelocity(0)
-									sleep(1000)
-									tank.setSpeed(-.2)
-									sleep(1000)
-									tank.setSpeed(0)
-									sleep(1000)
-									RefreshableData.waitForNewData()
-
-									searchPath = aStarToPoint
-									/*
-									new PFVisualizer {
-										val samples = 15
-										val pathFinder = searchPath
-										val plotTitle = "searchPath"
-										val fileName = "searchPath"
-										val name = "searchPath"
-										val worldsize : Int = constants("worldsize")
-										val obstacleList = Seq[Polygon]()
-									}.draw()
-									*/
-								}
-								def isInWall = false/*{
-									!occgrid.polygons.filter(_.contains(goal)).isEmpty
-								}*/
-								def isGoalInWall = occgrid.data(gx)(gy) == Occupant.WALL || isInWall
+								def isGoalInWall = occgrid.data(gx)(gy) == Occupant.WALL
 								val isClose = myTank.location.distance(goal) < 30
-								//println("isGoalInWall: " + isGoalInWall)
-								//println("isClose: " + isClose)
-
 								if (isClose || isGoalInWall) {
-println("is close or is wall")
-true
-} else false
+									println("is close or is wall")
+									true
+								} else false
 							}
 						}
 
@@ -244,10 +150,13 @@ true
 			occgrid.update(queue.invokeAndWait(_.occgrids(ids)))
 		}
 
+		def time = (new java.util.Date).getTime
 		myTanks foreach {myTank =>
 			actor {
-				moveTank(myTank)//, pointsToVisit(myTank.tankId))
-				LOG.info("Scout agent [" + myTank.callsign + "] is done")
+				val start = time
+				moveTank(myTank)
+				val end = time
+				LOG.info("Scout agent [" + myTank.callsign + "] is done in " + (end - start) + "ms")
 			}
 		}
 	}
