@@ -1,10 +1,11 @@
-package cs470.visualizer
+package cs470.visualization
 
 import scala.swing._
-import scala.Array._
 import cs470.domain._
 import javax.swing.{Timer, JPanel}
 import java.awt.event.{ActionEvent, ActionListener}
+import javax.imageio.ImageIO
+import java.io.IOException
 
 /**
  * @author tylers3
@@ -31,18 +32,26 @@ class SwingOccgridRealVisualizer(data: (Int, Int) => Double, worldsize: Int, loc
 
 	def top = new MainFrame {
 		title = "Searching Visualizer"
-		/*
-		val x = newField
-		val y = newField
-		val percentage = newField
-		*/
-		val update = new Button {
-			action = Action("Update") {
-				updateImage()
+		val save = new Button {
+			action = Action("Save") {
+				val chooser = new FileChooser(new java.io.File(".")) {
+					title = "File Chooser"
+					multiSelectionEnabled = false
+				}
+				chooser.showSaveDialog(this) match {
+					case FileChooser.Result.Approve => {
+						try {
+							ImageIO.write(bufferedImage, "png", chooser.selectedFile)
+						} catch {
+							case ioe : IOException => LOG.error("There was an error writing file")
+						}
+					}
+					case _ =>
+				}
 			}
 		}
-		val corners = new Button {
-			action = Action("Corners") {
+		val polygons = new Button {
+			action = Action("Show Polygons") {
 				val corners = occgrid.polygons
 				if (corners.isEmpty) println("No corners found")
 				else {
@@ -67,19 +76,51 @@ class SwingOccgridRealVisualizer(data: (Int, Int) => Double, worldsize: Int, loc
 		}
 
 		def label(s: String) = new Label(s + " = ");
-		val updatePanel = new FlowPanel(/*label("x"), x.field, label("y"), y.field, label("percentage"), percentage.field, */ update, corners)
+		val updatePanel = new FlowPanel(save, polygons)
 		contents = new BorderPanel {
 			add(updatePanel, BorderPanel.Position.North)
 			add(new ScrollPane(Component.wrap(image)), BorderPanel.Position.Center)
 		}
 	}
 
-	def time = new java.util.Date().getTime
+	private def time = new java.util.Date().getTime
+
+	import java.awt._
+	import java.awt.image._
+	import scala.collection.JavaConversions._
+
+	private val grayscale: Seq[Color] = (0 to 100).foldLeft(new java.util.ArrayList[Color]()) {
+		(seq, num) => {
+			val color = 255 - (num * 2.55).asInstanceOf[Int]
+			seq.add(new Color(color, color, color))
+			seq
+		}
+	}
+
+	def bufferedImage = {
+		val bufferedImage = new BufferedImage(worldsize - 1, worldsize - 1, BufferedImage.TYPE_INT_ARGB)
+		val graphics = bufferedImage.getGraphics.asInstanceOf[Graphics2D]
+		graphics.setColor(java.awt.Color.BLACK)
+		for (x <- 0 until worldsize - 1) {
+			for (y <- 0 until worldsize - 1) {
+
+				//graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (data(x)(y)).asInstanceOf[Float]))
+				def percent = {
+					var percent = 0
+					lock synchronized {
+						percent = java.lang.Math.floor(data(x, y) * 100).asInstanceOf[Int]
+					}
+					percent
+				}
+				//println("percent [" + percent + "] -> " + grayscale(percent))
+				graphics.setColor(grayscale(percent))
+				graphics.drawLine(x, y, x, y)
+			}
+		}
+		bufferedImage
+	}
 
 	val image = {
-		import java.awt._
-		import java.awt.image._
-		import scala.collection.JavaConversions._
 		val panel = new JPanel {
 			val grayscale: Seq[Color] = (0 to 100).foldLeft(new java.util.ArrayList[Color]()) {
 				(seq, num) => {
@@ -95,32 +136,13 @@ class SwingOccgridRealVisualizer(data: (Int, Int) => Double, worldsize: Int, loc
 
 				val start = time
 
-				val bufferedImage = new BufferedImage(worldsize, worldsize, BufferedImage.TYPE_INT_ARGB)
-				val graphics = bufferedImage.getGraphics.asInstanceOf[Graphics2D]
-				graphics.setColor(java.awt.Color.BLACK)
-				for (x <- 0 until worldsize - 1) {
-					for (y <- 0 until worldsize - 1) {
-
-						//graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (data(x)(y)).asInstanceOf[Float]))
-						def percent = {
-							var percent = 0
-							lock synchronized {
-								percent = java.lang.Math.floor(data(x, y) * 100).asInstanceOf[Int]
-							}
-							percent
-						}
-						//println("percent [" + percent + "] -> " + grayscale(percent))
-						graphics.setColor(grayscale(percent))
-						graphics.drawLine(x, y, x, y)
-					}
-				}
 				g.drawImage(bufferedImage, 0, 0, this)
 				val end = time
 
 				LOG.debug("Redrew in " + (end - start) + "ms")
 			}
 		}
-		panel.setPreferredSize(new java.awt.Dimension(worldsize, worldsize))
+		panel.setPreferredSize(new java.awt.Dimension(worldsize - 1, worldsize - 1))
 		panel
 	}
 
