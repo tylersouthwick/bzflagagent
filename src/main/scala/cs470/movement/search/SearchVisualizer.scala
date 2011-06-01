@@ -11,6 +11,7 @@ trait SearchVisualizer {
   val title: String
 
   lazy val visualizer = {
+	  /*
 
     val tmp = new Visualizer {
       val fileName = filename
@@ -21,12 +22,13 @@ trait SearchVisualizer {
     }
     tmp.draw()
     tmp
-/*	  new {
+	  */
+	  new {
 		  def close() {}
 		  def clear() {}
 		  def drawSearchNodes(s : Traversable[(Point, Point)]) {}
 		  def drawFinalPath(s : Traversable[(Point, Point)]) {}
-	  }*/
+	  }
   }
 
 
