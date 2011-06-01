@@ -11,6 +11,7 @@ import cs470.visualization.PFVisualizer
 import collection.mutable.{PriorityQueue, LinkedList, Queue}
 import java.awt.event.ItemEvent
 import cs470.bzrc.{RefreshableData, Tank}
+import javax.management.remote.rmi._RMIConnection_Stub
 
 class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threading {
 
@@ -116,7 +117,7 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 									if (angle > Degree(20).radian) {
 										0.1
 									} else {
-										.3
+										.6
 									}
 								} else {
 									super.getTurningSpeed(angle)
@@ -127,7 +128,7 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 
 							var count = 0
 							def path = {
-								if (count > 15) {
+								if (count > 8) {
                                     val dis = tank.location.distance(previousDistance)
                                     if(dis < 1){
                                     println("Tank " + tank.callsign + " appears stuck")
@@ -153,7 +154,17 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 									count = count + 1
 								}
 
-								new Vector(searchPath.getPathVector(myTank.location).vector + PotentialFieldGenerator.randomVector)
+								val tankLocation = myTank.location
+								val walls = occgrid.neighbors(occgrid.convert(tankLocation)).filter{case (x, y) => occgrid.data(x)(y) == Occupant.WALL}.map{case (x, y) => occgrid.getLocation(x, y)}
+								val wallField = walls.map(PotentialFieldGenerator.ReflectivePF(tankLocation, _, 5, 25, 500)).foldLeft(Point.ORIGIN) { _ + _ }
+								try {
+									new Vector(searchPath.getPathVector(tankLocation).vector + PotentialFieldGenerator.randomVector + wallField)
+								} catch {
+									case t:IllegalArgumentException => {
+										occgrid.P_s(x, y, 1.0)
+										new Vector(new Point(0, 0))
+									}
+								}
 							}
 
 							val goal = point

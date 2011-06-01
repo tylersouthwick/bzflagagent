@@ -160,4 +160,18 @@ object PotentialFieldGenerator {
 	private val s2 = .1
 val scale = 5
 	def randomVector = new Point(s2 + scale * scala.util.Random.nextGaussian, s2 + scale * scala.util.Random.nextGaussian)
+
+	def ReflectivePF(current: Point, goal: Point, r1: Double, s: Double, beta: Double) = {
+		val r2 = r1 + s
+		val d = current.distance(goal)
+		val theta = current.getAngle(goal)
+		val i = 30
+
+		if (d < r1)
+			new Point(-signum(cos(theta)) * i, -signum(sin(theta)) * i)
+		else if (d > r2)
+			new Point(0, 0)
+		else
+			new Point(-beta * (r2 - d) * cos(theta), -beta * (r2 - d) * sin(theta))
+	}
 }

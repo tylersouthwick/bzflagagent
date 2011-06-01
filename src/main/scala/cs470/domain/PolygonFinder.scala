@@ -12,6 +12,8 @@ import cs470.utils.{Degree, DefaultProperties, Properties}
 
 trait PolygonFinder extends Occgrid {
 
+	def neighbors(corner : (Int, Int)) = Seq(corner, (corner._1 + width, corner._2), (corner._1 + width, corner._2 + height), (corner._1, corner._2 + height))
+
 	def polygons : Seq[Polygon] = {
 		val polygons = new java.util.LinkedList[Polygon]
 		val tmp = Array.ofDim[Occupant.Occupant](width, height)
@@ -67,7 +69,7 @@ trait PolygonFinder extends Occgrid {
 					val width = findBoxWidth(corner)
                     val height = (0 to width - 1).map(findBoxHeight(corner, _)).min
 
-					val corners = Seq(corner, (corner._1 + width, corner._2), (corner._1 + width, corner._2 + height), (corner._1, corner._2 + height))
+					val corners = neighbors(corner)
 					polygons.add(new Polygon(corners.map(t => getLocation(t._1, t._2))))
 					for (x <- corner._1 until corner._1 + width) {
 						for (y <- corner._2 until corner._2 + height) {

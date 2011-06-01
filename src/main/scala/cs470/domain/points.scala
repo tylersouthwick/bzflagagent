@@ -5,6 +5,7 @@ import cs470.utils.Radian
 
 object Point {
   implicit def convertTupleToPoint(t: Tuple2[Double, Double]) = new Point(t._1, t._2)
+	val ORIGIN = new Point(0, 0)
 }
 
 class Point(val x: Double, val y: Double) {
