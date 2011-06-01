@@ -1,18 +1,13 @@
 package cs470.domain
 
-import collection.mutable.{HashMap, LinkedList}
-import cs470.domain._
-import Constants._
-import cs470.bzrc.{Tank, RefreshableEnemies, DataStore}
-import cs470.utils.{Degree, DefaultProperties, Properties}
-
 /**
  * @author tylers2
  */
 
 trait PolygonFinder extends Occgrid {
 
-	def neighbors(corner : (Int, Int)) = Seq(corner, (corner._1 + width, corner._2), (corner._1 + width, corner._2 + height), (corner._1, corner._2 + height))
+	def neighbors(t : (Int, Int)) : Seq[(Int, Int)] = neighbors(t._1, t._2)
+	def neighbors(x : Int, y : Int) = Seq((x - 1, y), (x - 1, y + 1), (x, y + 1), (x + 1, y + 1), (x + 1, y), (x + 1, y - 1), (x, y - 1), (x-1, y - 1))
 
 	def polygons : Seq[Polygon] = {
 		val polygons = new java.util.LinkedList[Polygon]
@@ -67,7 +62,7 @@ trait PolygonFinder extends Occgrid {
 			corner match {
 				case Some(corner) => {
 					val width = findBoxWidth(corner)
-					val height = (0 to width - 1).map(findBoxHeight(corner, _)).min
+                    val height = (0 to width - 1).map(findBoxHeight(corner, _)).min
 
 					val corners = Seq(corner, (corner._1 + width, corner._2), (corner._1 + width, corner._2 + height), (corner._1, corner._2 + height))
 					polygons.add(new Polygon(corners.map(t => getLocation(t._1, t._2))))
