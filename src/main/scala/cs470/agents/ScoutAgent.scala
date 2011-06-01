@@ -91,21 +91,23 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 								if (count > 8) {
                                     val dis = tank.location.distance(previousDistance)
                                     if(dis < 1){
-                                    println("Tank " + tank.callsign + " appears stuck")
-									tank.setSpeed(0)
-									tank.setAngularVelocity(0)
-									sleep(1000)
-									tank.setSpeed(-1)
-									sleep(2000)
-									tank.setSpeed(0)
-									sleep(1000)
-									RefreshableData.waitForNewData()
+                                    	println("Tank " + tank.callsign + " appears stuck")
+										tank.setSpeed(.5)
+										tank.setAngularVelocity(.8)
+										sleep(200)
+										tank.setAngularVelocity(0)
+										sleep(800)
+										tank.setSpeed(-1)
+										sleep(2000)
+										tank.setSpeed(0)
+										sleep(1000)
+										RefreshableData.waitForNewData()
 
-                                    println("Moving")
-									RefreshableData.waitForNewData()
-                                    println("recalculating")
-									searchPath = aStarToPoint
-                                }
+                                    	println("Moving")
+										RefreshableData.waitForNewData()
+                                    	println("recalculating")
+										searchPath = aStarToPoint
+                                	}
                                     previousDistance = tank.location
 									count = 0
 								} else {
@@ -146,7 +148,7 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 		}
 		val ids = myTanks.map(_.tankId)
 
-		schedule(300) {
+		schedule(100) {
 			occgrid.update(queue.invokeAndWait(_.occgrids(ids)))
 		}
 
