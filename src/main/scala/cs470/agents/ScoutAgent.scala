@@ -122,14 +122,19 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 								} catch {
 									case t:IllegalArgumentException => {
 										println("Trying to find path in wall.  Updating all neighbor points")
-										occgrid.P_s(x, y, 1.0)
+										val updateValue = .96
+										occgrid.P_s(x, y, updateValue)
+										var count = 0
 										//set all adjacent to 1
 										def updateNeighbors(allNeighbors : Seq[(Int, Int)]) {
 											//println("all neighbors: " + allNeighbors.map{t => (t, occgrid.data(t._1)(t._2))})
 											val neighbors = allNeighbors.filter{t => occgrid.data(t._1)(t._2) != Occupant.WALL && occgrid.P_s(t._1, t._2) >= DefaultProperties.prior}
 											//println("updating neighbors: " + neighbors)
-											neighbors.foreach{t => occgrid.P_s(t._1, t._2, 1.0)}
-											neighbors.foreach{t => updateNeighbors(occgrid.neighbors(t._1, t._2))}
+											neighbors.foreach{t => occgrid.P_s(t._1, t._2, updateValue)}
+											if (count < 150) {
+												count = count + 1
+												neighbors.foreach{t => updateNeighbors(occgrid.neighbors(t._1, t._2))}
+											}
 										}
 										updateNeighbors(occgrid.neighbors(x, y))
 										new Vector(new Point(0, 0))
