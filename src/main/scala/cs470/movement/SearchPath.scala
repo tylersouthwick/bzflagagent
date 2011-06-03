@@ -37,7 +37,7 @@ abstract class SearchPath(store: DataStore) extends PotentialFieldGenerator(stor
 
 	trait AgentSearcher extends A_StarSearcher with PenalizedUniformCostSearch {
 		val datastore = store
-		val start = store.tanks.find(_.tankId == tankIdd).get.location
+		lazy val goal = store.tanks.find(_.tankId == tankIdd).get.location
 		val q = queue
 		lazy val occgrid = buildOccgrid()
 	}
@@ -45,12 +45,12 @@ abstract class SearchPath(store: DataStore) extends PotentialFieldGenerator(stor
 	val searcher = new AgentSearcher {
 		lazy val name = searchName
 		lazy val tankId = tankIdd
-		lazy val goal = searchGoal
+		lazy val start = searchGoal
 		lazy val title = searchTitle
 		lazy val filename = searchName
 	}
 
-	lazy val result = searcher.search
+	lazy val result = searcher.search.reverse
 	val r = Properties("searcher.r", 5)
 	val s = Properties("searcher.s", 30)
 	val alpha = Properties("searcher.alpha", 5.8)
@@ -59,9 +59,15 @@ abstract class SearchPath(store: DataStore) extends PotentialFieldGenerator(stor
 	lazy val myTank = store.tanks.find(_.tankId == tankIdd).get
 
 	def getPathVector(point: Point) = {
-		val minPointIdx = result.map {
+		val minPointIdxT = result.map {
 			p => (p, p.distance(point))
-		}.zipWithIndex.min._2+4
+		}.zipWithIndex.min._2
+
+		val minPointIdx = {
+if (result.length < minPointIdxT + 4) {
+	minPointIdxT + 4
+} else minPointIdxT
+}
 
 		val minPoint: Point = result(minPointIdx)
 /*
@@ -102,19 +108,14 @@ abstract class SearchPath(store: DataStore) extends PotentialFieldGenerator(stor
 					val theta = acos(num / den)
 					x2 = x4
 					val xs = Seq(x1, x2, x3, x4)
-					//					println("xs = " + xs + "; theta = " + theta)
-					//				val t = abs(minPoint.getAngle(p)-startingLocation.getAngle(p))
-					//				println("\tminPoint = " + minPoint + ";p = " + x1 + "; t = " + t + "; deg60 = " + deg60)
 					theta > deg60
 			}.get
 		}
 		catch {case _ =>
 			result(result.size - 1)
 		}
-
-        val diff = new Point(java.lang.Math.signum(random - .5) * 2,0)
+        val diff = new Point(4,0)
 		val t = new Vector(AttractivePF(point, goalPoint+diff, 1, point.distance(goalPoint), 50))
-				LOG.debug("@" + point + " to " + goalPoint + " w/ " + t)
 		t
 
 	}
