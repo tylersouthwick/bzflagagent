@@ -111,9 +111,10 @@ abstract class SearchPath(store: DataStore) extends PotentialFieldGenerator(stor
 		catch {case _ =>
 			result(result.size - 1)
 		}
-        val diff = new Point(4,0)
+
+        val diff = new Point(java.lang.Math.signum(random - .5) * 2,0)
 		val t = new Vector(AttractivePF(point, goalPoint+diff, 1, point.distance(goalPoint), 50))
-				println("@" + point + " to " + goalPoint + " w/ " + t)
+				LOG.debug("@" + point + " to " + goalPoint + " w/ " + t)
 		t
 
 	}
