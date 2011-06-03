@@ -165,7 +165,7 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 
 						override def inRange(vector: Vector) = {
 							def isGoalInWall = occgrid.data(gx)(gy) == Occupant.WALL
-							val isClose = myTank.location.distance(goal) < 30
+							val isClose = myTank.location.distance(goal) < 20
 							if (isClose || isGoalInWall) {
 								LOG.info("Tank " + myTank.callsign + " is close or is wall")
 								true
