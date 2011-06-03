@@ -44,13 +44,13 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 
 					val ps = occgrid.P_s(x, y)
 					if (ps < .95 && ps > .05) {
-						println("Trying point " + point + " [" + pointsToVisit.size + "]")
+						LOG.info("Tank " + myTank.callsign + " is trying point " + point + " [" + pointsToVisit.size + "]")
 
 						var searchType = "PF"
 
 						def aStarToPoint = new SearchPath(store) {
 							searchType = "A*"
-							LOG.debug("Creating A* for " + myTank.callsign + " to " + point)
+							LOG.info("Creating A* for " + myTank.callsign + " to " + point)
 							val tankIdd = myTank.tankId
 							val searchGoal = point
 
@@ -59,6 +59,7 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 
 						def pfToPoint = {
 							if (usePF) {
+								LOG.info("Using potential fields for " + myTank.callsign + " to " + point)
 								usePF = false
 								new PotentialFieldGenerator(store) {
 									searchType = "PF"
@@ -91,7 +92,7 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 								if (count > 8) {
                                     val dis = tank.location.distance(previousDistance)
                                     if(dis < 1){
-                                    	println("Tank " + tank.callsign + " appears stuck")
+                                    	LOG.info("Tank " + tank.callsign + " appears stuck")
 										tank.setSpeed(0)
 										tank.setAngularVelocity(.8)
 										sleep(500)
@@ -103,9 +104,8 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 										sleep(1000)
 										RefreshableData.waitForNewData()
 
-                                    	println("Moving")
 										RefreshableData.waitForNewData()
-                                    	println("recalculating")
+                                    	LOG.info("Recalculating A* path for " + tank.callsign)
 										searchPath = aStarToPoint
                                 	}
                                     previousDistance = tank.location
@@ -121,7 +121,7 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 									new Vector(searchPath.getPathVector(tankLocation).vector + PotentialFieldGenerator.randomVector + wallField)
 								} catch {
 									case t:IllegalArgumentException => {
-										println("Trying to find path in wall.  Updating all neighbor points")
+										LOG.info("Trying to find path in wall.  Updating all neighbor points")
 										val updateValue = .96
 										occgrid.P_s(x, y, updateValue)
 										var count = 0
@@ -151,7 +151,7 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 								def isGoalInWall = occgrid.data(gx)(gy) == Occupant.WALL
 								val isClose = myTank.location.distance(goal) < 30
 								if (isClose || isGoalInWall) {
-									println("is close or is wall")
+									LOG.info("Tank " + tank.callsign + " is close or is wall")
 									true
 								} else false
 							}
