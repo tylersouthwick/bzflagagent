@@ -19,6 +19,7 @@ dependencies {
 	compile "org.scala-lang:scala-library:$scalaVersion"
 	compile 'commons-cli:commons-cli:1.2'
 	compile 'log4j:log4j:1.2.16'
+	compile files('libs/ejml-0.16.jar')
 
 	testCompile 'junit:junit:4.8.1'
 }
