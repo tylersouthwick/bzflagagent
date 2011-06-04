@@ -56,13 +56,13 @@ case class SittingDuckPigeon(tank : Tank, store : DataStore) extends Pigeon(tank
 }
 
 case class MovingPigeon(tank : Tank, store : DataStore) extends Pigeon(tank, store) with Threading {
-	val startingPosition = new Point(100, 0)
+	val startingPosition = new Point(-100, 0)
 
 	override def start() {
 		super.start()
 		loop {
-			moveToLocation(new Point(-100, 0))
-			moveToLocation(new Point(100, 0))
+			moveToLocation(new Point(-100, 100))
+			moveToLocation(new Point(-100, -100))
 		}
 	}
 }
