@@ -112,7 +112,7 @@ abstract class PotentialFieldsMover(store: DataStore) {
 
 	private val origin = new Point(0, 0)
 
-	private def distance = goal.distance(tank.location)
+	protected def distance = goal.distance(tank.location)
 
 	def inRange(vector: Vector) = {
 		distance > howClose
