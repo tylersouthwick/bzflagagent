@@ -17,7 +17,7 @@ class KalmanAgent(host: String, port: Int) extends Agent(host, port) with Thread
 			}
 		}
 
-		val enemy = enemies.filter(_.color == "green").find(_.callsign == "green1").get
+		val enemy = enemies.filter(_.color == "green").find(_.callsign == "green0").get
 		val filter = KalmanFilter(enemy)
 
 		actor {
