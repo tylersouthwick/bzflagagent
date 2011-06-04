@@ -49,7 +49,7 @@ class Point(val x: Double, val y: Double) {
     val dx = goal.x - x
     val dy = goal.y - y
 
-    atan2(dy, dx)
+    Radian(atan2(dy, dx))
   }
 
   def magnitude = {

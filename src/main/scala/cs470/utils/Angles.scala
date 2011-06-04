@@ -39,7 +39,7 @@ class Degree(private val deg : Double) extends Angle {
 
 	def abs = new Degree(value.abs)
 
-	override def toString = value + " deg"
+	override def toString = (value + 360) % 360 + " deg"
 }
 
 object Radian extends (Double => Radian) {

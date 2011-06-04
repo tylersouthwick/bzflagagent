@@ -3,8 +3,11 @@ package cs470.agents
 import cs470.utils._
 import cs470.filters.KalmanFilter
 import cs470.bzrc.{RefreshableData, Enemy}
+import cs470.domain.Point
 
 class KalmanAgent(host: String, port: Int) extends Agent(host, port) with Threading {
+	def time = new java.util.Date().getTime
+
 	def run() {
 		val tank = myTanks(0)
 
@@ -14,9 +17,10 @@ class KalmanAgent(host: String, port: Int) extends Agent(host, port) with Thread
 			}
 		}
 
-		val enemy = enemies.filter(_.color == "green").find(_.callsign == "green0").get
+		val enemy = enemies.filter(_.color == "green").find(_.callsign == "green1").get
 		val filter = KalmanFilter(enemy)
 
+		actor {
 		loop {
 			filter.update()
 			println("mu: ")
@@ -24,8 +28,25 @@ class KalmanAgent(host: String, port: Int) extends Agent(host, port) with Thread
 			println("confidence: ")
 			println(filter.sigma)
 
-			sleep(500)
-			//RefreshableData.waitForNewData()
+			RefreshableData.waitForNewData()
+		}
+		}
+
+		actor {
+		loop {
+			val start = time
+			val futureTime = 1000
+			val prediction = filter.predict(futureTime/1000)
+			val dist = prediction - tank.location
+			val angle = Radian(java.lang.Math.atan2(dist.y,dist.x))
+			tank.moveToAngle(angle)
+			val timeToWait = futureTime - (time - start)
+			if (timeToWait > 0) {
+				sleep(timeToWait)
+			}
+			println("angle: " + (tank.angle.degree, angle.degree))
+			tank.shoot()
+		}
 		}
 	}
 

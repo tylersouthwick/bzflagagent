@@ -6,6 +6,7 @@ import org.ejml.alg.dense.decomposition.DecompositionFactory
 import org.ejml.ops.CommonOps
 import cs470.bzrc.Enemy
 import java.util.Date
+import cs470.domain.Point
 
 case class KalmanFilter(enemy : Enemy) {
 	var mu = new SimpleMatrix(Array(Array(0.0, 0.0, 0.0, 0.0, 0.0, 0.0))).transpose()
@@ -99,9 +100,7 @@ case class KalmanFilter(enemy : Enemy) {
 		val current = time
 		val d = current - lastTime
 		lastTime = current
-		val t = d / 1000.0
-		println("deltaT: " + t)
-		t
+		d / 1000.0
 	}
 
 	def update() {
@@ -121,7 +120,6 @@ case class KalmanFilter(enemy : Enemy) {
 		mu = f * mu + K * (zt - H * f * mu)
 		sigma = (I - K * H) * (f * sigma * ft + sigmaX)
 
-		println("")
 		visualize(dt)
 	}
 
@@ -138,11 +136,11 @@ case class KalmanFilter(enemy : Enemy) {
 
 	import java.io._
 	import java.lang.Math._
-	val file = new PrintWriter(new BufferedOutputStream(new FileOutputStream("kalman.gpi")))
+	private val file = new PrintWriter(new BufferedOutputStream(new FileOutputStream("kalman.gpi")))
 	file.println("set xrange [-400.0: 400.0]\nset yrange [-400.0: 400.0]\nset pm3d\nset view map\nunset key\nset size square")
 	file.println("set palette model RGB functions 1-gray, 1-gray, 1-gray\n\n# How fine the plotting should be, at some processing cost:\nset isosamples 100")
 
-	def visualize(deltaT : Double) {
+	private def visualize(deltaT : Double) {
 		val sigma_x = sqrt(sigma.get(0, 0))
 		val sigma_y = sqrt(sigma.get(3, 3))
 		val rho = sigma.get(0, 1) / (sigma_x * sigma_y)
@@ -152,5 +150,10 @@ case class KalmanFilter(enemy : Enemy) {
 		file.println("splot 1.0/(2.0 * pi * sigma_x * sigma_y * sqrt(1 - rho**2)) \\\n\t* exp(-1.0/2.0 * (x**2 / sigma_x**2 + y**2 / sigma_y**2 \\\n\t- 2.0*rho*x*y/(sigma_x*sigma_y))) with pm3d")
 		file.println("pause " + deltaT)
 		file.flush()
+	}
+
+	def predict(deltaT : Double) = {
+		val p = F(deltaT) * mu
+		new Point(p.get(0, 0), p.get(3, 0))
 	}
 }

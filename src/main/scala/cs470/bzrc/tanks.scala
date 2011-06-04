@@ -129,13 +129,13 @@ abstract class Tank(queue: BzrcQueue, tanks: RefreshableTanks) extends Threading
   def pdController(error0: Radian, targetAngle: Radian) {
     val uncorrectedError = (targetAngle - angle).radian
 
-    println("angle: " + angle.degree)
-    println("targetAngle: " + targetAngle.degree)
+    //println("angle: " + angle.degree)
+    //println("targetAngle: " + targetAngle.degree)
     //Correct for right turns
     val moddedError = uncorrectedError % (2 * PI)
     val errorM = moddedError % PI
     val error = new Radian(if (errorM == moddedError) errorM else -errorM)
-    println("error: " + error.degree)
+    //println("error: " + error.degree)
 
     val rv = (Kp * error + Kd * (error - error0) / 200);
     val v = if (rv > maxVel) 1 else rv / maxVel
