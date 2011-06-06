@@ -99,11 +99,9 @@ case class NonConformingClayPigeon(tank: Tank, store: DataStore) extends Pigeon(
 	val startingPosition = new Point(0, 100)
 	val LOG = org.apache.log4j.Logger.getLogger(classOf[NonConformingClayPigeon])
 
-	val randomGenerator = new Random()
+	private val randomGenerator = new Random()
 
-	def randomness = {
-		randomGenerator.nextGaussian() + .5
-	}
+	private def randomness = randomGenerator.nextGaussian() + .5
 
 	def aliveLoop() {
 		val s = randomness
