@@ -95,7 +95,7 @@ case class MovingPigeon(tank: Tank, store: DataStore) extends Pigeon(tank, store
 	}
 }
 
-case class NonConformingClayPigeon(tank: Tank, store: DataStore) extends Pigeon(tank, store) {
+case class NonConformingClayPigeon(tank: Tank, store: DataStore) extends Pigeon(tank, store) with Threading {
 	val startingPosition = new Point(0, 100)
 	val LOG = org.apache.log4j.Logger.getLogger(classOf[NonConformingClayPigeon])
 
