@@ -4,6 +4,7 @@ import cs470.utils._
 import cs470.filters.KalmanFilter
 import cs470.bzrc.{RefreshableData, Enemy}
 import cs470.domain.Point
+import java.util.concurrent.CountDownLatch
 
 class KalmanAgent(host: String, port: Int) extends Agent(host, port) with Threading {
 	import KalmanAgent._
@@ -18,25 +19,26 @@ class KalmanAgent(host: String, port: Int) extends Agent(host, port) with Thread
 			}
 		}
 
-		enemies.filter(_.status == "alive").foreach{enemy =>
+		enemies.filter(_.alive).foreach{enemy =>
 			val filter = KalmanFilter(enemy)
 			LOG.info("Aiming for " + enemy.callsign)
-			var filteringDone = false
-			var shootingDone = false
+			val latch = new CountDownLatch(2)
 
 			actor {
-				while (enemy.status == "alive") {
+				while (enemy.alive) {
 					filter.update()
-					LOG.debug("mu: \n" + filter.mu)
-					LOG.debug("confidence: \n" + filter.sigma)
+					if (LOG.isDebugEnabled) {
+						LOG.debug("mu: \n" + filter.mu)
+						LOG.debug("confidence: \n" + filter.sigma)
+					}
 					RefreshableData.waitForNewData()
 				}
-				filteringDone = true
+				latch.countDown()
 				LOG.info("Done updating for " + enemy.callsign)
 			}
 
-			val shooting = actor {
-				while (enemy.status == "alive") {
+			actor {
+				while (enemy.alive) {
 					val start = time
 					val futureTime = 1000
 					val prediction = filter.predict(futureTime / 1000)
@@ -50,11 +52,11 @@ class KalmanAgent(host: String, port: Int) extends Agent(host, port) with Thread
 					LOG.info("angle: " + (tank.angle.degree, angle.degree))
 					tank.shoot()
 				}
-				shootingDone = true
+				latch.countDown()
 				LOG.info("Done shooting " + enemy.callsign)
 			}
 
-			while (!(filteringDone && shootingDone)) {}
+			while (latch.getCount > 0) {}
 
 			LOG.info("Successfully killed " + enemy.callsign)
 		}
