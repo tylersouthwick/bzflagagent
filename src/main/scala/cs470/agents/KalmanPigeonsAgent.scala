@@ -88,9 +88,9 @@ case class MovingPigeon(tank: Tank, store: DataStore) extends Pigeon(tank, store
 	}
 
 	def aliveLoop() {
-		tank.setSpeed(-.5)
+		tank.setSpeed(-.8)
 		sleep(movementTime)
-		tank.setSpeed(.5)
+		tank.setSpeed(.8)
 		sleep(movementTime)
 	}
 }
@@ -103,12 +103,17 @@ case class NonConformingClayPigeon(tank: Tank, store: DataStore) extends Pigeon(
 
 	private def randomness = randomGenerator.nextGaussian() + .5
 
+		val angles = Seq(-1.0,-.5,0,.5,1.0)
+	var count = 0
+
 	def aliveLoop() {
-		val s = randomness
-		val a = randomness
-		LOG.info("Setting speed: " + s + " and angle: " + a)
+		val s = randomGenerator.nextGaussian() * 2.0
+		val a = 0.0
+		LOG.debug("Setting speed: " + s + " and angle: " + a)
 		tank.setSpeed(s)
-		tank.setAngularVelocity(a)
-		sleep(1000)
+		count = count + 1
+		if(count > 3) count = 0
+		tank.setAngularVelocity(angles(count))
+		sleep(2000)
 	}
 }
