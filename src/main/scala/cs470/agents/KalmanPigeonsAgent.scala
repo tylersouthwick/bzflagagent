@@ -8,8 +8,8 @@ import cs470.movement.{PotentialFieldConstants, PotentialFieldGenerator, Potenti
 class KalmanPigeonsAgent(host: String, port: Int) extends Agent(host, port) with Threading {
 	def run() {
 		val pigeons = Seq(MovingPigeon(myTanks(0), store),
-						SittingDuckPigeon(myTanks(1), store),
-						NonConformingClayPigeon(myTanks(2), store))
+			SittingDuckPigeon(myTanks(1), store),
+			NonConformingClayPigeon(myTanks(2), store))
 		for (pigeon <- pigeons) {
 			actor {
 				pigeon.start()
@@ -20,18 +20,19 @@ class KalmanPigeonsAgent(host: String, port: Int) extends Agent(host, port) with
 }
 
 object KalmanPigeonsAgent extends AgentCreator {
-	val LOG = org.apache.log4j.Logger.getLogger(classOf[ScoutAgent])
+	val LOG = org.apache.log4j.Logger.getLogger(classOf[KalmanPigeonsAgent])
 
 	def name = "kalmanPigeons"
 
 	def create(host: String, port: Int) = new KalmanPigeonsAgent(host, port)
 }
 
-sealed abstract class Pigeon(tank : Tank, store : DataStore) {
-	val startingPosition : Point
+sealed abstract class Pigeon(tank: Tank, store: DataStore) {
+	val startingPosition: Point
+	val LOG : org.apache.log4j.Logger
 
-	def moveToLocation(location : Point) {
-		println("moving pigeon :: " + tank.callsign)
+	def moveToLocation(location: Point) {
+		LOG.info("Moving " + tank.callsign)
 		val mytank = tank
 		new PotentialFieldsMover(store) {
 			def goal = location
@@ -43,7 +44,8 @@ sealed abstract class Pigeon(tank : Tank, store : DataStore) {
 			override def inRange(vector: Vector) = distance < 5
 
 		}.moveAlongPotentialField()
-		println("done moving pigeon :: " + tank.callsign)
+
+		LOG.info("Done moving " + tank.callsign)
 	}
 
 	def moveToStartingLocation() {
@@ -61,17 +63,19 @@ sealed abstract class Pigeon(tank : Tank, store : DataStore) {
 	def aliveLoop()
 }
 
-case class SittingDuckPigeon(tank : Tank, store : DataStore) extends Pigeon(tank, store) {
+case class SittingDuckPigeon(tank: Tank, store: DataStore) extends Pigeon(tank, store) {
 	val startingPosition = new Point(0, -100)
+	val LOG = org.apache.log4j.Logger.getLogger(classOf[SittingDuckPigeon])
 
 	override def aliveLoop() {
 	}
 }
 
-case class MovingPigeon(tank : Tank, store : DataStore) extends Pigeon(tank, store) with Threading {
+case class MovingPigeon(tank: Tank, store: DataStore) extends Pigeon(tank, store) with Threading {
 	val startingPosition = new Point(-100, 0)
-
+	val LOG = org.apache.log4j.Logger.getLogger(classOf[MovingPigeon])
 	val movementTime = 15000
+
 	override def moveToStartingLocation() {
 		super.moveToStartingLocation()
 		tank.moveToAngle(Degree(90))
@@ -88,8 +92,9 @@ case class MovingPigeon(tank : Tank, store : DataStore) extends Pigeon(tank, sto
 	}
 }
 
-case class NonConformingClayPigeon(tank : Tank, store : DataStore) extends Pigeon(tank, store) {
+case class NonConformingClayPigeon(tank: Tank, store: DataStore) extends Pigeon(tank, store) {
 	val startingPosition = new Point(0, 100)
+	val LOG = org.apache.log4j.Logger.getLogger(classOf[NonConformingClayPigeon])
 
 	override def aliveLoop() {
 	}

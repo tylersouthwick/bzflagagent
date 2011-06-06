@@ -49,7 +49,8 @@ class KalmanAgent(host: String, port: Int) extends Agent(host, port) with Thread
 					if (timeToWait > 0) {
 						sleep(timeToWait)
 					}
-					LOG.info("angle: " + (tank.angle.degree, angle.degree))
+					LOG.debug("angle: " + (tank.angle.degree, angle.degree))
+					LOG.info("Shooting " + enemy.callsign)
 					tank.shoot()
 				}
 				latch.countDown()
