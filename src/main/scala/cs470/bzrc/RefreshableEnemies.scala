@@ -27,4 +27,7 @@ trait Enemy {
 	def flag : String
 	def location : Point
 	def angle : Angle
+
+	def alive = "alive" == status
+	def dead = "dead" == status
 }
