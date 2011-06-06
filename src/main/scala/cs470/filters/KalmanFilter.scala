@@ -18,10 +18,10 @@ case class KalmanFilter(enemy : Enemy) {
 		}
 		setValue(0, 100)
 		setValue(1, 100)
-		setValue(2, 100)
+		setValue(2, 10)
 		setValue(3, 100)
 		setValue(4, 100)
-		setValue(5, 100)
+		setValue(5, 10)
 		new SimpleMatrix(data)
 	}
 
