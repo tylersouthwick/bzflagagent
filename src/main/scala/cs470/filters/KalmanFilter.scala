@@ -10,6 +10,7 @@ import cs470.domain.Point
 
 case class KalmanFilter(enemy : Enemy) {
 	var mu = new SimpleMatrix(Array(Array(0.0, 0.0, 0.0, 0.0, 0.0, 0.0))).transpose()
+	val name = "Kalman filter"
 
 	var sigma : SimpleMatrix = {
 		val data = Array.ofDim[Double](6, 6)
@@ -136,7 +137,7 @@ case class KalmanFilter(enemy : Enemy) {
 
 	import java.io._
 	import java.lang.Math._
-	private val file = new PrintWriter(new BufferedOutputStream(new FileOutputStream("kalman.gpi")))
+	private val file = new PrintWriter(new BufferedOutputStream(new FileOutputStream(name + ".gpi")))
 	file.println("set xrange [-400.0: 400.0]\nset yrange [-400.0: 400.0]\nset pm3d\nset view map\nunset key\nset size square")
 	file.println("set palette model RGB functions 1-gray, 1-gray, 1-gray\n\n# How fine the plotting should be, at some processing cost:\nset isosamples 100")
 

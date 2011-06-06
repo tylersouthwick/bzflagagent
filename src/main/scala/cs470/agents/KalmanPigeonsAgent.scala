@@ -4,11 +4,12 @@ import cs470.bzrc.{DataStore, Tank}
 import cs470.domain._
 import cs470.utils.{Degree, Radian, Threading}
 import cs470.movement.{PotentialFieldConstants, PotentialFieldGenerator, PotentialFieldsMover}
+import util.Random
 
 class KalmanPigeonsAgent(host: String, port: Int) extends Agent(host, port) with Threading {
 	def run() {
-		val pigeons = Seq(MovingPigeon(myTanks(0), store),
-			SittingDuckPigeon(myTanks(1), store),
+		val pigeons = Seq(MovingPigeon(myTanks(1), store),
+			SittingDuckPigeon(myTanks(0), store),
 			NonConformingClayPigeon(myTanks(2), store))
 		for (pigeon <- pigeons) {
 			actor {
@@ -29,7 +30,7 @@ object KalmanPigeonsAgent extends AgentCreator {
 
 sealed abstract class Pigeon(tank: Tank, store: DataStore) {
 	val startingPosition: Point
-	val LOG : org.apache.log4j.Logger
+	val LOG: org.apache.log4j.Logger
 
 	def moveToLocation(location: Point) {
 		LOG.info("Moving " + tank.callsign)
@@ -58,6 +59,8 @@ sealed abstract class Pigeon(tank: Tank, store: DataStore) {
 		while (!tank.dead) {
 			aliveLoop()
 		}
+
+		LOG.info(tank.callsign + " has been killed")
 	}
 
 	def aliveLoop()
@@ -79,15 +82,15 @@ case class MovingPigeon(tank: Tank, store: DataStore) extends Pigeon(tank, store
 	override def moveToStartingLocation() {
 		super.moveToStartingLocation()
 		tank.moveToAngle(Degree(90))
-		tank.setSpeed(1)
+		tank.setSpeed(.5)
 		sleep(movementTime / 2)
 		tank.setSpeed(0)
 	}
 
 	def aliveLoop() {
-		tank.setSpeed(-1)
+		tank.setSpeed(-.5)
 		sleep(movementTime)
-		tank.setSpeed(1)
+		tank.setSpeed(.5)
 		sleep(movementTime)
 	}
 }
@@ -96,6 +99,18 @@ case class NonConformingClayPigeon(tank: Tank, store: DataStore) extends Pigeon(
 	val startingPosition = new Point(0, 100)
 	val LOG = org.apache.log4j.Logger.getLogger(classOf[NonConformingClayPigeon])
 
-	override def aliveLoop() {
+	val randomGenerator = new Random()
+
+	def randomness = {
+		randomGenerator.nextGaussian() + .5
+	}
+
+	def aliveLoop() {
+		val s = randomness
+		val a = randomness
+		LOG.info("Setting speed: " + s + " and angle: " + a)
+		tank.setSpeed(s)
+		tank.setAngularVelocity(a)
+		sleep(1000)
 	}
 }
