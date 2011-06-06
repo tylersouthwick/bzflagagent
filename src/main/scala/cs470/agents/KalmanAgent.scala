@@ -6,6 +6,7 @@ import cs470.bzrc.{RefreshableData, Enemy}
 import cs470.domain.Point
 
 class KalmanAgent(host: String, port: Int) extends Agent(host, port) with Threading {
+	import KalmanAgent._
 	def time = new java.util.Date().getTime
 
 	def run() {
@@ -17,43 +18,53 @@ class KalmanAgent(host: String, port: Int) extends Agent(host, port) with Thread
 			}
 		}
 
-		val enemy = enemies.filter(_.color == "green").find(_.callsign == "green0").get
-		val filter = KalmanFilter(enemy)
+		enemies.filter(_.status == "alive").foreach{enemy =>
+			val filter = KalmanFilter(enemy)
+			LOG.info("Aiming for " + enemy.callsign)
+			var filteringDone = false
+			var shootingDone = false
 
-		actor {
-		loop {
-			filter.update()
-			println("mu: ")
-			println(filter.mu)
-			println("confidence: ")
-			println(filter.sigma)
-
-			RefreshableData.waitForNewData()
-		}
-		}
-
-		actor {
-		loop {
-			val start = time
-			val futureTime = 1000
-			val prediction = filter.predict(futureTime/1000)
-			val dist = prediction - tank.location
-			val angle = Radian(java.lang.Math.atan2(dist.y,dist.x))
-			tank.moveToAngle(angle)
-			val timeToWait = futureTime - (time - start)
-			if (timeToWait > 0) {
-				sleep(timeToWait)
+			actor {
+				while (enemy.status == "alive") {
+					filter.update()
+					LOG.debug("mu: \n" + filter.mu)
+					LOG.debug("confidence: \n" + filter.sigma)
+					RefreshableData.waitForNewData()
+				}
+				filteringDone = true
+				LOG.info("Done updating for " + enemy.callsign)
 			}
-			println("angle: " + (tank.angle.degree, angle.degree))
-			tank.shoot()
-		}
-		}
-	}
 
+			val shooting = actor {
+				while (enemy.status == "alive") {
+					val start = time
+					val futureTime = 1000
+					val prediction = filter.predict(futureTime / 1000)
+					val dist = prediction - tank.location
+					val angle = Radian(java.lang.Math.atan2(dist.y, dist.x))
+					tank.moveToAngle(angle)
+					val timeToWait = futureTime - (time - start)
+					if (timeToWait > 0) {
+						sleep(timeToWait)
+					}
+					LOG.info("angle: " + (tank.angle.degree, angle.degree))
+					tank.shoot()
+				}
+				shootingDone = true
+				LOG.info("Done shooting " + enemy.callsign)
+			}
+
+			while (!(filteringDone && shootingDone)) {}
+
+			LOG.info("Successfully killed " + enemy.callsign)
+		}
+
+		LOG.info("Kalman Agent Done")
+	}
 }
 
 object KalmanAgent extends AgentCreator {
-	val LOG = org.apache.log4j.Logger.getLogger(classOf[ScoutAgent])
+	val LOG = org.apache.log4j.Logger.getLogger(classOf[KalmanAgent])
 
 	def name = "kalman"
 

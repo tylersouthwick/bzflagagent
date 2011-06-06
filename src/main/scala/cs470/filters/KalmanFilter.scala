@@ -17,11 +17,11 @@ case class KalmanFilter(enemy : Enemy) {
 			data(row)(row) = value
 		}
 		setValue(0, 100)
-		setValue(1, .1)
-		setValue(2, .1)
+		setValue(1, 100)
+		setValue(2, 100)
 		setValue(3, 100)
-		setValue(4, .1)
-		setValue(5, .1)
+		setValue(4, 100)
+		setValue(5, 100)
 		new SimpleMatrix(data)
 	}
 
