@@ -6,7 +6,7 @@ import cs470.bzrc.DataStore
 import java.util.Random
 import cs470.utils.Degree
 
-object PotentialFieldConstants {
+trait PotentialFieldConstants {
   val s = new {
     val obstacle = 50
     val base = 50
@@ -31,6 +31,8 @@ object PotentialFieldConstants {
     val enemy = 3
   }
 }
+
+object PotentialFieldConstants extends PotentialFieldConstants
 
 import PotentialFieldConstants._
 

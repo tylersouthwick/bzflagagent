@@ -1,9 +1,9 @@
 package cs470.agents
 
-import cs470.utils.Threading
-import cs470.movement.PotentialFieldsMover
 import cs470.bzrc.{DataStore, Tank}
 import cs470.domain._
+import cs470.utils.{Degree, Radian, Threading}
+import cs470.movement.{PotentialFieldConstants, PotentialFieldGenerator, PotentialFieldsMover}
 
 class KalmanPigeonsAgent(host: String, port: Int) extends Agent(host, port) with Threading {
 	def run() {
@@ -46,27 +46,51 @@ sealed abstract class Pigeon(tank : Tank, store : DataStore) {
 		println("done moving pigeon :: " + tank.callsign)
 	}
 
-	def start() {
+	def moveToStartingLocation() {
 		moveToLocation(startingPosition)
 	}
+
+	final def start() {
+		moveToStartingLocation()
+
+		while (!tank.dead) {
+			aliveLoop()
+		}
+	}
+
+	def aliveLoop()
 }
 
 case class SittingDuckPigeon(tank : Tank, store : DataStore) extends Pigeon(tank, store) {
 	val startingPosition = new Point(0, -100)
+
+	override def aliveLoop() {
+	}
 }
 
 case class MovingPigeon(tank : Tank, store : DataStore) extends Pigeon(tank, store) with Threading {
 	val startingPosition = new Point(-100, 0)
 
-	override def start() {
-		super.start()
-		loop {
-			moveToLocation(new Point(-100, 100))
-			moveToLocation(new Point(-100, -100))
-		}
+	val movementTime = 15000
+	override def moveToStartingLocation() {
+		super.moveToStartingLocation()
+		tank.moveToAngle(Degree(90))
+		tank.setSpeed(1)
+		sleep(movementTime / 2)
+		tank.setSpeed(0)
+	}
+
+	def aliveLoop() {
+		tank.setSpeed(-1)
+		sleep(movementTime)
+		tank.setSpeed(1)
+		sleep(movementTime)
 	}
 }
 
 case class NonConformingClayPigeon(tank : Tank, store : DataStore) extends Pigeon(tank, store) {
 	val startingPosition = new Point(0, 100)
+
+	override def aliveLoop() {
+	}
 }
