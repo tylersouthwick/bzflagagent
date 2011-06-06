@@ -115,7 +115,7 @@ if (result.length < minPointIdxT + 4) {
 			result(result.size - 1)
 		}
 		val dist = point.distance(goalPoint)
-        val diff = new Point(java.lang.Math.signum(random - .5) * dist * .04,0)
+        val diff = new Point(java.lang.Math.signum(random - .5) * dist * .02,0)
 		val t = new Vector(AttractivePF(point, goalPoint+diff, 1, dist, 50))
 		t
 

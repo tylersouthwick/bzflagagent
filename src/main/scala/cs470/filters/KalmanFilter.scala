@@ -10,7 +10,7 @@ import cs470.domain.Point
 
 case class KalmanFilter(enemy : Enemy) {
 	var mu = new SimpleMatrix(Array(Array(0.0, 0.0, 0.0, 0.0, 0.0, 0.0))).transpose()
-	val name = "Kalman filter"
+	val name = "Kalman filter_" + enemy.callsign
 
 	var sigma : SimpleMatrix = {
 		val data = Array.ofDim[Double](6, 6)
@@ -70,6 +70,7 @@ case class KalmanFilter(enemy : Enemy) {
 		data(1)(3) = 1
 		new SimpleMatrix(data)
 	}
+	val Ht = H.transpose()
 
 	val positionNoise = new {
 		val x = Properties("positionNoise.x", 5)
@@ -108,7 +109,6 @@ case class KalmanFilter(enemy : Enemy) {
 		val dt = deltaT
 		val f = F(dt)
 		val ft = f.transpose()
-		val Ht = H.transpose()
 
 		xt = sampleFromNormalDistribution(f * xt, sigmaX)
 		val zt = {
@@ -117,9 +117,10 @@ case class KalmanFilter(enemy : Enemy) {
 			new SimpleMatrix(Array(data)).transpose()
 		}
 
-		val K = (f * sigma * ft + sigmaX) * Ht * (H * (f * sigma * ft + sigmaX) * Ht + sigmaZ).invert
+		val temp = f * sigma * ft + sigmaX
+		val K = temp * Ht * (H * temp * Ht + sigmaZ).invert
 		mu = f * mu + K * (zt - H * f * mu)
-		sigma = (I - K * H) * (f * sigma * ft + sigmaX)
+		sigma = (I - K * H) * temp
 
 		visualize(dt)
 	}

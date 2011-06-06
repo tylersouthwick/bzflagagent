@@ -24,40 +24,44 @@ class KalmanAgent(host: String, port: Int) extends Agent(host, port) with Thread
 			LOG.info("Aiming for " + enemy.callsign)
 			val latch = new CountDownLatch(2)
 
-			actor {
+			(1 to 5) foreach { x=>
+				filter.update()
+				RefreshableData.waitForNewData()
+			}
+
 				while (enemy.alive) {
-					filter.update()
+			(1 to 3) foreach { x =>
+				filter.update()
+				RefreshableData.waitForNewData()
+			}
 					if (LOG.isDebugEnabled) {
 						LOG.debug("mu: \n" + filter.mu)
 						LOG.debug("confidence: \n" + filter.sigma)
 					}
-					RefreshableData.waitForNewData()
-				}
-				latch.countDown()
-				LOG.info("Done updating for " + enemy.callsign)
-			}
-
-			actor {
-				while (enemy.alive) {
 					val start = time
 					val futureTime = 1000
 					val prediction = filter.predict(futureTime / 1000)
+					println("location: " + enemy.location)
+					println("prediction: " + prediction)
 					val dist = prediction - tank.location
 					val angle = Radian(java.lang.Math.atan2(dist.y, dist.x))
 					tank.moveToAngle(angle)
-					val timeToWait = futureTime - (time - start)
-					if (timeToWait > 0) {
-						sleep(timeToWait)
-					}
+					//val timeToWait = futureTime - (time - start)
+					//println("Waiting: " + timeToWait)
 					LOG.debug("angle: " + (tank.angle.degree, angle.degree))
 					LOG.info("Shooting " + enemy.callsign)
+					println("location: " + enemy.location)
 					tank.shoot()
+					sleep(50)
+					tank.shoot()
+					sleep(50)
+					tank.shoot()
+					sleep(50)
+					tank.shoot()
+					sleep(50)
+					tank.shoot()
+					RefreshableData.waitForNewData()
 				}
-				latch.countDown()
-				LOG.info("Done shooting " + enemy.callsign)
-			}
-
-			while (latch.getCount > 0) {}
 
 			LOG.info("Successfully killed " + enemy.callsign)
 		}
