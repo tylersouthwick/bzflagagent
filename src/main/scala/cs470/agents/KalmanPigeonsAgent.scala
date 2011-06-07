@@ -75,9 +75,10 @@ case class SittingDuckPigeon(tank: Tank, store: DataStore) extends Pigeon(tank, 
 }
 
 case class MovingPigeon(tank: Tank, store: DataStore) extends Pigeon(tank, store) with Threading {
-	val startingPosition = new Point(-100, 0)
+	val startingPosition = new Point(0, 0)
 	val LOG = org.apache.log4j.Logger.getLogger(classOf[MovingPigeon])
 	val movementTime = 15000
+	val movementTime2 = 30000
 
 	override def moveToStartingLocation() {
 		super.moveToStartingLocation()
@@ -88,10 +89,10 @@ case class MovingPigeon(tank: Tank, store: DataStore) extends Pigeon(tank, store
 	}
 
 	def aliveLoop() {
-		tank.setSpeed(-.8)
-		sleep(movementTime)
-		tank.setSpeed(.8)
-		sleep(movementTime)
+		tank.setSpeed(-.4)
+		sleep(movementTime2)
+		tank.setSpeed(.4)
+		sleep(movementTime2)
 	}
 }
 

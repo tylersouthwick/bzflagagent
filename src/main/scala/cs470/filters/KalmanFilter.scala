@@ -10,7 +10,8 @@ import cs470.domain.Point
 
 case class KalmanFilter(enemy : Enemy) {
 	var mu = new SimpleMatrix(Array(Array(0.0, 0.0, 0.0, 0.0, 0.0, 0.0))).transpose()
-	val name = "Kalman filter_" + enemy.callsign
+	val name = "kalman_filter_" + enemy.callsign
+	val lock = new Object
 
 	var sigma : SimpleMatrix = {
 		val data = Array.ofDim[Double](6, 6)
@@ -18,11 +19,11 @@ case class KalmanFilter(enemy : Enemy) {
 			data(row)(row) = value
 		}
 		setValue(0, 100)
-		setValue(1, 100)
-		setValue(2, 10)
+		setValue(1, .1)
+		setValue(2, .1)
 		setValue(3, 100)
-		setValue(4, 100)
-		setValue(5, 10)
+		setValue(4, .1)
+		setValue(5, .1)
 		new SimpleMatrix(data)
 	}
 
@@ -33,10 +34,10 @@ case class KalmanFilter(enemy : Enemy) {
 		}
 		setValue(0, .1)
 		setValue(1, .1)
-		setValue(2, 100)
+		setValue(2, .8)
 		setValue(3, .1)
 		setValue(4, .1)
-		setValue(5, 100)
+		setValue(5, .8)
 		new SimpleMatrix(data)
 	}
 
@@ -73,8 +74,9 @@ case class KalmanFilter(enemy : Enemy) {
 	val Ht = H.transpose()
 
 	val positionNoise = new {
-		val x = Properties("positionNoise.x", 5)
-		val y = Properties("positionNoise.x", 5)
+		val positionNoise  = Properties("positionNoise", 5.0)
+		val x = positionNoise
+		val y = positionNoise
 	}
 
 	val sigmaZ = {
@@ -85,7 +87,7 @@ case class KalmanFilter(enemy : Enemy) {
 	}
 	val I = SimpleMatrix.wrap(CommonOps.identity(6))
 
-	val c = Properties("frictionCoefficient", 0.1)
+	val c = Properties("frictionCoefficient", 0.03)
 
 	implicit def simpleMatrixOverload(m : SimpleMatrix) = new {
 		def *(t : SimpleMatrix) = m.mult(t)
@@ -94,7 +96,6 @@ case class KalmanFilter(enemy : Enemy) {
 		//def invert = SimpleMatrix.wrap(CommonOps.invert(m.getMatrix))
 	}
 
-	var xt = mu
 	def time = new java.util.Date().getTime
 	var lastTime = time
 
@@ -105,12 +106,13 @@ case class KalmanFilter(enemy : Enemy) {
 		d / 1000.0
 	}
 
-	def update() {
+	var vcount = 0
+
+	def update() = lock.synchronized {
 		val dt = deltaT
 		val f = F(dt)
 		val ft = f.transpose()
 
-		xt = sampleFromNormalDistribution(f * xt, sigmaX)
 		val zt = {
 			val location = enemy.location
 			val data = Array(location.x, location.y)
@@ -122,7 +124,11 @@ case class KalmanFilter(enemy : Enemy) {
 		mu = f * mu + K * (zt - H * f * mu)
 		sigma = (I - K * H) * temp
 
-		visualize(dt)
+		if(vcount > 10){
+			vcount = 0
+			visualize(dt)
+		}
+		vcount = vcount + 1
 	}
 
 	private def sampleFromNormalDistribution(mu : SimpleMatrix, sigma : SimpleMatrix) = {
@@ -143,19 +149,41 @@ case class KalmanFilter(enemy : Enemy) {
 	file.println("set palette model RGB functions 1-gray, 1-gray, 1-gray\n\n# How fine the plotting should be, at some processing cost:\nset isosamples 100")
 
 	private def visualize(deltaT : Double) {
-		val sigma_x = sqrt(sigma.get(0, 0))
-		val sigma_y = sqrt(sigma.get(3, 3))
-		val rho = sigma.get(0, 1) / (sigma_x * sigma_y)
-		file.println("sigma_x = " + sigma_x)
-		file.println("sigma_y = " + sigma_y)
-		file.println("rho = " + rho)
-		file.println("splot 1.0/(2.0 * pi * sigma_x * sigma_y * sqrt(1 - rho**2)) \\\n\t* exp(-1.0/2.0 * (x**2 / sigma_x**2 + y**2 / sigma_y**2 \\\n\t- 2.0*rho*x*y/(sigma_x*sigma_y))) with pm3d")
-		file.println("pause " + deltaT)
-		file.flush()
+		val x = "(x-" + mu.get(0,0) + ")"
+		val y = "(y-" + mu.get(3,0) + ")"
+		val sigma_x = 5
+		val sigma_y = 5
+
+		if(sigma_x != 0 && sigma_y != 0){
+			val rho = 0
+			file.println("sigma_x = " + sigma_x)
+			file.println("sigma_y = " + sigma_y)
+			file.println("rho = " + rho)
+			file.println("splot 1.0/(2.0 * pi * sigma_x * sigma_y * sqrt(1 - rho**2)) \\\n\t* exp(-1.0/2.0 * (" + x + "**2 / sigma_x**2 + " + y + "**2 / sigma_y**2 \\\n\t- 2.0*rho*" + x + "*" + y + "/(sigma_x*sigma_y))) with pm3d")
+			file.println("pause 1")
+			file.flush()
+		}
 	}
 
 	def predict(deltaT : Double) = {
+		var mu_local : SimpleMatrix = null
+		lock synchronized {
+			mu_local = mu
+		}
 		val p = F(deltaT) * mu
+		//var f = F(.1)
+		//for(i <- 0 to e){
+		//	f = f * f
+		//}
+		//val p = f * mu
 		new Point(p.get(0, 0), p.get(3, 0))
 	}
+
+	def velocity = {
+		val vx = mu.get(1,0)
+		val vy = mu.get(4,0)
+		java.lang.Math.sqrt(vx * vx + vy * vy)
+	}
+
+	def position = new Point(mu.get(0, 0), mu.get(3, 0))
 }
