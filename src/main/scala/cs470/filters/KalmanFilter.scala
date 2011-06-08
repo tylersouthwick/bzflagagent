@@ -19,10 +19,10 @@ case class KalmanFilter(enemy : Enemy) {
 			data(row)(row) = value
 		}
 		setValue(0, 100)
-		setValue(1, .1)
+		setValue(1, 1)
 		setValue(2, .1)
 		setValue(3, 100)
-		setValue(4, .1)
+		setValue(4, 1)
 		setValue(5, .1)
 		new SimpleMatrix(data)
 	}
@@ -34,10 +34,10 @@ case class KalmanFilter(enemy : Enemy) {
 		}
 		setValue(0, .1)
 		setValue(1, .1)
-		setValue(2, .8)
+		setValue(2, .5)
 		setValue(3, .1)
 		setValue(4, .1)
-		setValue(5, .8)
+		setValue(5, .5)
 		new SimpleMatrix(data)
 	}
 
@@ -87,7 +87,7 @@ case class KalmanFilter(enemy : Enemy) {
 	}
 	val I = SimpleMatrix.wrap(CommonOps.identity(6))
 
-	val c = Properties("frictionCoefficient", 0.03)
+	val c = Properties("frictionCoefficient", 0.003)
 
 	implicit def simpleMatrixOverload(m : SimpleMatrix) = new {
 		def *(t : SimpleMatrix) = m.mult(t)
