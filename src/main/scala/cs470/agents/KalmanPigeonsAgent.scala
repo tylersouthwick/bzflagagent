@@ -2,15 +2,16 @@ package cs470.agents
 
 import cs470.bzrc.{DataStore, Tank}
 import cs470.domain._
-import cs470.utils.{Degree, Radian, Threading}
 import cs470.movement.{PotentialFieldConstants, PotentialFieldGenerator, PotentialFieldsMover}
 import util.Random
+import cs470.utils.{Properties, Degree, Radian, Threading}
 
 class KalmanPigeonsAgent(host: String, port: Int) extends Agent(host, port) with Threading {
 	def run() {
-		val pigeons = Seq(MovingPigeon(myTanks(1), store),
-			SittingDuckPigeon(myTanks(0), store),
-			NonConformingClayPigeon(myTanks(2), store))
+		val pigeons = Seq(
+//			MovingPigeon(myTanks(0), store))
+//			SittingDuckPigeon(myTanks(0), store))
+			NonConformingClayPigeon(myTanks(0), store))
 		for (pigeon <- pigeons) {
 			actor {
 				pigeon.start()
@@ -77,22 +78,21 @@ case class SittingDuckPigeon(tank: Tank, store: DataStore) extends Pigeon(tank, 
 case class MovingPigeon(tank: Tank, store: DataStore) extends Pigeon(tank, store) with Threading {
 	val startingPosition = new Point(0, 0)
 	val LOG = org.apache.log4j.Logger.getLogger(classOf[MovingPigeon])
-	val movementTime = 15000
-	val movementTime2 = 30000
+	val movementTime = Properties("kalmanpigeontime",25000)
 
 	override def moveToStartingLocation() {
 		super.moveToStartingLocation()
-		tank.moveToAngle(Degree(90))
+		tank.moveToAngle(Degree(Properties("conformingangle", 90)))
 		tank.setSpeed(.5)
 		sleep(movementTime / 2)
 		tank.setSpeed(0)
 	}
 
 	def aliveLoop() {
-		tank.setSpeed(-.4)
-		sleep(movementTime2)
-		tank.setSpeed(.4)
-		sleep(movementTime2)
+		tank.setSpeed(-.6)
+		sleep(movementTime)
+		tank.setSpeed(.6)
+		sleep(movementTime)
 	}
 }
 

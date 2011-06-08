@@ -40,9 +40,10 @@ val bulletVelocity = shotspeed
 					LOG.debug("mu: \n" + filter.mu)
 					LOG.debug("confidence: \n" + filter.sigma)
 				}
-					println("mu: \n" + filter.mu)
-					println("covariance: \n" + filter.sigma)
+				//	println("mu: \n" + filter.mu)
+				//	println("covariance: \n" + filter.sigma)
 				RefreshableData.waitForNewData()
+				//sleep(500)
 			}
 			latch.countDown()
 			LOG.info("Done updating for " + enemy.callsign)
@@ -51,25 +52,26 @@ val bulletVelocity = shotspeed
 		actor {
 			while (enemy.alive) {
 				val start = time
-				val futureTime : Double = 3500
-				val prediction = filter.predict(futureTime / 1000)
+				val futureTime : Double = 2500
+				val prediction = filter.predict(futureTime / 1000.0)
 				val dist = prediction - tank.location
 				val angle = Radian(java.lang.Math.atan2(dist.y, dist.x))
-				println("Moving to angle = " + angle.degree + " point@=" + prediction)
+//				println("Moving to angle = " + angle.degree + " point@=" + prediction)
 				tank.moveToAngle(angle)
+//				println("moved to position: " + prediction)
 				filter.update()
 				val timeForBullet = tank.location.distance(prediction) / bulletVelocity
-				val timeForEnemy = prediction.distance(filter.position) / filter.velocity
+				val timeForEnemy = futureTime
 				val timeToWait : Int = ((timeForBullet - timeForEnemy) * 1000.0).asInstanceOf[Int]
 				if (timeToWait > 0) {
 					LOG.info("Need to wait " + timeToWait + " bullet=" + timeForBullet + " enemy=" + timeForEnemy)
 					sleep(timeToWait)
 				} else {
-					LOG.info("Tank is behind")
+//					LOG.info("Tank is behind")
 				}
 				tank.shoot()
-				LOG.info("Shooting " + enemy.callsign + " ->" + prediction + " @" + enemy.location)
-				LOG.debug("angle: " + (tank.angle.degree, angle.degree))
+//				LOG.info("Shooting " + enemy.callsign + " ->" + prediction + " @" + enemy.location)
+//				LOG.debug("angle: " + (tank.angle.degree, angle.degree))
 				RefreshableData.waitForNewData()
 			}
 			latch.countDown()

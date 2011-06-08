@@ -120,8 +120,8 @@ abstract class Tank(queue: BzrcQueue, tanks: RefreshableTanks) extends Threading
   }
 
   val Kp = 1
-  val Kd = 4.5
-  val tol = degree(.5).radian
+  val Kd = .1
+  val tol = degree(4).radian
   val tolv = .1
   val maxVel = .7854
   //constants("tankangvel")
@@ -137,7 +137,7 @@ abstract class Tank(queue: BzrcQueue, tanks: RefreshableTanks) extends Threading
     val error = new Radian(if (errorM == moddedError) errorM else -errorM)
     //println("error: " + error.degree)
 
-    val rv = (Kp * error + Kd * (error - error0) / 200);
+    val rv = (Kp * error + Kd * (error - error0));
     val v = if (rv > maxVel) 1 else rv / maxVel
 
     if (abs(error) < tol && abs(v) < tolv) {

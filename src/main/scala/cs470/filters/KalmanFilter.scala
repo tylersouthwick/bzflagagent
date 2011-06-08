@@ -155,7 +155,14 @@ case class KalmanFilter(enemy : Enemy) {
 		val sigma_y = 5
 
 		if(sigma_x != 0 && sigma_y != 0){
+//				file.println("plot '-' w points")
+//			for(t <- 1 to 6){
+//				val p = predict(t.asInstanceOf[Double]/2.0)
+//				file.println(p.x + " " + p.y)
+//			}
+//			file.println("e")
 			val rho = 0
+			file.println
 			file.println("sigma_x = " + sigma_x)
 			file.println("sigma_y = " + sigma_y)
 			file.println("rho = " + rho)
@@ -170,19 +177,30 @@ case class KalmanFilter(enemy : Enemy) {
 		lock synchronized {
 			mu_local = mu
 		}
-		val p = F(deltaT) * mu
+		val f = F(deltaT)
+//		println("F(" + deltaT + "): " + f)
+		val p = f * mu_local
 		//var f = F(.1)
 		//for(i <- 0 to e){
 		//	f = f * f
 		//}
 		//val p = f * mu
-		new Point(p.get(0, 0), p.get(3, 0))
+		//val (x, y, vx, vy) = (mu_local.get(0,0), mu_local.get(3,0), mu_local.get(1, 0), mu_local.get(4, 0))
+		//new Point(x + vx * deltaT, y + vy * deltaT)
+		new Point(p.get(0,0), p.get(3,0))
 	}
 
 	def velocity = {
 		val vx = mu.get(1,0)
 		val vy = mu.get(4,0)
-		java.lang.Math.sqrt(vx * vx + vy * vy)
+		new Point(vx, vy)
+	}
+
+
+	def velocit2 = {
+		val vx = mu.get(1,0)
+		val vy = mu.get(4,0)
+		new Point(vx, vy)
 	}
 
 	def position = new Point(mu.get(0, 0), mu.get(3, 0))
