@@ -3,9 +3,9 @@ import cs470.bzrc.{Tank, DataStore}
 import cs470.domain.Point
 import cs470.movement.search.AStarSearch
 import cs470.movement.SearchPath
-import cs470.utils.MovingPDController
+import cs470.utils.{Threading, MovingPDController}
 
-abstract class Agent(tank : Tank, store : DataStore) {
+abstract class Agent(tank : Tank, store : DataStore) extends Threading {
 
 	val constants = store.constants
 	val flags = store.flags
@@ -20,7 +20,11 @@ abstract class Agent(tank : Tank, store : DataStore) {
 	def apply()
 
 	def start() {
-		apply()
+		actor {
+			println("test")
+			apply()
+			println("test2")
+		}
 	}
 
 	def move(goal : Point) {
@@ -34,11 +38,13 @@ abstract class Agent(tank : Tank, store : DataStore) {
 }
 
 object Agent {
+	val LOG = org.apache.log4j.Logger.getLogger(classOf[Agent])
+
 	def apply(store: DataStore) {
-		println("starting agents")
+		LOG.info("Starting agents with " + store.tanks.size + " at our disposal")
 		for (tank <- store.tanks) {
-			println("tank: " + tank)
-			AttackerAgent(tank, store).start()
+			LOG.info("Starting " + tank.callsign)
+			Dalek(tank, store).start()
 		}
 	}
 }
