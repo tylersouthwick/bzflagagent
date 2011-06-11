@@ -161,7 +161,7 @@
 	</repositories>
 
 	<properties>
-		<scala.version>2.9.0</scala.version>
+		<scala.version>2.9.0-1</scala.version>
 		<mainClass>cs470.Main</mainClass>
 	</properties>
 </project>
