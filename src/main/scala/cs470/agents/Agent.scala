@@ -6,6 +6,7 @@ import cs470.movement.{pfGotoPoint, SearchPath}
 import cs470.domain.{Vector, Point}
 import cs470.domain.Constants._
 import sun.java2d.pipe.LoopPipe
+import javax.management.remote.rmi._RMIConnection_Stub
 
 abstract class Agent(tank : Tank, store : DataStore) extends Threading {
 
@@ -56,17 +57,15 @@ object Agent extends Threading {
 
 	def apply(store: DataStore) {
 		LOG.info("Starting agents with " + store.tanks.size + " at our disposal")
-		val dalek = Dalek(store.tanks(1), store)
-		dalek.start()
-		val decoy = new Decoy(dalek, store.tanks(0), store)
-		decoy.start()
+		store.tanks.filter(_.tankId < 8).foreach(new Decoy(_, store).start())
+		//store.tanks.filter(_.tankId >= 8).foreach(new GotoFlag(_, store).start())
 
 		actor {
 			loop {
 				for (tank <- store.tanks) {
 					tank.shoot()
 				}
-				sleep(500)
+				sleep(400)
 			}
 		}
 	}

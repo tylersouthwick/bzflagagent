@@ -16,14 +16,29 @@ object Decoy {
 	val LOG = org.apache.log4j.Logger.getLogger(classOf[Decoy])
 }
 
-case class Decoy(dalek : Dalek,  tank : Tank, store : DataStore) extends Agent(tank, store) {
+case class Decoy(tank : Tank, store : DataStore) extends Agent(tank, store) {
 	import Decoy._
 
+	val team = store.constants("team")
 	def apply() {
 		LOG.info(tank.callsign + " is a DECOY!")
 		sleep(2000)
-		val enemy = store.enemies(0)
+		//go part way to flag
+		val flags = store.flags.filter(_.color != team)
+		val goal = flags.last.location
+		val searcher = findPath(goal)
+		new MovingPDController(goal, tank, store) {
+			def direction = searcher.getPathVector(tank.location)
 
+			howClose = 200
+		}.move()
+
+		for (enemy <- store.enemies) {
+			killEnemy(enemy)
+		}
+	}
+
+	def killEnemy(enemy : Enemy) {
 		//circle enemy
 		def searcher = new PotentialFieldGenerator(store) {
 			def getPathVector(point: Point) = {
@@ -51,7 +66,7 @@ case class Decoy(dalek : Dalek,  tank : Tank, store : DataStore) extends Agent(t
 
 		new MovingPDController(Point.ORIGIN, tank, store) {
 			def direction = searcher.getPathVector(tank.location)
-			override def inRange(vector: Vector) = false
+			override def inRange(vector: Vector) = enemy.dead
 		}.move()
 	}
 
