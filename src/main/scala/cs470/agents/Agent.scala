@@ -15,10 +15,16 @@ abstract class Agent(store: DataStore) {
 
 	def apply()
 
+	def start() {
+		apply()
+	}
 }
 
 object Agent {
 	def apply(store: DataStore) {
+		for (tank <- store.tanks) {
+			AttackerAgent(tank, store).start()
+		}
 		println("starting agents")
 	}
 }
