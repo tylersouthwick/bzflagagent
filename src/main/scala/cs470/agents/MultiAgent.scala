@@ -7,11 +7,11 @@ import cs470.bzrc.{Tank, DataStore}
 import cs470.movement.{SearchPath, PotentialFieldsMover}
 import cs470.visualization.PFVisualizer
 
-class MultiAgent(host: String, port: Int) extends Agent(host, port) with Threading {
+class MultiAgent(store : DataStore) extends Agent(store) with Threading {
 
   import MultiAgent._
 
-  def run() {
+  def apply() {
     val tanks = store.tanks
     if (tanks.size != 2) {
       LOG.error("Invalid number of tanks.  There must be 2 tanks")
@@ -128,10 +128,6 @@ abstract class MultiAgentBase(tank: Tank, store: DataStore) {
   }
 }
 
-object MultiAgent extends AgentCreator {
+object MultiAgent {
   val LOG = org.apache.log4j.Logger.getLogger("cs470.agents.MultiAgent")
-
-  def name = "multi"
-
-  def create(host: String, port: Int) = new MultiAgent(host, port)
 }

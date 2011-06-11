@@ -5,10 +5,10 @@ import cs470.domain.Constants._
 import cs470.movement.{SearchPath, PotentialFieldsMover, PotentialFieldGenerator}
 import cs470.utils._
 import collection.mutable.Queue
-import cs470.bzrc.{RefreshableData, Tank}
 import cs470.visualization.BayesianVisualizer
+import cs470.bzrc.{DataStore, RefreshableData, Tank}
 
-class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threading {
+class ScoutAgent(store : DataStore) extends Agent(store) with Threading {
 
 	import ScoutAgent._
 
@@ -16,7 +16,7 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 
 	val stepSize = 150
 
-	def run() {
+	def apply() {
 		LOG.info("Starting scout agent")
 		val occgrid = new BayesianOccgrid with BayesianVisualizer {
 			val constants = store.constants
@@ -197,10 +197,6 @@ class ScoutAgent(host: String, port: Int) extends Agent(host, port) with Threadi
 
 }
 
-object ScoutAgent extends AgentCreator {
+object ScoutAgent {
 	val LOG = org.apache.log4j.Logger.getLogger(classOf[ScoutAgent])
-
-	def name = "scout"
-
-	def create(host: String, port: Int) = new ScoutAgent(host, port)
 }

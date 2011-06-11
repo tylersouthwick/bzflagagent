@@ -2,19 +2,19 @@ package cs470.agents
 
 import cs470.utils._
 import cs470.filters.KalmanFilter
-import cs470.bzrc.{RefreshableData, Enemy}
 import cs470.domain._
 import Constants._
 import java.util.concurrent.CountDownLatch
+import cs470.bzrc.{DataStore, RefreshableData, Enemy}
 
-class KalmanAgent(host: String, port: Int) extends Agent(host, port) with Threading {
+class KalmanAgent(store : DataStore) extends Agent(store) with Threading {
 	import KalmanAgent._
 	def time = new java.util.Date().getTime
 
 val shotspeed : Int = constants("shotspeed")
 val bulletVelocity = shotspeed
 
-	def run() {
+	def apply() {
 		val tank = myTanks(0)
 
 		implicit object ClosestEnemy extends Ordering[Enemy] {
@@ -87,11 +87,6 @@ val bulletVelocity = shotspeed
 	}
 }
 
-object KalmanAgent extends AgentCreator {
+object KalmanAgent {
 	val LOG = org.apache.log4j.Logger.getLogger(classOf[KalmanAgent])
-
-	def name = "kalman"
-
-	def create(host: String, port: Int) = new KalmanAgent(host, port)
-
 }

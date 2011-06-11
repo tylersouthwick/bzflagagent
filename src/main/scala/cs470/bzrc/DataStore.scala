@@ -4,7 +4,7 @@ object DataStore {
 	val LOG = org.apache.log4j.Logger.getLogger(classOf[DataStore])
 }
 
-class DataStore(queue : BzrcQueue) {
+class DataStore(val queue : BzrcQueue) {
 	val enemies = new RefreshableEnemies(queue)
 	val tanks = new RefreshableTanks(queue)
 	val obstacles = queue.invokeAndWait(_.obstacles)
