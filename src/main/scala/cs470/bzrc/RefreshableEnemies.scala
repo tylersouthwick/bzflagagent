@@ -7,6 +7,17 @@ class RefreshableEnemies(queue : BzrcQueue) extends RefreshableData[OtherTank, E
 
 	def findData(data: BzData) = data.othertanks
 
+	def getClosest(location : Point) = {
+		foldLeft(null : Enemy){(prev,enemy) =>
+			if(prev == null) enemy
+			else {
+				if(enemy.location.distance(location) < prev.location.distance(location)) enemy
+				else prev
+			}
+		}
+	}
+
+
 	protected def convert(f: OtherTank) = new Enemy {
 		def tank = findItem(_.callsign == callsign)
 

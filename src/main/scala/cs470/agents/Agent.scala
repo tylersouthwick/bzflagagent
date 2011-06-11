@@ -1,8 +1,9 @@
 package cs470.agents
 
 import cs470.bzrc.DataStore
+import cs470.utils.Threading
 
-abstract class Agent(store: DataStore) {
+abstract class Agent(store: DataStore) extends Threading {
 
 	val constants = store.constants
 	val flags = store.flags
@@ -16,15 +17,22 @@ abstract class Agent(store: DataStore) {
 	def apply()
 
 	def start() {
-		apply()
+		actor {
+			println("test")
+			apply()
+			println("test2")
+		}
 	}
 }
 
 object Agent {
+	val LOG = org.apache.log4j.Logger.getLogger(classOf[Agent])
+
 	def apply(store: DataStore) {
+		LOG.info("Starting agents with " + store.tanks.size + " at our disposal")
 		for (tank <- store.tanks) {
-			AttackerAgent(tank, store).start()
+			LOG.info("Starting " + tank.callsign)
+			Dalek(tank, store).start()
 		}
-		println("starting agents")
 	}
 }
