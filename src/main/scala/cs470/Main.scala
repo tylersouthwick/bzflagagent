@@ -9,7 +9,7 @@ import utils.Properties
 object Main {
 	val LOG = Logger.getLogger("cs470.Main")
 	val DEFAULT_HOST = "localhost"
-	val DEFAULT_PORT = "9000";
+	val DEFAULT_PORT = "9001";
 
 	implicit def findAttribute(cmd: CommandLine) = new {
 		def findAttribute(name: String, error: => String, default: String): String = {
@@ -26,7 +26,13 @@ object Main {
 			val formatter = new HelpFormatter
 			formatter.printHelp("agents", options)
 		} else {
-			doMain(args)
+			try {
+				doMain(args)
+			} catch {
+				case t : Throwable => {
+					LOG.error("Unable to start", t)
+				}
+			}
 		}
 	}
 
