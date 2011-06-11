@@ -60,7 +60,13 @@ abstract class RefreshableData[F, T](queue : BzrcQueue) extends Traversable[T] {
 	def findData(data : BzData) : Seq[F]
 	def buffer = findData(RefreshableData.data)
 
-	lazy val availableData = lock { buffer.map(convert(_)) }
+	lazy val availableData = lock {
+		val data = buffer.map(convert(_))
+		loaded(data)
+		data
+	}
+
+	protected def loaded(data : Traversable[T]) {}
 
 	protected def convert(f : F) : T
 

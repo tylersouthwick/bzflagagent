@@ -16,7 +16,7 @@ trait PotentialFieldConstants {
   }
 
   val alpha = new {
-    val obstacle = 1
+    val obstacle = 20
     val base = 1
     val tanks = .2
     val flag = .5
@@ -25,7 +25,7 @@ trait PotentialFieldConstants {
 
   val r = new {
     val base = 5
-    val obstacle = 0
+    val obstacle = 5
     val tanks = 5
     val flag = 5
     val enemy = 3
@@ -45,6 +45,16 @@ class pfReturnToGoal(store: DataStore, baseGoalColor: String) extends PotentialF
 
     new Vector(toBase + buildRejectiveField(point) + randomVector)
   }
+}
+
+class pfGotoPoint(store: DataStore, goal : Point) extends PotentialFieldGenerator(store) {
+
+	def getPathVector(point: Point) = {
+		val toFlag = AttractivePF(point, goal, r.flag, s.flag, alpha.flag)
+
+		new Vector(toFlag + buildRejectiveField(point) + randomVector)
+	}
+
 }
 
 class pfFindFlag(store: DataStore, flagColor: String) extends PotentialFieldGenerator(store) {

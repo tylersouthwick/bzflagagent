@@ -15,16 +15,10 @@ class DataStore(val queue : BzrcQueue) {
 	val flags = new RefreshableFlags(queue)
 	val constants = queue.invokeAndWait(_.constants)
 	val bases = queue.invokeAndWait(_.bases)
-	val occgrid = try {
-		new UsableOccgrid(Properties("occgrid.discretize", 100), obstacles, constants("tankradius"), constants("worldsize"), enemies)
-	} catch {
-		case t : Throwable => {
-			println(t)
-			throw t
-		}
-	}
+	val occgrid = new UsableOccgrid(Properties("occgrid.discretize", 200), obstacles, constants("tankradius"), constants("worldsize"), Seq[Enemy]())
 
 	RefreshableData.waitForNewData()
+
 
 	import DataStore._
 	if (LOG.isDebugEnabled) {
@@ -32,4 +26,15 @@ class DataStore(val queue : BzrcQueue) {
 			LOG.debug("flag: " + flag)
 		}
 	}
+			new cs470.visualization.Visualizer {
+				val samples = 25
+				val plotTitle = "obstacles"
+				val fileName = "obstacles"
+				val name = "obstacles"
+				val worldsize = Integer.parseInt(constants("worldsize"))
+				val obstacleList = obstacles
+				draw()
+				plotLines()
+				close()
+			}
 }

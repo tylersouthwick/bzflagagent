@@ -29,12 +29,19 @@ class SearchPath(store: DataStore, result: Seq[Point]) extends PotentialFieldGen
 		}.zipWithIndex.min._2
 
 		val minPointIdx = {
-			if (result.length < minPointIdxT + 4) {
+			if (result.length > minPointIdxT + 4) {
 				minPointIdxT + 4
 			} else minPointIdxT
 		}
 
-		val minPoint: Point = result(minPointIdx)
+		val minPoint: Point = try{
+			result(minPointIdx)
+		} catch {
+			case t : Throwable => {
+				println(t)
+				throw t
+			}
+		}
 
 		val slice = result.slice(minPointIdx, result.size - 1)
 		val deg60: Double = Degree(40).radian.value

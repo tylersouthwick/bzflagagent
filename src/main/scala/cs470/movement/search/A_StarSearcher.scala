@@ -14,7 +14,7 @@ object AStarSearch {
 	def apply(occgrid : Occgrid, tank : Tank, goal : Point) = {
 		val myoccgrid = occgrid
 		val mygoal = goal
-		new A_StarSearcher {
+		new A_StarSearcher with PenalizedUniformCostSearch {
 			val goal = mygoal
 			val start = tank.location
 			val tankId = tank.tankId

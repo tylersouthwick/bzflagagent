@@ -64,6 +64,10 @@ trait Threading {
 	def loop(callback : => Unit) {
 		while (true) callback
 	}
+
+	def loop(whileTrue : => Boolean) (callback : => Unit) {
+		while (whileTrue) callback
+	}
 }
 
 

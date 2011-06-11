@@ -4,13 +4,11 @@ import org.ejml.simple.SimpleMatrix
 import cs470.utils.Properties
 import org.ejml.alg.dense.decomposition.DecompositionFactory
 import org.ejml.ops.CommonOps
-import cs470.bzrc.Enemy
-import java.util.Date
 import cs470.domain.Point
 
-case class KalmanFilter(enemy : Enemy) {
+class KalmanFilter(callsign : String, location : => Point) {
 	var mu = new SimpleMatrix(Array(Array(0.0, 0.0, 0.0, 0.0, 0.0, 0.0))).transpose()
-	val name = "kalman_filter_" + enemy.callsign
+	val name = "kalman_filter_" + callsign
 	val lock = new Object
 
 	var sigma : SimpleMatrix = {
@@ -74,7 +72,7 @@ case class KalmanFilter(enemy : Enemy) {
 	val Ht = H.transpose()
 
 	val positionNoise = new {
-		val positionNoise  = Properties("positionNoise", 5.0)
+		val positionNoise  = Properties("positionNoise", 3.0)
 		val x = positionNoise
 		val y = positionNoise
 	}
@@ -114,8 +112,8 @@ case class KalmanFilter(enemy : Enemy) {
 		val ft = f.transpose()
 
 		val zt = {
-			val location = enemy.location
-			val data = Array(location.x, location.y)
+			val position = location
+			val data = Array(position.x, position.y)
 			new SimpleMatrix(Array(data)).transpose()
 		}
 
@@ -124,11 +122,15 @@ case class KalmanFilter(enemy : Enemy) {
 		mu = f * mu + K * (zt - H * f * mu)
 		sigma = (I - K * H) * temp
 
+		//println("updated kalman [" + enemy + "]")
+		//println(mu)
+		/*
 		if(vcount > 10){
 			vcount = 0
 			visualize(dt)
 		}
 		vcount = vcount + 1
+		*/
 	}
 
 	private def sampleFromNormalDistribution(mu : SimpleMatrix, sigma : SimpleMatrix) = {

@@ -28,9 +28,10 @@ trait PFVisualizer extends Visualizer {
   private lazy val vec_len = 0.75 * worldsize.asInstanceOf[Double] / samples.asInstanceOf[Double]
 
 
-  override def draw() {
-    super.draw()
+  override def draw() = {
+    val f = super.draw()
     close()
+	  f
   }
 
   override def plot() {
@@ -150,13 +151,14 @@ trait Visualizer {
 
   private lazy val file = new PrintWriter(new BufferedOutputStream(new FileOutputStream(filename)))
 
-  def draw() {
+  def draw() = {
     LOG.info("Opening file for visualization for " + name + " to: " + filename)
 
     saveInfo()
     setGnuPlotHeader()
     drawObjects()
     plot()
+	filename
   }
 
   def plotLines() {

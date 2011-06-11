@@ -3,8 +3,8 @@ package cs470.domain
 import collection.mutable.{HashMap, LinkedList}
 import cs470.domain._
 import Constants._
-import cs470.bzrc.{Tank, RefreshableEnemies, DataStore}
 import cs470.utils.{Degree, DefaultProperties, Properties}
+import cs470.bzrc.{Enemy, Tank, RefreshableEnemies, DataStore}
 
 /**
  * @author tylers2
@@ -26,6 +26,19 @@ trait Occgrid {
 	def getLocation(x: Int, y: Int): Point
 
 	def print: String
+
+	import java.lang.Math._
+	def hasLineOfSight(start : Point, end : Point) : Boolean = {
+		val (s, e) = (convert(start), convert(end))
+		val slope = (e._2 - s._2).asInstanceOf[Double]/(e._1 - s._1).asInstanceOf[Double]
+		val intercept = s._2 - slope * s._1
+		for (x <- (min(s._1, e._1) to max(s._1, e._1))) {
+			if (data(x)(floor(slope * x + intercept).asInstanceOf[Int]) == Occupant.WALL) {
+				return false
+			}
+		}
+		true
+	}
 }
 
 trait UpdateableOccgrid extends ((Int, Int) => Double) with Occgrid {
@@ -162,7 +175,7 @@ trait BayesianOccgrid extends Occgrid with UpdateableOccgrid {
 
 }
 
-class UsableOccgrid(resolution: Int, obstacles: Seq[Polygon], tankRadius: Double, val worldSize: Int, enemies: RefreshableEnemies) extends Occgrid with Traversable[Array[Occupant.Occupant]] {
+class UsableOccgrid(resolution: Int, obstacles: Seq[Polygon], tankRadius: Double, val worldSize: Int, enemies: Seq[Enemy]) extends Occgrid with Traversable[Array[Occupant.Occupant]] {
 	val alpha = math.floor(worldSize / resolution)
 	val width = resolution
 	val height = resolution
