@@ -8,3 +8,4 @@ out
 *.swo
 writeups/multiagent/graphics/*.pdf
 *.gpi
+target
