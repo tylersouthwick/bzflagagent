@@ -7,7 +7,7 @@ import cs470.bzrc.{DataStore, Tank}
  */
 
 case class Dalek(tank: Tank, store: DataStore) extends Agent(tank, store) {
-	val LOG = org.apache.log4j.Logger.getLogger(classOf[Dalek])
+	import cs470.agents.Dalek._
 
 	def apply() {
 		LOG.info(tank.callsign + " is a dalek!")
@@ -15,4 +15,8 @@ case class Dalek(tank: Tank, store: DataStore) extends Agent(tank, store) {
 		LOG.info(tank.callsign + " is going for " + enemy.callsign)
 		move(enemy.location)
 	}
+}
+
+object Dalek {
+	val LOG = org.apache.log4j.Logger.getLogger(classOf[Dalek])
 }
