@@ -19,7 +19,7 @@ abstract class Agent(tank : Tank, store : DataStore) extends Threading {
 
 	def apply()
 
-	def start() {
+	final def start() {
 		actor {
 			println("test")
 			apply()
@@ -27,7 +27,7 @@ abstract class Agent(tank : Tank, store : DataStore) extends Threading {
 		}
 	}
 
-	def move(goal : Point) {
+	final def move(goal : Point) {
 		val path = AStarSearch(occgrid, tank, goal)
 		val searchPath = new SearchPath(store, path)
 
