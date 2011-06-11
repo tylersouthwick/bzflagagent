@@ -5,9 +5,9 @@ import cs470.filters.KalmanFilter
 import cs470.domain._
 import Constants._
 import java.util.concurrent.CountDownLatch
-import cs470.bzrc.{DataStore, RefreshableData, Enemy}
+import cs470.bzrc.{Tank, DataStore, RefreshableData, Enemy}
 
-class KalmanAgent(store : DataStore) extends Agent(store) with Threading {
+class KalmanAgent(tank : Tank, store : DataStore) extends Agent(tank, store) with Threading {
 	import KalmanAgent._
 	def time = new java.util.Date().getTime
 
@@ -15,8 +15,6 @@ val shotspeed : Int = constants("shotspeed")
 val bulletVelocity = shotspeed
 
 	def apply() {
-		val tank = myTanks(0)
-
 		implicit object ClosestEnemy extends Ordering[Enemy] {
 			def compare(x: Enemy, y: Enemy) = {
 				x.location.distance(tank.location) compareTo y.location.distance(tank.location)

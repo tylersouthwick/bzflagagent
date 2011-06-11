@@ -11,7 +11,7 @@ trait IterativeDeepeningSearch extends Searcher with DepthLimitedSearcher {
       depth =>
         LOG.debug("depth: " + depth)
         explored.clear()
-        visualizer.clear()
+        //visualizer.clear()
 
         val result = depthSearch(start, depth)
         if (result != null && isGoal(result)) {
@@ -21,7 +21,7 @@ trait IterativeDeepeningSearch extends Searcher with DepthLimitedSearcher {
         System.gc()
     }
 
-    visualizer.close()
+    //visualizer.close()
     throw new IllegalStateException("did not find path")
 
   }

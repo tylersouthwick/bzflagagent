@@ -26,7 +26,7 @@ trait DepthLimitedSearcher extends Searcher {
         return node
       } else if (node.depth != limit) {
         val children = node.filter(!_.visited).filter(!frontier.contains(_)).filter(_.occupant == Occupant.NONE).filter(_.depth < limit)
-        visualizer.drawSearchNodes(children map (child => (node.location, child.location)))
+        //visualizer.drawSearchNodes(children map (child => (node.location, child.location)))
         node.visited = true
         children.foreach(frontier.push)
       }

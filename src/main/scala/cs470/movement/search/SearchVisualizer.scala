@@ -3,33 +3,35 @@ package cs470.movement.search
 import cs470.visualization.{SearchVisualizer => Visualizer}
 import cs470.bzrc.DataStore
 import cs470.domain.Constants._
-import cs470.domain.Point
 
-trait SearchVisualizer {
-  val filename: String
-  val datastore: DataStore
-  val title: String
+trait SearchVisualizer extends Searcher {
+	val filename: String
+	val datastore: DataStore
 
-  lazy val visualizer = {
-	  /*
+	lazy val visualizer = {
+		val tmp = new Visualizer {
+			val fileName = filename
+			val name = "Search Visualizer"
+			val worldsize: Int = datastore.constants("worldsize")
+			val obstacleList = datastore.obstacles
+			val plotTitle = title
+		}
+		tmp.draw()
+		tmp
+	}
 
-    val tmp = new Visualizer {
-      val fileName = filename
-      val name = "Search Visualizer"
-      val worldsize: Int = datastore.constants("worldsize")
-      val obstacleList = datastore.obstacles
-      val plotTitle = title
-    }
-    tmp.draw()
-    tmp
-	  */
-	  new {
-		  def close() {}
-		  def clear() {}
-		  def drawSearchNodes(s : Traversable[(Point, Point)]) {}
-		  def drawFinalPath(s : Traversable[(Point, Point)]) {}
-	  }
-  }
+	override def search = {
+		val points = super.search
+		visualizer.drawFinalPath(points.zipWithIndex map {
+			case (point, idx) => {
+				if (idx + 1 < points.length) {
+					(point, points(idx + 1))
+				} else {
+					(point, point)
+				}
+			}
+		})
 
-
+		points
+	}
 }

@@ -147,7 +147,7 @@ abstract class MovingPDController(goal : Point, tank: Tank, store : DataStore) e
 
 	protected def distance = goal.distance(tank.location)
 
-	def inRange(vector: Vector) = distance > howClose
+	def inRange(vector: Vector) = distance < howClose
 
 	private val ZERO = Radian(0)
 
