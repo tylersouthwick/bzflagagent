@@ -73,6 +73,7 @@ abstract class Tank(queue: BzrcQueue, tanks: RefreshableTanks) extends Threading
   def callsign: String
 
   def dead = "dead" == status
+	def alive = "alive" == status
 
   def setSpeed(s: Double) {
     queue.invoke {

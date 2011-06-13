@@ -7,6 +7,7 @@ import cs470.utils.{MovingPDController, Radian}
 import cs470.movement.PotentialFieldGenerator
 import cs470.domain.{Point, Vector}
 import cs470.visualization.PFVisualizer
+import javax.management.remote.rmi._RMIConnection_Stub
 
 /**
  * @author tylers2
@@ -19,11 +20,18 @@ object Decoy {
 case class Decoy(tank : Tank, store : DataStore) extends Agent(tank, store) {
 	import Decoy._
 
-	val team = store.constants("team")
+	import java.lang.Math.PI
 	def apply() {
 		LOG.info(tank.callsign + " is a DECOY!")
-		sleep(2000)
+		val angle = tank.angle.radian
+		if (angle >= Radian(PI / 2.0) && angle <= Radian(3.0 * PI / 4.0)) {
+			tank.setSpeed(-1)
+		} else {
+			tank.setSpeed(1)
+		}
+		sleep(5000)
 		//go part way to flag
+		/*
 		val flags = store.flags.filter(_.color != team)
 		val goal = flags.last.location
 		val searcher = findPath(goal)
@@ -32,18 +40,27 @@ case class Decoy(tank : Tank, store : DataStore) extends Agent(tank, store) {
 
 			howClose = 200
 		}.move()
+		*/
 
-		for (enemy <- store.enemies) {
-			killEnemy(enemy)
+		loop(tank.alive && enemies.filter(_.dead).isEmpty) {
+			killEnemy()
 		}
+
+		if (tank.alive) {
+			LOG.info(tank.callsign + " Is becoming a Flag Getter")
+			new FlagGetter(tank.location, tank, store).apply()
+		}
+
 	}
 
-	def killEnemy(enemy : Enemy) {
+	def enemy = enemies.getClosest(tank.location)
+
+	def killEnemy() {
 		//circle enemy
-		def searcher = new PotentialFieldGenerator(store) {
+		val searcher = new PotentialFieldGenerator(store) {
 			def getPathVector(point: Point) = {
 				val distance = 50
-				val goal = enemy.location
+				val goal = enemy.predict(500)
 				val towards = AttractivePF(point, goal, distance, distance + 50, 10)
 				val away = ReflectivePF(point, goal, 5, distance - 5, 30)
 				val around = TangentialPF(point, goal, distance - 10, 20, 30, true)
@@ -66,6 +83,9 @@ case class Decoy(tank : Tank, store : DataStore) extends Agent(tank, store) {
 
 		new MovingPDController(Point.ORIGIN, tank, store) {
 			def direction = searcher.getPathVector(tank.location)
+
+			override def getTurningSpeed(angle: Double) = .7
+
 			override def inRange(vector: Vector) = enemy.dead
 		}.move()
 	}

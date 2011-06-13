@@ -1,12 +1,11 @@
 package cs470.agents
+
 import cs470.bzrc.{Tank, DataStore}
 import cs470.movement.search.AStarSearch
-import cs470.utils.{Threading, MovingPDController}
 import cs470.movement.{pfGotoPoint, SearchPath}
-import cs470.domain.{Vector, Point}
+import cs470.domain._
 import cs470.domain.Constants._
-import sun.java2d.pipe.LoopPipe
-import javax.management.remote.rmi._RMIConnection_Stub
+import cs470.utils.{Radian, Threading}
 
 abstract class Agent(tank : Tank, store : DataStore) extends Threading {
 
@@ -17,8 +16,11 @@ abstract class Agent(tank : Tank, store : DataStore) extends Threading {
 	val enemies = store.enemies
 	val bases = store.bases
 	val occgrid = store.occgrid
+	val team = constants("team")
 
 	val queue = store.queue
+
+	val otherFlag = flags.filter(_.color != team).last
 
 	def apply()
 
@@ -33,32 +35,44 @@ abstract class Agent(tank : Tank, store : DataStore) extends Threading {
 	final def findPath(goal : Point) = {
 		println("finding new path: "+ goal)
 		try {
-			val d = doAStar(goal)
+			val d = findAStarPath(goal)
 			println("a*")
 			d
 		} catch {
 			case _ => {
 				println("pf")
-				doPotentialField(goal : Point)
+				findPFPath(goal : Point)
 			}
 		}
 	}
 
-	private def doAStar(goal : Point) = {
+	final def findAStarPath(goal : Point) = {
 		val path = AStarSearch(occgrid, tank, goal)
 		new SearchPath(store, path)
 	}
 
-	private def doPotentialField(goal : Point) = new pfGotoPoint(store, goal)
+	final def findPFPath(goal : Point) = new pfGotoPoint(store, goal)
 }
 
+import java.lang.Math.PI
 object Agent extends Threading {
 	val LOG = org.apache.log4j.Logger.getLogger(classOf[Agent])
 
 	def apply(store: DataStore) {
 		LOG.info("Starting agents with " + store.tanks.size + " at our disposal")
-		store.tanks.filter(_.tankId < 8).foreach(new Decoy(_, store).start())
-		//store.tanks.filter(_.tankId >= 8).foreach(new GotoFlag(_, store).start())
+
+		val worldsize : Int = store.constants("worldsize")
+		val w = worldsize / 2 - 60
+
+		val points = Seq((w, w), (-w, w), (w, -w), (-w, -w)).map(point => new Point(point._1, point._2))
+
+		val decoys = store.tanks.filter(_.tankId < store.tanks.size - points.size)
+
+		decoys.foreach(new Decoy(_, store).start())
+
+		points.zipWithIndex.foreach{case (point, idx) =>
+			new FlagGetter(point, store.tanks(decoys.size + idx), store).start()
+		}
 
 		actor {
 			loop {
