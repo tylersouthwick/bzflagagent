@@ -39,8 +39,12 @@ class FlagGetter(position : Point, tank : Tank, store : DataStore) extends Agent
 		LOG.info(tank.callsign + " going to starting position: " + position)
 		val searcher = findPFPath(position)
 
+        val start = time
+        val timeout = 15000
+
 		new MovingPDController(position, tank, store) {
 			def direction = searcher.getPathVector(tank.location)
+            override def inRange(vector : Vector) = super.inRange(vector) || (time - start - timeout > 0)
 		}.move()
 	}
 
