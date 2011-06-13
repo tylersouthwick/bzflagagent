@@ -5,7 +5,7 @@ import cs470.movement.search.AStarSearch
 import cs470.movement.{pfGotoPoint, SearchPath}
 import cs470.domain._
 import cs470.domain.Constants._
-import cs470.utils.{Radian, Threading}
+import cs470.utils.Threading
 
 abstract class Agent(tank : Tank, store : DataStore) extends Threading {
 
@@ -21,6 +21,7 @@ abstract class Agent(tank : Tank, store : DataStore) extends Threading {
 	val queue = store.queue
 
 	val otherFlag = flags.filter(_.color != team).last
+	val mybase = store.bases.find(_.color == team).get
 
 	def apply()
 
@@ -33,14 +34,10 @@ abstract class Agent(tank : Tank, store : DataStore) extends Threading {
 	}
 
 	final def findPath(goal : Point) = {
-		println("finding new path: "+ goal)
 		try {
-			val d = findAStarPath(goal)
-			println("a*")
-			d
+			findAStarPath(goal)
 		} catch {
 			case _ => {
-				println("pf")
 				findPFPath(goal : Point)
 			}
 		}
@@ -54,7 +51,6 @@ abstract class Agent(tank : Tank, store : DataStore) extends Threading {
 	final def findPFPath(goal : Point) = new pfGotoPoint(store, goal)
 }
 
-import java.lang.Math.PI
 object Agent extends Threading {
 	val LOG = org.apache.log4j.Logger.getLogger(classOf[Agent])
 
